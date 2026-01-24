@@ -8,20 +8,30 @@ export async function GET(
   { params }: { params: Promise<{ sn: string }> }
 ) {
   try {
+    // 환경변수 체크
+    if (!SERVICE_KEY) {
+      return NextResponse.json(
+        { resultCode: 500, resultMsg: 'API key not configured', result: null },
+        { status: 500 }
+      );
+    }
+
     const { sn } = await params;
 
-    const queryParams = new URLSearchParams({
-      serviceKey: SERVICE_KEY,
-      resultType: 'json',
-      sn: sn,
-    });
+    // serviceKey는 별도로 인코딩 (이중 인코딩 방지)
+    const apiUrl = `${API_BASE_URL}/detail?serviceKey=${encodeURIComponent(SERVICE_KEY)}&resultType=json&sn=${sn}`;
 
-    const response = await fetch(`${API_BASE_URL}/detail?${queryParams.toString()}`, {
-      next: { revalidate: 3600 }, // 1시간 캐싱
+    const response = await fetch(apiUrl, {
+      next: { revalidate: 3600 },
     });
 
     if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error('API response error:', response.status, errorText);
+      return NextResponse.json(
+        { resultCode: response.status, resultMsg: `API error: ${response.status}`, result: null },
+        { status: 500 }
+      );
     }
 
     const data = await response.json();
@@ -30,7 +40,7 @@ export async function GET(
   } catch (error) {
     console.error('Job detail API error:', error);
     return NextResponse.json(
-      { resultCode: 500, resultMsg: 'Internal Server Error', result: null },
+      { resultCode: 500, resultMsg: String(error), result: null },
       { status: 500 }
     );
   }

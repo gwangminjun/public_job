@@ -10,14 +10,13 @@ const SERVICE_KEY = process.env.DATA_GO_KR_API_KEY || '';
 
 async function getJobDetail(sn: string): Promise<JobDetail | null> {
   try {
-    const params = new URLSearchParams({
-      serviceKey: SERVICE_KEY,
-      resultType: 'json',
-      sn: sn,
-    });
+    if (!SERVICE_KEY) return null;
 
-    const response = await fetch(`${API_BASE_URL}/detail?${params.toString()}`, {
-      next: { revalidate: 3600 }, // 1시간 캐싱
+    // serviceKey는 별도로 인코딩 (이중 인코딩 방지)
+    const apiUrl = `${API_BASE_URL}/detail?serviceKey=${encodeURIComponent(SERVICE_KEY)}&resultType=json&sn=${sn}`;
+
+    const response = await fetch(apiUrl, {
+      next: { revalidate: 3600 },
     });
 
     if (!response.ok) return null;
