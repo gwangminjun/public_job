@@ -1,10 +1,4 @@
 {
   "framework": "nextjs",
-  "regions": ["icn1"],
-  "crons": [
-    {
-      "path": "/api/revalidate",
-      "schedule": "0 */6 * * *"
-    }
-  ]
+  "regions": ["icn1"]
 }
