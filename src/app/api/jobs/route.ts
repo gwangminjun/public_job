@@ -15,25 +15,21 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
 
-    // URL 직접 구성 (serviceKey는 이미 인코딩된 상태로 전달)
-    const queryParams = new URLSearchParams();
-    queryParams.append('resultType', 'json');
-    queryParams.append('numOfRows', searchParams.get('limit') || '20');
-    queryParams.append('pageNo', searchParams.get('page') || '1');
-
-    // 선택적 필터 파라미터 추가
-    const keyword = searchParams.get('keyword');
-    if (keyword) {
-      queryParams.append('recrutPbancTtl', keyword);
-    }
-
+    const numOfRows = searchParams.get('limit') || '20';
+    const pageNo = searchParams.get('page') || '1';
+    const keyword = searchParams.get('keyword') || '';
     const onlyOngoing = searchParams.get('onlyOngoing');
-    if (onlyOngoing === 'true') {
-      queryParams.append('ongoingYn', 'Y');
+
+    // URL 직접 구성
+    let apiUrl = `${API_BASE_URL}/list?serviceKey=${SERVICE_KEY}&resultType=json&numOfRows=${numOfRows}&pageNo=${pageNo}`;
+
+    if (keyword) {
+      apiUrl += `&recrutPbancTtl=${encodeURIComponent(keyword)}`;
     }
 
-    // serviceKey는 별도로 추가 (이중 인코딩 방지)
-    const apiUrl = `${API_BASE_URL}/list?serviceKey=${encodeURIComponent(SERVICE_KEY)}&${queryParams.toString()}`;
+    if (onlyOngoing === 'true') {
+      apiUrl += '&ongoingYn=Y';
+    }
 
     const response = await fetch(apiUrl, {
       next: { revalidate: 300 },
@@ -43,7 +39,7 @@ export async function GET(request: NextRequest) {
       const errorText = await response.text();
       console.error('API response error:', response.status, errorText);
       return NextResponse.json(
-        { resultCode: response.status, resultMsg: `API error: ${response.status}`, result: [] },
+        { resultCode: response.status, resultMsg: `API error: ${response.status}`, result: [], debug: apiUrl.replace(SERVICE_KEY, 'HIDDEN') },
         { status: 500 }
       );
     }

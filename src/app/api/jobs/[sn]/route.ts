@@ -18,8 +18,8 @@ export async function GET(
 
     const { sn } = await params;
 
-    // serviceKey는 별도로 인코딩 (이중 인코딩 방지)
-    const apiUrl = `${API_BASE_URL}/detail?serviceKey=${encodeURIComponent(SERVICE_KEY)}&resultType=json&sn=${sn}`;
+    // URL 직접 구성 (인코딩 없이)
+    const apiUrl = `${API_BASE_URL}/detail?serviceKey=${SERVICE_KEY}&resultType=json&sn=${sn}`;
 
     const response = await fetch(apiUrl, {
       next: { revalidate: 3600 },
