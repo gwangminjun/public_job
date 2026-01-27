@@ -111,6 +111,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ sn: 
             <InfoItem label="채용구분" value={job.recrutSeNm || '-'} />
             <InfoItem label="학력요건" value={job.acbgCondNmLst || '-'} />
             <InfoItem label="직무분야" value={job.ncsCdNmLst || '-'} />
+            <InfoItem label="충원여부" value={job.replmprYn === 'Y' ? '충원' : '신규'} />
             <InfoItem
               label="공고기간"
               value={`${formatDate(job.pbancBgngYmd)} ~ ${formatDate(job.pbancEndYmd)}`}
@@ -126,10 +127,18 @@ export default async function JobDetailPage({ params }: { params: Promise<{ sn: 
           </div>
         )}
 
-        {/* 우대사항 */}
+        {/* 우대조건 */}
+        {job.prefCondCn && (
+          <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b">우대조건</h2>
+            <p className="text-gray-700 whitespace-pre-line">{job.prefCondCn}</p>
+          </div>
+        )}
+
+        {/* 우대사항(가점) */}
         {job.prefCn && (
           <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b">우대사항</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b">우대사항(가점)</h2>
             <p className="text-gray-700 whitespace-pre-line">{job.prefCn}</p>
           </div>
         )}
@@ -150,6 +159,14 @@ export default async function JobDetailPage({ params }: { params: Promise<{ sn: 
           </div>
         )}
 
+        {/* 지원방법 */}
+        {job.nonatchRsn && (
+          <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b">지원방법</h2>
+            <p className="text-gray-700 whitespace-pre-line">{job.nonatchRsn}</p>
+          </div>
+        )}
+
         {/* 하단 버튼 */}
         <div className="flex justify-center gap-4">
           <Link
@@ -158,6 +175,19 @@ export default async function JobDetailPage({ params }: { params: Promise<{ sn: 
           >
             목록으로
           </Link>
+          {job.srcUrl && (
+            <a
+              href={job.srcUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors"
+            >
+              원본 공고
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          )}
           <a
             href={`https://www.gojobs.go.kr/mobile/jobMain.do?reqNo=${job.recrutPblntSn}`}
             target="_blank"

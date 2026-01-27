@@ -14,6 +14,11 @@ export interface Job {
   acbgCondNmLst: string;        // 학력요건
   aplyQlfcCn?: string;          // 지원자격
   disqlfcRsn?: string;          // 결격사유
+  srcUrl?: string;              // 원본 공고 URL
+  prefCondCn?: string;          // 우대조건 내용
+  replmprYn?: 'Y' | 'N';        // 충원 여부
+  nonatchRsn?: string;          // 첨부파일 없는 사유
+  decimalDay?: number;          // D-day (숫자)
 }
 
 // 채용공고 상세
@@ -54,6 +59,8 @@ export interface FilterState {
   regions: string[];
   hireTypes: string[];
   recruitTypes: string[];
+  ncsTypes: string[];
+  educationTypes: string[];
   onlyOngoing: boolean;
   page: number;
   limit: number;

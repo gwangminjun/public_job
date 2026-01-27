@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useFilterStore } from '@/store/filterStore';
-import { REGIONS, HIRE_TYPES, RECRUIT_TYPES } from '@/lib/utils';
+import { REGIONS, HIRE_TYPES, RECRUIT_TYPES, NCS_TYPES, EDUCATION_TYPES } from '@/lib/utils';
 
 export function SearchFilter() {
   const {
@@ -14,6 +14,10 @@ export function SearchFilter() {
     toggleHireType,
     recruitTypes,
     toggleRecruitType,
+    ncsTypes,
+    toggleNcsType,
+    educationTypes,
+    toggleEducationType,
     onlyOngoing,
     setOnlyOngoing,
     resetFilters,
@@ -28,7 +32,7 @@ export function SearchFilter() {
   };
 
   const activeFilterCount =
-    regions.length + hireTypes.length + recruitTypes.length + (onlyOngoing ? 0 : 1);
+    regions.length + hireTypes.length + recruitTypes.length + ncsTypes.length + educationTypes.length + (onlyOngoing ? 0 : 1);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6">
@@ -132,6 +136,34 @@ export function SearchFilter() {
                   label={type}
                   isActive={recruitTypes.includes(type)}
                   onClick={() => toggleRecruitType(type)}
+                />
+              ))}
+            </div>
+          </FilterSection>
+
+          {/* NCS 직무분류 */}
+          <FilterSection title="직무분야 (NCS)">
+            <div className="flex flex-wrap gap-2">
+              {NCS_TYPES.map((type) => (
+                <FilterChip
+                  key={type}
+                  label={type}
+                  isActive={ncsTypes.includes(type)}
+                  onClick={() => toggleNcsType(type)}
+                />
+              ))}
+            </div>
+          </FilterSection>
+
+          {/* 학력정보 */}
+          <FilterSection title="학력">
+            <div className="flex flex-wrap gap-2">
+              {EDUCATION_TYPES.map((type) => (
+                <FilterChip
+                  key={type}
+                  label={type}
+                  isActive={educationTypes.includes(type)}
+                  onClick={() => toggleEducationType(type)}
                 />
               ))}
             </div>
