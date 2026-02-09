@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFilterStore } from '@/store/filterStore';
 import { REGIONS, HIRE_TYPES, RECRUIT_TYPES, NCS_TYPES, EDUCATION_TYPES } from '@/lib/utils';
 
@@ -25,6 +25,10 @@ export function SearchFilter() {
 
   const [searchInput, setSearchInput] = useState(keyword);
   const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => {
+    setSearchInput(keyword);
+  }, [keyword]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

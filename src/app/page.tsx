@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { Suspense, useState, useMemo } from 'react';
 import { Header } from '@/components/layout/Header';
 import { SearchFilter } from '@/components/layout/SearchFilter';
+import { UrlFilterSync } from '@/components/layout/UrlFilterSync';
 import { Footer } from '@/components/layout/Footer';
 import { StatsPanel } from '@/components/stats/StatsPanel';
 import { JobList } from '@/components/jobs/JobList';
@@ -41,6 +42,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Suspense fallback={null}>
+        <UrlFilterSync />
+      </Suspense>
+
       <Header />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 py-8 w-full">

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { FilterState } from '@/lib/types';
 
 interface FilterStore extends FilterState {
+  setFilters: (filters: Partial<FilterState>) => void;
   setKeyword: (keyword: string) => void;
   setRegions: (regions: string[]) => void;
   toggleRegion: (region: string) => void;
@@ -33,6 +34,8 @@ const initialState: FilterState = {
 
 export const useFilterStore = create<FilterStore>((set) => ({
   ...initialState,
+
+  setFilters: (filters) => set((state) => ({ ...state, ...filters })),
 
   setKeyword: (keyword) => set({ keyword, page: 1 }),
 
