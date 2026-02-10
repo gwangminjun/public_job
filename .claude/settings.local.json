@@ -4,7 +4,9 @@
       "Bash(npm run dev:*)",
       "Bash(npm run build:*)",
       "Bash(tree:*)",
-      "Bash(head:*)"
+      "Bash(head:*)",
+      "Bash(npx next build:*)",
+      "WebSearch"
     ]
   }
 }
