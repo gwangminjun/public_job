@@ -18,6 +18,7 @@ export function Footer() {
           <p className="text-xs mt-2 text-gray-500">
             &copy; {new Date().getFullYear()} Public Job Portal. All rights reserved.
           </p>
+          <p className="text-xs mt-1 text-gray-600">v0.1.0</p>
         </div>
       </div>
     </footer>
