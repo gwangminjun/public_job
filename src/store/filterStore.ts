@@ -31,7 +31,7 @@ const initialState: FilterState = {
   onlyOngoing: true,
   sort: 'latest',
   page: 1,
-  limit: 20,
+  limit: 21,
 };
 
 export const useFilterStore = create<FilterStore>((set) => ({

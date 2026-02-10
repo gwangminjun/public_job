@@ -83,7 +83,6 @@ export function useJobs(statFilter: string = '') {
       statFilter,
     }),
     staleTime: 1000 * 60 * 5, // 5분
-    placeholderData: (previousData) => previousData,
   });
 }
 
