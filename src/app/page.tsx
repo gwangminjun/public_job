@@ -12,13 +12,12 @@ import { Pagination } from '@/components/ui/Pagination';
 import { useJobs } from '@/hooks/useJobs';
 import { useFilterStore } from '@/store/filterStore';
 import { Job } from '@/lib/types';
-import { isEndingSoon, isNewJob } from '@/lib/utils';
 
 export default function Home() {
-  const { data, isLoading, error } = useJobs();
-  const { page, limit, setPage } = useFilterStore();
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [activeStatFilter, setActiveStatFilter] = useState<StatType | null>(null);
+  const { data, isLoading, error } = useJobs(activeStatFilter || '');
+  const { page, limit, setPage } = useFilterStore();
 
   // API에서 전체 기준 통계 사용
   const stats = useMemo(() => {
@@ -29,29 +28,13 @@ export default function Home() {
   }, [data?.stats]);
 
   const handleStatClick = useCallback((type: StatType) => {
-    // 같은 카드를 다시 누르면 필터 해제, 또는 '전체 채용'/'등록 기관'은 해제만
     if (activeStatFilter === type || type === 'total' || type === 'institutions') {
       setActiveStatFilter(null);
-      return;
+    } else {
+      setActiveStatFilter(type);
     }
-    setActiveStatFilter(type);
-  }, [activeStatFilter]);
-
-  const filteredJobs = useMemo(() => {
-    const jobs = data?.result || [];
-    if (!activeStatFilter || activeStatFilter === 'total') return jobs;
-
-    switch (activeStatFilter) {
-      case 'endingSoon':
-        return jobs.filter((j) => isEndingSoon(j.pbancEndYmd));
-      case 'newJobs':
-        return jobs.filter((j) => isNewJob(j.pbancBgngYmd));
-      case 'institutions':
-        return jobs;
-      default:
-        return jobs;
-    }
-  }, [data?.result, activeStatFilter]);
+    setPage(1);
+  }, [activeStatFilter, setPage]);
 
   const totalPages = Math.ceil((data?.totalCount || 0) / limit);
 
@@ -91,21 +74,13 @@ export default function Home() {
         {/* 결과 카운트 */}
         {!isLoading && data && (
           <p className="text-sm text-gray-500 mb-4">
-            {activeStatFilter && activeStatFilter !== 'total' ? (
-              <>
-                필터 적용: <span className="font-semibold text-gray-900">{filteredJobs.length.toLocaleString()}</span>개의 채용공고
-              </>
-            ) : (
-              <>
-                총 <span className="font-semibold text-gray-900">{data.totalCount?.toLocaleString()}</span>개의 채용공고
-              </>
-            )}
+            총 <span className="font-semibold text-gray-900">{data.totalCount?.toLocaleString()}</span>개의 채용공고
           </p>
         )}
 
         {/* 채용 목록 */}
         <JobList
-          jobs={filteredJobs}
+          jobs={data?.result || []}
           isLoading={isLoading}
           onJobClick={setSelectedJob}
         />

@@ -15,6 +15,7 @@ async function fetchJobs(params: {
   educationTypes: string[];
   onlyOngoing: boolean;
   sort: string;
+  statFilter: string;
 }): Promise<JobListResponse> {
   const searchParams = new URLSearchParams({
     page: params.page.toString(),
@@ -29,6 +30,7 @@ async function fetchJobs(params: {
   if (params.recruitTypes.length > 0) searchParams.append('recruitTypes', params.recruitTypes.join(','));
   if (params.ncsTypes.length > 0) searchParams.append('ncsTypes', params.ncsTypes.join(','));
   if (params.educationTypes.length > 0) searchParams.append('educationTypes', params.educationTypes.join(','));
+  if (params.statFilter) searchParams.append('statFilter', params.statFilter);
 
   const response = await fetch(`/api/jobs?${searchParams.toString()}`);
 
@@ -39,44 +41,46 @@ async function fetchJobs(params: {
   return response.json();
 }
 
-export function useJobs() {
-  const { 
-    page, 
-    limit, 
-    keyword, 
-    onlyOngoing, 
-    regions, 
-    hireTypes, 
-    recruitTypes, 
-    ncsTypes, 
+export function useJobs(statFilter: string = '') {
+  const {
+    page,
+    limit,
+    keyword,
+    onlyOngoing,
+    regions,
+    hireTypes,
+    recruitTypes,
+    ncsTypes,
     educationTypes,
     sort
   } = useFilterStore();
 
   return useQuery({
-    queryKey: ['jobs', { 
-      page, 
-      limit, 
-      keyword, 
-      onlyOngoing, 
-      regions, 
-      hireTypes, 
-      recruitTypes, 
-      ncsTypes, 
+    queryKey: ['jobs', {
+      page,
+      limit,
+      keyword,
+      onlyOngoing,
+      regions,
+      hireTypes,
+      recruitTypes,
+      ncsTypes,
       educationTypes,
-      sort
+      sort,
+      statFilter,
     }],
-    queryFn: () => fetchJobs({ 
-      page, 
-      limit, 
-      keyword, 
-      regions, 
-      hireTypes, 
-      recruitTypes, 
-      ncsTypes, 
+    queryFn: () => fetchJobs({
+      page,
+      limit,
+      keyword,
+      regions,
+      hireTypes,
+      recruitTypes,
+      ncsTypes,
       educationTypes,
       onlyOngoing,
-      sort
+      sort,
+      statFilter,
     }),
     staleTime: 1000 * 60 * 5, // 5분
     placeholderData: (previousData) => previousData,

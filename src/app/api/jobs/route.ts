@@ -53,6 +53,7 @@ export async function GET(request: NextRequest) {
     const educationTypes = searchParams.get('educationTypes')?.split(',') || [];
     const onlyOngoing = searchParams.get('onlyOngoing') === 'true';
     const sort = searchParams.get('sort') || 'latest';
+    const statFilter = searchParams.get('statFilter') || '';
 
     // 1. Check Cache & Fetch if needed
     const now = Date.now();
@@ -149,8 +150,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // 4. Stats (전체 필터 결과 기준)
-    const totalCount = filteredJobs.length;
+    // 4. Stats (전체 필터 결과 기준, statFilter 적용 전)
     const endingSoonCount = filteredJobs.filter(job => {
       const dDay = job.decimalDay;
       return dDay !== undefined && dDay >= 0 && dDay <= 3;
@@ -164,8 +164,27 @@ export async function GET(request: NextRequest) {
       return startDate > weekAgo;
     }).length;
     const institutionsCount = new Set(filteredJobs.map(job => job.instNm)).size;
+    const statsTotal = filteredJobs.length;
 
-    // 5. Pagination
+    // 5. statFilter 적용 (페이지네이션 전)
+    if (statFilter === 'endingSoon') {
+      filteredJobs = filteredJobs.filter(job => {
+        const dDay = job.decimalDay;
+        return dDay !== undefined && dDay >= 0 && dDay <= 3;
+      });
+    } else if (statFilter === 'newJobs') {
+      filteredJobs = filteredJobs.filter(job => {
+        if (!job.pbancBgngYmd) return false;
+        const formatted = `${job.pbancBgngYmd.slice(0, 4)}-${job.pbancBgngYmd.slice(4, 6)}-${job.pbancBgngYmd.slice(6, 8)}`;
+        const startDate = new Date(formatted);
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return startDate > weekAgo;
+      });
+    }
+
+    // 6. Pagination
+    const totalCount = filteredJobs.length;
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     const paginatedJobs = filteredJobs.slice(startIndex, endIndex);
@@ -176,7 +195,7 @@ export async function GET(request: NextRequest) {
       totalCount: totalCount,
       result: paginatedJobs,
       stats: {
-        totalCount,
+        totalCount: statsTotal,
         endingSoon: endingSoonCount,
         newJobs: newJobsCount,
         institutions: institutionsCount,
