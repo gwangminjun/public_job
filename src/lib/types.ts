@@ -62,9 +62,12 @@ export interface FilterState {
   ncsTypes: string[];
   educationTypes: string[];
   onlyOngoing: boolean;
+  sort: SortType;
   page: number;
   limit: number;
 }
+
+export type SortType = 'latest' | 'deadline' | 'personnel';
 
 // 통계
 export interface Stats {

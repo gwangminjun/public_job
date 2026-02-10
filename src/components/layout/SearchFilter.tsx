@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useFilterStore } from '@/store/filterStore';
 import { REGIONS, HIRE_TYPES, RECRUIT_TYPES, NCS_TYPES, EDUCATION_TYPES } from '@/lib/utils';
+import { SortType } from '@/lib/types';
 
 export function SearchFilter() {
   const {
@@ -20,11 +21,14 @@ export function SearchFilter() {
     toggleEducationType,
     onlyOngoing,
     setOnlyOngoing,
+    sort,
+    setSort,
     resetFilters,
   } = useFilterStore();
 
   const [searchInput, setSearchInput] = useState(keyword);
   const [showFilters, setShowFilters] = useState(false);
+
 
   useEffect(() => {
     setSearchInput(keyword);
@@ -72,8 +76,8 @@ export function SearchFilter() {
         </button>
       </form>
 
-      {/* 필터 토글 버튼 */}
-      <div className="flex items-center justify-between mt-4">
+      {/* 필터 토글 버튼 및 정렬/옵션 */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-4 gap-4">
         <button
           onClick={() => setShowFilters(!showFilters)}
           className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
@@ -86,19 +90,32 @@ export function SearchFilter() {
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
-          필터 {activeFilterCount > 0 && `(${activeFilterCount})`}
+          상세 필터 {activeFilterCount > 0 && `(${activeFilterCount})`}
         </button>
 
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={onlyOngoing}
-            onChange={(e) => setOnlyOngoing(e.target.checked)}
-            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-          />
-          <span className="text-sm text-gray-600">진행중인 공고만</span>
-        </label>
+        <div className="flex items-center gap-4">
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortType)}
+            className="text-sm border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1.5 px-3"
+          >
+            <option value="latest">최신순</option>
+            <option value="deadline">마감임박순</option>
+            <option value="personnel">채용인원순</option>
+          </select>
+
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={onlyOngoing}
+              onChange={(e) => setOnlyOngoing(e.target.checked)}
+              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+            />
+            <span className="text-sm text-gray-600">진행중인 공고만</span>
+          </label>
+        </div>
       </div>
+
 
       {/* 상세 필터 */}
       {showFilters && (

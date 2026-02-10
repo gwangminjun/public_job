@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { FilterState } from '@/lib/types';
+import { FilterState, SortType } from '@/lib/types';
 
 interface FilterStore extends FilterState {
   setFilters: (filters: Partial<FilterState>) => void;
@@ -17,6 +17,7 @@ interface FilterStore extends FilterState {
   setOnlyOngoing: (onlyOngoing: boolean) => void;
   setPage: (page: number) => void;
   setLimit: (limit: number) => void;
+  setSort: (sort: SortType) => void;
   resetFilters: () => void;
 }
 
@@ -28,6 +29,7 @@ const initialState: FilterState = {
   ncsTypes: [],
   educationTypes: [],
   onlyOngoing: true,
+  sort: 'latest',
   page: 1,
   limit: 20,
 };
@@ -40,6 +42,7 @@ export const useFilterStore = create<FilterStore>((set) => ({
   setKeyword: (keyword) => set({ keyword, page: 1 }),
 
   setRegions: (regions) => set({ regions, page: 1 }),
+
 
   toggleRegion: (region) => set((state) => ({
     regions: state.regions.includes(region)
@@ -89,6 +92,8 @@ export const useFilterStore = create<FilterStore>((set) => ({
   setPage: (page) => set({ page }),
 
   setLimit: (limit) => set({ limit, page: 1 }),
+
+  setSort: (sort) => set({ sort, page: 1 }),
 
   resetFilters: () => set(initialState),
 }));
