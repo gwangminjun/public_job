@@ -14,13 +14,14 @@ interface StatsPanelProps {
 }
 
 export function StatsPanel({ totalCount, endingSoon, newJobs, institutions, activeStatFilter, onStatClick }: StatsPanelProps) {
-  const stats: { key: StatType; label: string; value: number; suffix: string; subLabel?: string; color: string }[] = [
+  const stats: { key: StatType; label: string; value: number; suffix: string; subLabel?: string; color: string; desc: string }[] = [
     {
       key: 'total',
       label: '전체 채용',
       value: totalCount,
       suffix: '건',
       color: 'from-blue-500 to-blue-600',
+      desc: '필터 초기화',
     },
     {
       key: 'endingSoon',
@@ -29,6 +30,7 @@ export function StatsPanel({ totalCount, endingSoon, newJobs, institutions, acti
       suffix: '건',
       subLabel: '(3일 이내)',
       color: 'from-red-500 to-red-600',
+      desc: '마감 임박 공고만 보기',
     },
     {
       key: 'newJobs',
@@ -37,6 +39,7 @@ export function StatsPanel({ totalCount, endingSoon, newJobs, institutions, acti
       suffix: '건',
       subLabel: '(7일 이내)',
       color: 'from-green-500 to-green-600',
+      desc: '신규 등록 공고만 보기',
     },
     {
       key: 'institutions',
@@ -44,6 +47,7 @@ export function StatsPanel({ totalCount, endingSoon, newJobs, institutions, acti
       value: institutions,
       suffix: '개',
       color: 'from-purple-500 to-purple-600',
+      desc: '필터 초기화',
     },
   ];
 
@@ -65,6 +69,7 @@ export function StatsPanel({ totalCount, endingSoon, newJobs, institutions, acti
             {stat.subLabel && (
               <p className="text-xs opacity-75 mt-1">{stat.subLabel}</p>
             )}
+            <p className="text-xs opacity-60 mt-2 border-t border-white/20 pt-2">{stat.desc}</p>
           </button>
         );
       })}
