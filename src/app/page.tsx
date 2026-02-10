@@ -16,56 +16,26 @@ import { isEndingSoon, isNewJob } from '@/lib/utils';
 
 export default function Home() {
   const { data, isLoading, error } = useJobs();
-  const { page, limit, setPage, setSort, resetFilters } = useFilterStore();
+  const { page, limit, setPage } = useFilterStore();
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [activeStatFilter, setActiveStatFilter] = useState<StatType | null>(null);
 
-  // 통계 계산
+  // API에서 전체 기준 통계 사용
   const stats = useMemo(() => {
-    if (!data?.result) {
+    if (!data?.stats) {
       return { totalCount: 0, endingSoon: 0, newJobs: 0, institutions: 0 };
     }
-
-    const jobs = data.result;
-    const endingSoon = jobs.filter((j) => isEndingSoon(j.pbancEndYmd)).length;
-    const newJobs = jobs.filter((j) => isNewJob(j.pbancBgngYmd)).length;
-    const institutions = new Set(jobs.map((j) => j.instNm)).size;
-
-    return {
-      totalCount: data.totalCount || jobs.length,
-      endingSoon,
-      newJobs,
-      institutions,
-    };
-  }, [data]);
+    return data.stats;
+  }, [data?.stats]);
 
   const handleStatClick = useCallback((type: StatType) => {
-    // 같은 카드를 다시 누르면 필터 해제
-    if (activeStatFilter === type) {
+    // 같은 카드를 다시 누르면 필터 해제, 또는 '전체 채용'/'등록 기관'은 해제만
+    if (activeStatFilter === type || type === 'total' || type === 'institutions') {
       setActiveStatFilter(null);
-      resetFilters();
       return;
     }
-
     setActiveStatFilter(type);
-
-    switch (type) {
-      case 'total':
-        resetFilters();
-        break;
-      case 'endingSoon':
-        resetFilters();
-        setSort('deadline');
-        break;
-      case 'newJobs':
-        resetFilters();
-        setSort('latest');
-        break;
-      case 'institutions':
-        resetFilters();
-        break;
-    }
-  }, [activeStatFilter, resetFilters, setSort]);
+  }, [activeStatFilter]);
 
   const filteredJobs = useMemo(() => {
     const jobs = data?.result || [];

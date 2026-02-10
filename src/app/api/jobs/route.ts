@@ -149,8 +149,23 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // 4. Pagination
+    // 4. Stats (전체 필터 결과 기준)
     const totalCount = filteredJobs.length;
+    const endingSoonCount = filteredJobs.filter(job => {
+      const dDay = job.decimalDay;
+      return dDay !== undefined && dDay >= 0 && dDay <= 3;
+    }).length;
+    const newJobsCount = filteredJobs.filter(job => {
+      if (!job.pbancBgngYmd) return false;
+      const formatted = `${job.pbancBgngYmd.slice(0, 4)}-${job.pbancBgngYmd.slice(4, 6)}-${job.pbancBgngYmd.slice(6, 8)}`;
+      const startDate = new Date(formatted);
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      return startDate > weekAgo;
+    }).length;
+    const institutionsCount = new Set(filteredJobs.map(job => job.instNm)).size;
+
+    // 5. Pagination
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     const paginatedJobs = filteredJobs.slice(startIndex, endIndex);
@@ -159,7 +174,13 @@ export async function GET(request: NextRequest) {
       resultCode: 200,
       resultMsg: 'Success',
       totalCount: totalCount,
-      result: paginatedJobs
+      result: paginatedJobs,
+      stats: {
+        totalCount,
+        endingSoon: endingSoonCount,
+        newJobs: newJobsCount,
+        institutions: institutionsCount,
+      },
     };
 
     return NextResponse.json(response);

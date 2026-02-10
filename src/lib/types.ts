@@ -45,6 +45,7 @@ export interface JobListResponse {
   resultMsg: string;
   totalCount: number;
   result: Job[];
+  stats?: Stats;
 }
 
 export interface JobDetailResponse {
