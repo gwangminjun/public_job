@@ -28,7 +28,7 @@ export default function Home() {
   }, [data?.stats]);
 
   const handleStatClick = useCallback((type: StatType) => {
-    if (activeStatFilter === type || type === 'total' || type === 'institutions') {
+    if (activeStatFilter === type || type === 'total') {
       setActiveStatFilter(null);
     } else {
       setActiveStatFilter(type);

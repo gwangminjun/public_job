@@ -181,6 +181,9 @@ export async function GET(request: NextRequest) {
         weekAgo.setDate(weekAgo.getDate() - 7);
         return startDate > weekAgo;
       });
+    } else if (statFilter === 'institutions') {
+      // 기관명 기준 정렬 (같은 기관끼리 모아보기)
+      filteredJobs.sort((a, b) => (a.instNm || '').localeCompare(b.instNm || '', 'ko'));
     }
 
     // 6. Pagination

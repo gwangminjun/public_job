@@ -47,7 +47,7 @@ export function StatsPanel({ totalCount, endingSoon, newJobs, institutions, acti
       value: institutions,
       suffix: '개',
       color: 'from-purple-500 to-purple-600',
-      desc: '필터 초기화',
+      desc: '기관별 모아보기',
     },
   ];
 
