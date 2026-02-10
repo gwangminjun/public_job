@@ -10,6 +10,7 @@ import {
 } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { ShareButton } from '@/components/ui/ShareButton';
 import Link from 'next/link';
 
 interface JobModalProps {
@@ -44,9 +45,11 @@ export function JobModal({ job, onClose }: JobModalProps) {
   const detail = data?.result;
   const endingSoon = isEndingSoon(job.pbancEndYmd);
   const ddayText = getDdayText(job.pbancEndYmd);
+  const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/jobs/${job.recrutPblntSn}` : '';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -161,20 +164,30 @@ export function JobModal({ job, onClose }: JobModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-gray-100 bg-gray-50">
-          <Link
-            href={`/jobs/${job.recrutPblntSn}`}
-            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-          >
-            상세 페이지로 이동
-          </Link>
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col md:flex-row items-center justify-between p-6 border-t border-gray-100 bg-gray-50 gap-4">
+          <div className="flex items-center gap-3 w-full md:w-auto justify-center md:justify-start">
+            <Link
+              href={`/jobs/${job.recrutPblntSn}`}
+              className="text-sm text-blue-600 hover:text-blue-800 font-medium whitespace-nowrap"
+            >
+              상세 페이지
+            </Link>
+            <div className="w-px h-4 bg-gray-300 mx-1"></div>
+            <ShareButton
+              title={job.recrutPbancTtl}
+              text={`${job.instNm} 채용공고를 확인해보세요!`}
+              url={shareUrl}
+              className="bg-white border border-gray-200 hover:bg-gray-50 text-xs px-3 py-1.5"
+            />
+          </div>
+
+          <div className="flex items-center gap-3 w-full md:w-auto justify-center md:justify-end">
             {(detail?.srcUrl || job.srcUrl) && (
               <a
                 href={detail?.srcUrl || job.srcUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 text-white text-sm rounded-lg font-medium hover:bg-gray-700 transition-colors whitespace-nowrap"
               >
                 원본 공고
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -186,9 +199,9 @@ export function JobModal({ job, onClose }: JobModalProps) {
               href={`https://www.gojobs.go.kr/mobile/jobMain.do?reqNo=${job.recrutPblntSn}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2 bg-blue-600 text-white text-sm rounded-lg font-medium hover:bg-blue-700 transition-colors whitespace-nowrap"
             >
-              잡알리오에서 지원하기
+              지원하기
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
@@ -199,6 +212,7 @@ export function JobModal({ job, onClose }: JobModalProps) {
     </div>
   );
 }
+
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
