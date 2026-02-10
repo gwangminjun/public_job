@@ -1,11 +1,11 @@
 'use client';
 
-import { Suspense, useState, useMemo } from 'react';
+import { Suspense, useState, useMemo, useCallback } from 'react';
 import { Header } from '@/components/layout/Header';
 import { SearchFilter } from '@/components/layout/SearchFilter';
 import { UrlFilterSync } from '@/components/layout/UrlFilterSync';
 import { Footer } from '@/components/layout/Footer';
-import { StatsPanel } from '@/components/stats/StatsPanel';
+import { StatsPanel, StatType } from '@/components/stats/StatsPanel';
 import { JobList } from '@/components/jobs/JobList';
 import { JobModal } from '@/components/jobs/JobModal';
 import { Pagination } from '@/components/ui/Pagination';
@@ -16,8 +16,9 @@ import { isEndingSoon, isNewJob } from '@/lib/utils';
 
 export default function Home() {
   const { data, isLoading, error } = useJobs();
-  const { page, limit, setPage } = useFilterStore();
+  const { page, limit, setPage, setSort, resetFilters } = useFilterStore();
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [activeStatFilter, setActiveStatFilter] = useState<StatType | null>(null);
 
   // 통계 계산
   const stats = useMemo(() => {
@@ -38,6 +39,50 @@ export default function Home() {
     };
   }, [data]);
 
+  const handleStatClick = useCallback((type: StatType) => {
+    // 같은 카드를 다시 누르면 필터 해제
+    if (activeStatFilter === type) {
+      setActiveStatFilter(null);
+      resetFilters();
+      return;
+    }
+
+    setActiveStatFilter(type);
+
+    switch (type) {
+      case 'total':
+        resetFilters();
+        break;
+      case 'endingSoon':
+        resetFilters();
+        setSort('deadline');
+        break;
+      case 'newJobs':
+        resetFilters();
+        setSort('latest');
+        break;
+      case 'institutions':
+        resetFilters();
+        break;
+    }
+  }, [activeStatFilter, resetFilters, setSort]);
+
+  const filteredJobs = useMemo(() => {
+    const jobs = data?.result || [];
+    if (!activeStatFilter || activeStatFilter === 'total') return jobs;
+
+    switch (activeStatFilter) {
+      case 'endingSoon':
+        return jobs.filter((j) => isEndingSoon(j.pbancEndYmd));
+      case 'newJobs':
+        return jobs.filter((j) => isNewJob(j.pbancBgngYmd));
+      case 'institutions':
+        return jobs;
+      default:
+        return jobs;
+    }
+  }, [data?.result, activeStatFilter]);
+
   const totalPages = Math.ceil((data?.totalCount || 0) / limit);
 
   return (
@@ -56,6 +101,8 @@ export default function Home() {
             endingSoon={stats.endingSoon}
             newJobs={stats.newJobs}
             institutions={stats.institutions}
+            activeStatFilter={activeStatFilter}
+            onStatClick={handleStatClick}
           />
         </div>
 
@@ -74,13 +121,21 @@ export default function Home() {
         {/* 결과 카운트 */}
         {!isLoading && data && (
           <p className="text-sm text-gray-500 mb-4">
-            총 <span className="font-semibold text-gray-900">{data.totalCount?.toLocaleString()}</span>개의 채용공고
+            {activeStatFilter && activeStatFilter !== 'total' ? (
+              <>
+                필터 적용: <span className="font-semibold text-gray-900">{filteredJobs.length.toLocaleString()}</span>개의 채용공고
+              </>
+            ) : (
+              <>
+                총 <span className="font-semibold text-gray-900">{data.totalCount?.toLocaleString()}</span>개의 채용공고
+              </>
+            )}
           </p>
         )}
 
         {/* 채용 목록 */}
         <JobList
-          jobs={data?.result || []}
+          jobs={filteredJobs}
           isLoading={isLoading}
           onJobClick={setSelectedJob}
         />
