@@ -8,11 +8,18 @@ import { JobModal } from '@/components/jobs/JobModal';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Job } from '@/lib/types';
+import { useRecentViewedStore } from '@/store/recentViewedStore';
 
 export default function BookmarksPage() {
   const mounted = useMounted();
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const { bookmarks, clearBookmarks } = useBookmarkStore();
+  const addRecent = useRecentViewedStore((state) => state.addRecent);
+
+  const handleJobClick = (job: Job) => {
+    addRecent(job);
+    setSelectedJob(job);
+  };
 
     // Hydration mismatch 방지: 마운트 전에는 렌더링 하지 않거나 로딩 상태 표시
   if (!mounted) {
@@ -70,7 +77,7 @@ export default function BookmarksPage() {
           <JobList 
             jobs={bookmarks} 
             isLoading={false} 
-            onJobClick={setSelectedJob} 
+            onJobClick={handleJobClick} 
           />
         )}
       </main>

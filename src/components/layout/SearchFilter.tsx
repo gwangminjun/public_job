@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useFilterStore } from '@/store/filterStore';
+import { useFilterPresetStore } from '@/store/filterPresetStore';
 import { REGIONS, HIRE_TYPES, RECRUIT_TYPES, NCS_TYPES, EDUCATION_TYPES } from '@/lib/utils';
 import { SortType } from '@/lib/types';
 
@@ -26,8 +27,15 @@ export function SearchFilter() {
     resetFilters,
   } = useFilterStore();
 
+  const presets = useFilterPresetStore((state) => state.presets);
+  const savePreset = useFilterPresetStore((state) => state.savePreset);
+  const loadPreset = useFilterPresetStore((state) => state.loadPreset);
+  const deletePreset = useFilterPresetStore((state) => state.deletePreset);
+
   const [searchInput, setSearchInput] = useState(keyword);
   const [showFilters, setShowFilters] = useState(false);
+  const [presetName, setPresetName] = useState('');
+  const [selectedPresetId, setSelectedPresetId] = useState('');
 
 
   useEffect(() => {
@@ -41,6 +49,43 @@ export function SearchFilter() {
 
   const activeFilterCount =
     regions.length + hireTypes.length + recruitTypes.length + ncsTypes.length + educationTypes.length + (onlyOngoing ? 0 : 1);
+
+  const handleSavePreset = () => {
+    const trimmedName = presetName.trim();
+
+    if (!trimmedName) {
+      return;
+    }
+
+    savePreset(trimmedName, {
+      keyword,
+      regions,
+      hireTypes,
+      recruitTypes,
+      ncsTypes,
+      educationTypes,
+      onlyOngoing,
+      sort,
+    });
+    setPresetName('');
+  };
+
+  const handleLoadPreset = () => {
+    if (!selectedPresetId) {
+      return;
+    }
+
+    loadPreset(selectedPresetId);
+  };
+
+  const handleDeletePreset = () => {
+    if (!selectedPresetId) {
+      return;
+    }
+
+    deletePreset(selectedPresetId);
+    setSelectedPresetId('');
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 md:p-6 transition-colors duration-300">
@@ -75,6 +120,63 @@ export function SearchFilter() {
           검색
         </button>
       </form>
+
+      {/* 필터 프리셋 */}
+      <div className="mt-4 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 p-3">
+        <div className="flex flex-col lg:flex-row gap-3">
+          <div className="flex-1 flex gap-2">
+            <input
+              type="text"
+              value={presetName}
+              onChange={(e) => setPresetName(e.target.value)}
+              placeholder="필터 프리셋 이름"
+              className="flex-1 min-w-0 px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              type="button"
+              onClick={handleSavePreset}
+              disabled={!presetName.trim()}
+              className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              저장
+            </button>
+          </div>
+
+          <div className="flex-1 flex gap-2">
+            <select
+              value={selectedPresetId}
+              onChange={(e) => setSelectedPresetId(e.target.value)}
+              className="flex-1 min-w-0 px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">프리셋 선택</option>
+              {presets.map((preset) => (
+                <option key={preset.id} value={preset.id}>
+                  {preset.name}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={handleLoadPreset}
+              disabled={!selectedPresetId}
+              className="px-4 py-2 text-sm rounded-lg bg-gray-700 text-white hover:bg-gray-800 dark:bg-gray-600 dark:hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              불러오기
+            </button>
+            <button
+              type="button"
+              onClick={handleDeletePreset}
+              disabled={!selectedPresetId}
+              className="px-4 py-2 text-sm rounded-lg text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              삭제
+            </button>
+          </div>
+        </div>
+        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+          현재 필터 조건을 이름으로 저장하고 빠르게 다시 불러올 수 있습니다.
+        </p>
+      </div>
 
       {/* 필터 토글 버튼 및 정렬/옵션 */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-4 gap-4">

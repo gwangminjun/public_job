@@ -11,13 +11,17 @@ import { JobModal } from '@/components/jobs/JobModal';
 import { Pagination } from '@/components/ui/Pagination';
 import { useJobs } from '@/hooks/useJobs';
 import { useFilterStore } from '@/store/filterStore';
+import { useRecentViewedStore } from '@/store/recentViewedStore';
 import { Job } from '@/lib/types';
+import { formatRecentViewedAt } from '@/lib/utils';
 
 export default function Home() {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [activeStatFilter, setActiveStatFilter] = useState<StatType | null>(null);
   const { data, isLoading, error } = useJobs(activeStatFilter || '');
   const { page, limit, setPage } = useFilterStore();
+  const recentJobs = useRecentViewedStore((state) => state.recentJobs);
+  const addRecent = useRecentViewedStore((state) => state.addRecent);
 
   // API에서 전체 기준 통계 사용
   const stats = useMemo(() => {
@@ -37,6 +41,12 @@ export default function Home() {
   }, [activeStatFilter, setPage]);
 
   const totalPages = Math.ceil((data?.totalCount || 0) / limit);
+  const latestRecentJobs = useMemo(() => recentJobs.slice(0, 5), [recentJobs]);
+
+  const handleJobClick = useCallback((job: Job) => {
+    addRecent(job);
+    setSelectedJob(job);
+  }, [addRecent]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
@@ -64,6 +74,34 @@ export default function Home() {
           <SearchFilter />
         </div>
 
+        {/* 최근 본 공고 */}
+        <section className="mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 md:p-6 transition-colors duration-300">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">최근 본 공고</h2>
+            <span className="text-xs text-gray-500 dark:text-gray-400">최대 5개 표시</span>
+          </div>
+
+          {latestRecentJobs.length === 0 ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400">아직 열람한 공고가 없습니다.</p>
+          ) : (
+            <div className="space-y-2">
+              {latestRecentJobs.map(({ job, viewedAt }) => (
+                <button
+                  key={job.recrutPblntSn}
+                  onClick={() => handleJobClick(job)}
+                  className="w-full text-left rounded-lg px-3 py-2 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors"
+                >
+                  <p className="text-sm font-medium text-gray-900 dark:text-white line-clamp-1">{job.recrutPbancTtl}</p>
+                  <div className="mt-1 flex items-center justify-between gap-3 text-xs text-gray-500 dark:text-gray-400">
+                    <span className="truncate">{job.instNm}</span>
+                    <span className="shrink-0">열람 {formatRecentViewedAt(viewedAt)}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
+
         {/* 에러 표시 */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300">
@@ -82,7 +120,7 @@ export default function Home() {
         <JobList
           jobs={data?.result || []}
           isLoading={isLoading}
-          onJobClick={setSelectedJob}
+          onJobClick={handleJobClick}
         />
 
         {/* 페이지네이션 */}

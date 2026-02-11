@@ -68,6 +68,8 @@ export interface FilterState {
   limit: number;
 }
 
+export type PresetFilters = Omit<FilterState, 'page' | 'limit'>;
+
 export type SortType = 'latest' | 'deadline' | 'personnel';
 
 // 통계
@@ -76,4 +78,16 @@ export interface Stats {
   endingSoon: number;      // 3일 이내 마감
   newJobs: number;         // 7일 이내 등록
   institutions: number;    // 등록기관 수
+}
+
+export interface RecentJob {
+  job: Job;
+  viewedAt: string;
+}
+
+export interface FilterPreset {
+  id: string;
+  name: string;
+  filters: PresetFilters;
+  createdAt: string;
 }
