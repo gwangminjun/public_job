@@ -25,7 +25,7 @@ export function JobList({ jobs, isLoading, onJobClick }: JobListProps) {
     return (
       <div className="text-center py-16">
         <svg
-          className="mx-auto h-16 w-16 text-gray-300"
+          className="mx-auto h-16 w-16 text-gray-300 dark:text-gray-600"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -37,8 +37,8 @@ export function JobList({ jobs, isLoading, onJobClick }: JobListProps) {
             d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <p className="mt-4 text-lg text-gray-500">검색 결과가 없습니다</p>
-        <p className="mt-2 text-sm text-gray-400">다른 검색어나 필터를 사용해 보세요</p>
+        <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">검색 결과가 없습니다</p>
+        <p className="mt-2 text-sm text-gray-400 dark:text-gray-500">다른 검색어나 필터를 사용해 보세요</p>
       </div>
     );
   }

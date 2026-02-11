@@ -42,7 +42,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         이전
       </button>
@@ -52,16 +52,16 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
           <button
             key={index}
             onClick={() => onPageChange(page)}
-            className={`px-3 py-2 rounded-lg text-sm font-medium ${
+            className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               currentPage === page
                 ? 'bg-blue-600 text-white'
-                : 'text-gray-700 hover:bg-gray-100'
+                : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
             }`}
           >
             {page}
           </button>
         ) : (
-          <span key={index} className="px-2 py-2 text-gray-400">
+          <span key={index} className="px-2 py-2 text-gray-400 dark:text-gray-500">
             {page}
           </span>
         )
@@ -70,7 +70,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         다음
       </button>

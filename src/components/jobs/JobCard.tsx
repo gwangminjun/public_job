@@ -37,19 +37,19 @@ export function JobCard({ job, onClick }: JobCardProps) {
   return (
     <article
       onClick={() => onClick(job)}
-      className={`relative bg-white rounded-xl shadow-sm border border-gray-100 p-5 cursor-pointer
-        transition-all duration-200 hover:shadow-md hover:border-blue-200 hover:-translate-y-1
+      className={`relative bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 cursor-pointer
+        transition-all duration-200 hover:shadow-md hover:border-blue-200 dark:hover:border-blue-700 hover:-translate-y-1
         ${isExpired ? 'opacity-60' : ''}`}
     >
       {/* 북마크 버튼 (우측 상단 절대 위치) */}
       <button
         onClick={handleBookmark}
-        className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors z-10"
+        className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors z-10"
         title={bookmarked ? "북마크 해제" : "북마크 추가"}
       >
         <svg
           className={`w-6 h-6 transition-colors ${
-            bookmarked ? 'text-red-500 fill-current' : 'text-gray-400'
+            bookmarked ? 'text-red-500 fill-current' : 'text-gray-400 dark:text-gray-500'
           }`}
           fill="none"
           stroke="currentColor"
@@ -69,7 +69,7 @@ export function JobCard({ job, onClick }: JobCardProps) {
         <div className="flex gap-2">
           <span
             className={`inline-flex items-center px-3 py-1 rounded-lg text-sm font-bold
-              ${isExpired ? 'bg-gray-100 text-gray-500' :
+              ${isExpired ? 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400' :
                 endingSoon ? 'bg-red-500 text-white' :
                 'bg-blue-500 text-white'}`}
           >
@@ -85,16 +85,16 @@ export function JobCard({ job, onClick }: JobCardProps) {
       </div>
 
       {/* 제목 */}
-      <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-2 pr-8">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1 line-clamp-2 pr-8">
         {truncate(job.recrutPbancTtl, 50)}
       </h3>
 
 
       {/* 기관명 */}
-      <p className="text-sm text-gray-600 mb-3">{job.instNm}</p>
+      <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">{job.instNm}</p>
 
       {/* 상세 정보 */}
-      <div className="space-y-1.5 text-sm text-gray-500">
+      <div className="space-y-1.5 text-sm text-gray-500 dark:text-gray-400">
         <div className="flex items-center gap-2">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -121,7 +121,7 @@ export function JobCard({ job, onClick }: JobCardProps) {
       </div>
 
       {/* 하단: 기간 */}
-      <div className="mt-4 pt-3 border-t border-gray-100 text-xs text-gray-400">
+      <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-400 dark:text-gray-500">
         <span>공고기간: {formatDate(job.pbancBgngYmd)} ~ {formatDate(job.pbancEndYmd)}</span>
       </div>
     </article>

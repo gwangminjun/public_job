@@ -42,7 +42,7 @@ export function ShareButton({ title, text, url, className = '' }: ShareButtonPro
     <div className="relative inline-block">
       <button
         onClick={handleShare}
-        className={`flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors font-medium text-sm ${className}`}
+        className={`flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 rounded-lg transition-colors font-medium text-sm ${className}`}
         aria-label="공고 공유하기"
       >
         <svg
@@ -63,9 +63,9 @@ export function ShareButton({ title, text, url, className = '' }: ShareButtonPro
 
       {/* 복사 완료 툴팁 */}
       {copied && (
-        <div className="absolute left-1/2 -translate-x-1/2 -top-10 bg-gray-800 text-white text-xs py-1 px-2 rounded shadow-lg whitespace-nowrap animate-fade-in-up">
+        <div className="absolute left-1/2 -translate-x-1/2 -top-10 bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-900 text-xs py-1 px-2 rounded shadow-lg whitespace-nowrap animate-fade-in-up">
           링크가 복사되었습니다!
-          <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-800"></div>
+          <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-800 dark:border-t-gray-200"></div>
         </div>
       )}
     </div>

@@ -48,17 +48,17 @@ export function isOngoing(endDateStr: string): boolean {
 
 // 고용형태 뱃지 색상
 export function getHireTypeBadgeColor(hireType: string): string {
-  if (hireType.includes('정규직')) return 'bg-blue-100 text-blue-800';
-  if (hireType.includes('계약직')) return 'bg-yellow-100 text-yellow-800';
-  if (hireType.includes('비정규직')) return 'bg-orange-100 text-orange-800';
-  return 'bg-gray-100 text-gray-800';
+  if (hireType.includes('정규직')) return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
+  if (hireType.includes('계약직')) return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
+  if (hireType.includes('비정규직')) return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
+  return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
 }
 
 // 채용구분 뱃지 색상
 export function getRecruitTypeBadgeColor(recruitType: string): string {
-  if (recruitType.includes('신입')) return 'bg-green-100 text-green-800';
-  if (recruitType.includes('경력')) return 'bg-purple-100 text-purple-800';
-  return 'bg-gray-100 text-gray-800';
+  if (recruitType.includes('신입')) return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+  if (recruitType.includes('경력')) return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
+  return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
 }
 
 // 지역 목록 (CODE.pdf R3000)

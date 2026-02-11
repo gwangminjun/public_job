@@ -57,9 +57,9 @@ export function JobModal({ job, onClose }: JobModalProps) {
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col transition-colors duration-300">
         {/* Header */}
-        <div className="flex items-start justify-between p-6 border-b border-gray-100">
+        <div className="flex items-start justify-between p-6 border-b border-gray-100 dark:border-gray-700">
           <div className="flex-1 pr-4">
             <div className="flex items-center gap-2 mb-2">
               <span
@@ -72,14 +72,14 @@ export function JobModal({ job, onClose }: JobModalProps) {
                 <Badge variant="info">진행중</Badge>
               )}
             </div>
-            <h2 className="text-xl font-bold text-gray-900">{job.recrutPbancTtl}</h2>
-            <p className="text-gray-600 mt-1">{job.instNm}</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{job.recrutPbancTtl}</h2>
+            <p className="text-gray-600 dark:text-gray-300 mt-1">{job.instNm}</p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
-            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -90,7 +90,7 @@ export function JobModal({ job, onClose }: JobModalProps) {
           <div className="grid md:grid-cols-2 gap-6">
             {/* 기본 정보 */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">기본 정보</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b dark:border-gray-700 pb-2">기본 정보</h3>
 
               <InfoRow label="근무지역" value={job.workRgnNmLst || '-'} />
               <InfoRow label="채용인원" value={`${job.recrutNope}명`} />
@@ -107,7 +107,7 @@ export function JobModal({ job, onClose }: JobModalProps) {
 
             {/* 상세 정보 */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">상세 정보</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b dark:border-gray-700 pb-2">상세 정보</h3>
 
               {isLoading ? (
                 <div className="space-y-3">
@@ -119,40 +119,40 @@ export function JobModal({ job, onClose }: JobModalProps) {
                 <div className="space-y-4">
                   {detail.aplyQlfcCn && (
                     <div>
-                      <p className="text-sm font-medium text-gray-500 mb-1">지원자격</p>
-                      <p className="text-sm text-gray-700 whitespace-pre-line">
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">지원자격</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
                         {detail.aplyQlfcCn}
                       </p>
                     </div>
                   )}
                   {detail.prefCondCn && (
                     <div>
-                      <p className="text-sm font-medium text-gray-500 mb-1">우대조건</p>
-                      <p className="text-sm text-gray-700 whitespace-pre-line">
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">우대조건</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
                         {detail.prefCondCn}
                       </p>
                     </div>
                   )}
                   {detail.prefCn && (
                     <div>
-                      <p className="text-sm font-medium text-gray-500 mb-1">우대사항(가점)</p>
-                      <p className="text-sm text-gray-700 whitespace-pre-line">
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">우대사항(가점)</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
                         {detail.prefCn}
                       </p>
                     </div>
                   )}
                   {detail.scrnprcdrMthdExpln && (
                     <div>
-                      <p className="text-sm font-medium text-gray-500 mb-1">전형절차</p>
-                      <p className="text-sm text-gray-700 whitespace-pre-line">
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">전형절차</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
                         {detail.scrnprcdrMthdExpln}
                       </p>
                     </div>
                   )}
                   {detail.nonatchRsn && (
                     <div>
-                      <p className="text-sm font-medium text-gray-500 mb-1">지원방법</p>
-                      <p className="text-sm text-gray-700 whitespace-pre-line">
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">지원방법</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
                         {detail.nonatchRsn}
                       </p>
                     </div>
@@ -164,20 +164,20 @@ export function JobModal({ job, onClose }: JobModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="flex flex-col md:flex-row items-center justify-between p-6 border-t border-gray-100 bg-gray-50 gap-4">
+        <div className="flex flex-col md:flex-row items-center justify-between p-6 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 gap-4">
           <div className="flex items-center gap-3 w-full md:w-auto justify-center md:justify-start">
             <Link
               href={`/jobs/${job.recrutPblntSn}`}
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium whitespace-nowrap"
+              className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium whitespace-nowrap"
             >
               상세 페이지
             </Link>
-            <div className="w-px h-4 bg-gray-300 mx-1"></div>
+            <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-1"></div>
             <ShareButton
               title={job.recrutPbancTtl}
               text={`${job.instNm} 채용공고를 확인해보세요!`}
               url={shareUrl}
-              className="bg-white border border-gray-200 hover:bg-gray-50 text-xs px-3 py-1.5"
+              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-xs px-3 py-1.5 dark:text-gray-300"
             />
           </div>
 
@@ -206,8 +206,8 @@ export function JobModal({ job, onClose }: JobModalProps) {
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex">
-      <span className="w-24 flex-shrink-0 text-sm text-gray-500">{label}</span>
-      <span className="text-sm text-gray-900">{value}</span>
+      <span className="w-24 flex-shrink-0 text-sm text-gray-500 dark:text-gray-400">{label}</span>
+      <span className="text-sm text-gray-900 dark:text-gray-200">{value}</span>
     </div>
   );
 }
