@@ -3,14 +3,16 @@
 import { Job } from '@/lib/types';
 import { JobCard } from './JobCard';
 import { JobCardSkeleton } from '@/components/ui/Skeleton';
+import { StatType } from '@/components/stats/StatsPanel';
 
 interface JobListProps {
   jobs: Job[];
   isLoading: boolean;
   onJobClick: (job: Job) => void;
+  activeStatFilter?: StatType | null;
 }
 
-export function JobList({ jobs, isLoading, onJobClick }: JobListProps) {
+export function JobList({ jobs, isLoading, onJobClick, activeStatFilter }: JobListProps) {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -39,6 +41,46 @@ export function JobList({ jobs, isLoading, onJobClick }: JobListProps) {
         </svg>
         <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">검색 결과가 없습니다</p>
         <p className="mt-2 text-sm text-gray-400 dark:text-gray-500">다른 검색어나 필터를 사용해 보세요</p>
+      </div>
+    );
+  }
+
+  if (activeStatFilter === 'institutions') {
+    const groupedByInstitution = jobs.reduce<Record<string, Job[]>>((acc, job) => {
+      const institution = job.instNm || '기관명 미확인';
+
+      if (!acc[institution]) {
+        acc[institution] = [];
+      }
+
+      acc[institution].push(job);
+      return acc;
+    }, {});
+
+    const sortedInstitutions = Object.keys(groupedByInstitution).sort((a, b) => a.localeCompare(b, 'ko'));
+
+    return (
+      <div className="space-y-6">
+        {sortedInstitutions.map((institution) => (
+          <section key={institution}>
+            <div className="mb-3 flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
+              <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white">{institution}</h3>
+              <span className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
+                {groupedByInstitution[institution].length}건
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {groupedByInstitution[institution].map((job) => (
+                <JobCard
+                  key={job.recrutPblntSn}
+                  job={job}
+                  onClick={onJobClick}
+                />
+              ))}
+            </div>
+          </section>
+        ))}
       </div>
     );
   }

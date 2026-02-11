@@ -38,6 +38,10 @@ export default function Home() {
       setActiveStatFilter(null);
     } else {
       setActiveStatFilter(type);
+
+      if (type === 'institutions') {
+        setViewMode('list');
+      }
     }
     setPage(1);
   }, [activeStatFilter, setPage]);
@@ -114,9 +118,16 @@ export default function Home() {
         {/* 결과 카운트 */}
         {!isLoading && data && (
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              총 <span className="font-semibold text-gray-900 dark:text-white">{data.totalCount?.toLocaleString()}</span>개의 채용공고
-            </p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                총 <span className="font-semibold text-gray-900 dark:text-white">{data.totalCount?.toLocaleString()}</span>개의 채용공고
+              </p>
+              {activeStatFilter === 'institutions' && (
+                <span className="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2.5 py-1 text-xs font-medium">
+                  기관명 기준 모아보기 적용됨
+                </span>
+              )}
+            </div>
 
             <div className="inline-flex rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-1">
               <button
@@ -142,6 +153,7 @@ export default function Home() {
             jobs={data?.result || []}
             isLoading={isLoading}
             onJobClick={handleJobClick}
+            activeStatFilter={activeStatFilter}
           />
         ) : (
           <JobCalendar
