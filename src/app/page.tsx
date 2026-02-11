@@ -7,6 +7,7 @@ import { UrlFilterSync } from '@/components/layout/UrlFilterSync';
 import { Footer } from '@/components/layout/Footer';
 import { StatsPanel, StatType } from '@/components/stats/StatsPanel';
 import { JobList } from '@/components/jobs/JobList';
+import { JobCalendar } from '@/components/jobs/JobCalendar';
 import { JobModal } from '@/components/jobs/JobModal';
 import { Pagination } from '@/components/ui/Pagination';
 import { useJobs } from '@/hooks/useJobs';
@@ -17,6 +18,7 @@ import { formatRecentViewedAt } from '@/lib/utils';
 
 export default function Home() {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [activeStatFilter, setActiveStatFilter] = useState<StatType | null>(null);
   const { data, isLoading, error } = useJobs(activeStatFilter || '');
   const { page, limit, setPage } = useFilterStore();
@@ -111,17 +113,42 @@ export default function Home() {
 
         {/* 결과 카운트 */}
         {!isLoading && data && (
-          <p className="text-sm text-gray-500 mb-4 dark:text-gray-400">
-            총 <span className="font-semibold text-gray-900 dark:text-white">{data.totalCount?.toLocaleString()}</span>개의 채용공고
-          </p>
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              총 <span className="font-semibold text-gray-900 dark:text-white">{data.totalCount?.toLocaleString()}</span>개의 채용공고
+            </p>
+
+            <div className="inline-flex rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-1">
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-1.5 text-sm rounded-md transition-colors ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+              >
+                리스트
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('calendar')}
+                className={`px-3 py-1.5 text-sm rounded-md transition-colors ${viewMode === 'calendar' ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+              >
+                캘린더
+              </button>
+            </div>
+          </div>
         )}
 
-        {/* 채용 목록 */}
-        <JobList
-          jobs={data?.result || []}
-          isLoading={isLoading}
-          onJobClick={handleJobClick}
-        />
+        {viewMode === 'list' || isLoading ? (
+          <JobList
+            jobs={data?.result || []}
+            isLoading={isLoading}
+            onJobClick={handleJobClick}
+          />
+        ) : (
+          <JobCalendar
+            jobs={data?.result || []}
+            onJobClick={handleJobClick}
+          />
+        )}
 
         {/* 페이지네이션 */}
         {!isLoading && totalPages > 1 && (
