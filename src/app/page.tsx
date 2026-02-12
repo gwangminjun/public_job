@@ -8,6 +8,7 @@ import { Footer } from '@/components/layout/Footer';
 import { StatsPanel, StatType } from '@/components/stats/StatsPanel';
 import { JobList } from '@/components/jobs/JobList';
 import { JobCalendar } from '@/components/jobs/JobCalendar';
+import { JobMapView } from '@/components/jobs/JobMapView';
 import { JobModal } from '@/components/jobs/JobModal';
 import { Pagination } from '@/components/ui/Pagination';
 import { useJobs } from '@/hooks/useJobs';
@@ -19,7 +20,7 @@ import { formatRecentViewedAt } from '@/lib/utils';
 
 export default function Home() {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
-  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'map'>('list');
   const [activeStatFilter, setActiveStatFilter] = useState<StatType | null>(null);
   const { data, isLoading, error } = useJobs(activeStatFilter || '');
   const { page, limit, setPage } = useFilterStore();
@@ -134,6 +135,11 @@ export default function Home() {
                   캘린더는 즐겨찾기 공고만 표시 ({bookmarks.length}건)
                 </span>
               )}
+              {viewMode === 'map' && (
+                <span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2.5 py-1 text-xs font-medium">
+                  지도 뷰에서 지역별 공고 분포를 확인할 수 있습니다
+                </span>
+              )}
             </div>
 
             <div className="inline-flex rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-1">
@@ -151,6 +157,13 @@ export default function Home() {
               >
                 캘린더
               </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('map')}
+                className={`px-3 py-1.5 text-sm rounded-md transition-colors ${viewMode === 'map' ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+              >
+                지도
+              </button>
             </div>
           </div>
         )}
@@ -162,7 +175,7 @@ export default function Home() {
             onJobClick={handleJobClick}
             activeStatFilter={activeStatFilter}
           />
-        ) : (
+        ) : viewMode === 'calendar' ? (
           bookmarks.length > 0 ? (
             <JobCalendar
               jobs={bookmarks}
@@ -174,10 +187,15 @@ export default function Home() {
               <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">리스트에서 하트 버튼을 눌러 공고를 저장하면 캘린더에서 마감일로 모아볼 수 있어요.</p>
             </div>
           )
+        ) : (
+          <JobMapView
+            jobs={data?.result || []}
+            onJobClick={handleJobClick}
+          />
         )}
 
         {/* 페이지네이션 */}
-        {!isLoading && viewMode === 'list' && totalPages > 1 && (
+        {!isLoading && viewMode !== 'calendar' && totalPages > 1 && (
           <div className="mt-8">
             <Pagination
               currentPage={page}
