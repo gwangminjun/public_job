@@ -4,7 +4,7 @@ import { addMonths, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameMont
 import { ko } from 'date-fns/locale';
 import { useMemo, useState } from 'react';
 import { Job } from '@/lib/types';
-import { parseDate } from '@/lib/utils';
+import { getDday, parseDate } from '@/lib/utils';
 
 interface JobCalendarProps {
   jobs: Job[];
@@ -19,6 +19,11 @@ export function JobCalendar({ jobs, onJobClick }: JobCalendarProps) {
     const grouped = new Map<string, Job[]>();
 
     for (const job of jobs) {
+      const dday = getDday(job.pbancEndYmd);
+      if (dday < 0) {
+        continue;
+      }
+
       const endDate = parseDate(job.pbancEndYmd);
 
       if (Number.isNaN(endDate.getTime())) {

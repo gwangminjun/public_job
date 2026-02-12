@@ -12,6 +12,7 @@ import { JobModal } from '@/components/jobs/JobModal';
 import { Pagination } from '@/components/ui/Pagination';
 import { useJobs } from '@/hooks/useJobs';
 import { useFilterStore } from '@/store/filterStore';
+import { useBookmarkStore } from '@/store/bookmarkStore';
 import { useRecentViewedStore } from '@/store/recentViewedStore';
 import { Job } from '@/lib/types';
 import { formatRecentViewedAt } from '@/lib/utils';
@@ -22,6 +23,7 @@ export default function Home() {
   const [activeStatFilter, setActiveStatFilter] = useState<StatType | null>(null);
   const { data, isLoading, error } = useJobs(activeStatFilter || '');
   const { page, limit, setPage } = useFilterStore();
+  const bookmarks = useBookmarkStore((state) => state.bookmarks);
   const recentJobs = useRecentViewedStore((state) => state.recentJobs);
   const addRecent = useRecentViewedStore((state) => state.addRecent);
 
@@ -127,6 +129,11 @@ export default function Home() {
                   기관명 기준 모아보기 적용됨
                 </span>
               )}
+              {viewMode === 'calendar' && (
+                <span className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2.5 py-1 text-xs font-medium">
+                  캘린더는 즐겨찾기 공고만 표시 ({bookmarks.length}건)
+                </span>
+              )}
             </div>
 
             <div className="inline-flex rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-1">
@@ -156,14 +163,21 @@ export default function Home() {
             activeStatFilter={activeStatFilter}
           />
         ) : (
-          <JobCalendar
-            jobs={data?.result || []}
-            onJobClick={handleJobClick}
-          />
+          bookmarks.length > 0 ? (
+            <JobCalendar
+              jobs={bookmarks}
+              onJobClick={handleJobClick}
+            />
+          ) : (
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-10 text-center">
+              <p className="text-base font-medium text-gray-900 dark:text-white">캘린더에 표시할 즐겨찾기 공고가 없습니다.</p>
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">리스트에서 하트 버튼을 눌러 공고를 저장하면 캘린더에서 마감일로 모아볼 수 있어요.</p>
+            </div>
+          )
         )}
 
         {/* 페이지네이션 */}
-        {!isLoading && totalPages > 1 && (
+        {!isLoading && viewMode === 'list' && totalPages > 1 && (
           <div className="mt-8">
             <Pagination
               currentPage={page}
