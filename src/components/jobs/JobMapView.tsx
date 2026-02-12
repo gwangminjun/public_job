@@ -1,24 +1,19 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { ComponentType, ReactNode, useMemo, useState } from 'react';
 import { Job } from '@/lib/types';
-import { LeafletRegionMap } from './LeafletRegionMap';
+import { getDdayText } from '@/lib/utils';
 
 interface JobMapViewProps {
   jobs: Job[];
   onJobClick: (job: Job) => void;
+  isLoading?: boolean;
 }
 
-export type RegionPoint = {
+type RegionPoint = {
   lat: number;
   lng: number;
-};
-
-export type RegionBucket = {
-  region: string;
-  jobs: Job[];
-  count: number;
-  point: RegionPoint;
 };
 
 const REGION_POINTS: Record<string, RegionPoint> = {
@@ -62,6 +57,93 @@ const REGION_ALIASES: Record<string, string> = {
   제주특별자치도: '제주',
 };
 
+const DEFAULT_CENTER: [number, number] = [36.25, 127.9];
+const DEFAULT_ZOOM = 7;
+
+type MapContainerProps = {
+  center: [number, number];
+  zoom: number;
+  scrollWheelZoom: boolean;
+  className?: string;
+  children?: ReactNode;
+};
+
+type TileLayerProps = {
+  attribution: string;
+  url: string;
+};
+
+type MarkerProps = {
+  position: [number, number];
+  eventHandlers?: {
+    click?: () => void;
+  };
+  children?: ReactNode;
+};
+
+type PopupProps = {
+  children?: ReactNode;
+};
+
+type MarkerClusterGroupProps = {
+  chunkedLoading?: boolean;
+  iconCreateFunction?: (cluster: { getChildCount: () => number }) => unknown;
+  children?: ReactNode;
+};
+
+const MapContainer = dynamic(
+  () => import('react-leaflet').then((mod) => mod.MapContainer as ComponentType<MapContainerProps>),
+  { ssr: false }
+);
+
+const TileLayer = dynamic(
+  () => import('react-leaflet').then((mod) => mod.TileLayer as ComponentType<TileLayerProps>),
+  { ssr: false }
+);
+
+const Marker = dynamic(
+  () => import('react-leaflet').then((mod) => mod.Marker as ComponentType<MarkerProps>),
+  { ssr: false }
+);
+
+const Popup = dynamic(
+  () => import('react-leaflet').then((mod) => mod.Popup as ComponentType<PopupProps>),
+  { ssr: false }
+);
+
+const MarkerClusterGroup = dynamic(
+  () => import('react-leaflet-cluster').then((mod) => mod.default as ComponentType<MarkerClusterGroupProps>),
+  { ssr: false }
+);
+
+function createClusterIcon(cluster: { getChildCount: () => number }): unknown {
+  const count = cluster.getChildCount();
+  const tier = count < 10 ? 'sm' : count < 30 ? 'md' : count < 80 ? 'lg' : 'xl';
+  const sizeByTier: Record<typeof tier, number> = {
+    sm: 34,
+    md: 44,
+    lg: 56,
+    xl: 68,
+  };
+  const size = sizeByTier[tier];
+
+  const leaflet = (globalThis as {
+    L?: {
+      divIcon: (options: { html: string; className: string; iconSize: [number, number] }) => unknown;
+    };
+  }).L;
+
+  if (!leaflet?.divIcon) {
+    return undefined;
+  }
+
+  return leaflet.divIcon({
+    html: `<span>${count}</span>`,
+    className: `job-cluster-icon job-cluster-icon--${tier}`,
+    iconSize: [size, size],
+  });
+}
+
 function normalizeRegion(value: string): string {
   const trimmed = value.trim();
   if (!trimmed) {
@@ -90,7 +172,18 @@ function getPrimaryRegion(workRegionText: string): string {
   return normalizeRegion(firstRegion);
 }
 
-export function JobMapView({ jobs, onJobClick }: JobMapViewProps) {
+function buildJobPosition(base: RegionPoint, index: number, jobId: number): [number, number] {
+  const angle = ((index + (jobId % 7)) * 37) % 360;
+  const radians = (angle * Math.PI) / 180;
+  const ring = 0.03 + ((index % 5) * 0.015);
+  const lat = base.lat + Math.sin(radians) * ring;
+  const lng = base.lng + Math.cos(radians) * ring;
+  return [lat, lng];
+}
+
+export function JobMapView({ jobs, onJobClick, isLoading = false }: JobMapViewProps) {
+  const [selectedRegion, setSelectedRegion] = useState<string>('');
+
   const regionBuckets = useMemo(() => {
     const buckets = new Map<string, Job[]>();
 
@@ -105,19 +198,32 @@ export function JobMapView({ jobs, onJobClick }: JobMapViewProps) {
     }
 
     return Array.from(buckets.entries())
-      .map(([region, regionJobs]) => ({
-        region,
-        jobs: regionJobs,
-        count: regionJobs.length,
-        point: REGION_POINTS[region],
-      }))
+      .map(([region, regionJobs]) => ({ region, jobs: regionJobs, count: regionJobs.length }))
       .sort((a, b) => b.count - a.count);
   }, [jobs]);
 
-  const [selectedRegion, setSelectedRegion] = useState<string>('');
+  const jobsWithPosition = useMemo(() => {
+    return regionBuckets.flatMap((bucket) => {
+      const point = REGION_POINTS[bucket.region] || REGION_POINTS.해외;
+
+      return bucket.jobs.map((job, index) => ({
+        job,
+        region: bucket.region,
+        position: buildJobPosition(point, index, job.recrutPblntSn),
+      }));
+    });
+  }, [regionBuckets]);
 
   const activeRegion = selectedRegion || regionBuckets[0]?.region || '';
-  const activeJobs = regionBuckets.find((bucket) => bucket.region === activeRegion)?.jobs || [];
+  const activeRegionJobs = jobsWithPosition.filter((item) => item.region === activeRegion);
+
+  if (isLoading) {
+    return (
+      <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-10 text-center">
+        <p className="text-base font-medium text-gray-900 dark:text-white">지도 데이터를 불러오는 중입니다...</p>
+      </div>
+    );
+  }
 
   if (jobs.length === 0) {
     return (
@@ -132,15 +238,42 @@ export function JobMapView({ jobs, onJobClick }: JobMapViewProps) {
     <section className="rounded-xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 md:p-6 shadow-sm transition-colors duration-300">
       <div className="mb-3 flex items-center justify-between gap-2">
         <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white">지역별 채용 지도</h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400">원형 마커를 클릭하면 지역별 공고를 확인할 수 있습니다.</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">전체 채용 {jobs.length.toLocaleString()}건, 확대하면 개별 공고 마커를 확인할 수 있습니다.</p>
       </div>
 
-      <div className="h-[420px] rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <LeafletRegionMap
-          regionBuckets={regionBuckets}
-          activeRegion={activeRegion}
-          onSelectRegion={setSelectedRegion}
-        />
+      <div className="h-[500px] rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <MapContainer center={DEFAULT_CENTER} zoom={DEFAULT_ZOOM} scrollWheelZoom={true} className="h-full w-full">
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+
+          <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterIcon}>
+            {jobsWithPosition.map(({ job, region, position }) => (
+              <Marker
+                key={job.recrutPblntSn}
+                position={position}
+                eventHandlers={{ click: () => setSelectedRegion(region) }}
+              >
+                <Popup>
+                  <div className="min-w-[220px]">
+                    <p className="text-xs text-blue-600 font-medium mb-1">{region}</p>
+                    <p className="text-sm font-semibold mb-1">{job.recrutPbancTtl}</p>
+                    <p className="text-xs text-gray-600 mb-2">{job.instNm}</p>
+                    <p className="text-xs text-gray-500 mb-3">{getDdayText(job.pbancEndYmd)}</p>
+                    <button
+                      type="button"
+                      onClick={() => onJobClick(job)}
+                      className="w-full rounded-md bg-blue-600 px-3 py-1.5 text-xs text-white hover:bg-blue-700"
+                    >
+                      상세 보기
+                    </button>
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+          </MarkerClusterGroup>
+        </MapContainer>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
@@ -159,11 +292,11 @@ export function JobMapView({ jobs, onJobClick }: JobMapViewProps) {
         })}
       </div>
 
-      {activeJobs.length > 0 && (
+      {activeRegionJobs.length > 0 && (
         <div className="mt-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/60 p-4">
           <h4 className="text-sm md:text-base font-semibold text-gray-900 dark:text-white mb-3">{activeRegion} 공고 목록</h4>
           <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-            {activeJobs.map((job) => (
+            {activeRegionJobs.map(({ job }) => (
               <button
                 key={job.recrutPblntSn}
                 type="button"

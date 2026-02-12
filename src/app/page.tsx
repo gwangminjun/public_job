@@ -12,6 +12,7 @@ import { JobMapView } from '@/components/jobs/JobMapView';
 import { JobModal } from '@/components/jobs/JobModal';
 import { Pagination } from '@/components/ui/Pagination';
 import { useJobs } from '@/hooks/useJobs';
+import { useMapJobs } from '@/hooks/useMapJobs';
 import { useFilterStore } from '@/store/filterStore';
 import { useBookmarkStore } from '@/store/bookmarkStore';
 import { useRecentViewedStore } from '@/store/recentViewedStore';
@@ -23,6 +24,7 @@ export default function Home() {
   const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'map'>('list');
   const [activeStatFilter, setActiveStatFilter] = useState<StatType | null>(null);
   const { data, isLoading, error } = useJobs(activeStatFilter || '');
+  const { data: mapData, isLoading: isMapLoading } = useMapJobs(activeStatFilter || '');
   const { page, limit, setPage } = useFilterStore();
   const bookmarks = useBookmarkStore((state) => state.bookmarks);
   const recentJobs = useRecentViewedStore((state) => state.recentJobs);
@@ -137,7 +139,7 @@ export default function Home() {
               )}
               {viewMode === 'map' && (
                 <span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2.5 py-1 text-xs font-medium">
-                  지도 뷰에서 지역별 공고 분포를 확인할 수 있습니다
+                  지도 뷰는 현재 필터 기준 전체 공고({mapData?.totalCount?.toLocaleString() || 0}건)로 표시됩니다
                 </span>
               )}
             </div>
@@ -189,7 +191,8 @@ export default function Home() {
           )
         ) : (
           <JobMapView
-            jobs={data?.result || []}
+            jobs={mapData?.result || []}
+            isLoading={isMapLoading}
             onJobClick={handleJobClick}
           />
         )}
