@@ -1,5 +1,6 @@
 import { differenceInDays, parse, format, isAfter, subDays } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { Job } from '@/lib/types';
 
 // YYYYMMDD 형식을 Date 객체로 변환
 export function parseDate(dateStr: string): Date {
@@ -116,4 +117,74 @@ export function formatRecentViewedAt(isoDateTime: string): string {
     minute: '2-digit',
     hour12: false,
   }).format(date);
+}
+
+function escapeIcsText(value: string): string {
+  return value
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\n/g, '\\n');
+}
+
+function buildIcsDate(dateStr: string, addDaysOffset = 0): string {
+  const cleaned = dateStr.replace(/[^0-9]/g, '').slice(0, 8);
+  if (cleaned.length !== 8) {
+    return cleaned;
+  }
+
+  const year = Number(cleaned.slice(0, 4));
+  const month = Number(cleaned.slice(4, 6)) - 1;
+  const day = Number(cleaned.slice(6, 8));
+
+  const date = new Date(year, month, day);
+  date.setDate(date.getDate() + addDaysOffset);
+
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}${m}${d}`;
+}
+
+export function createJobDeadlineIcs(job: Job): string {
+  const startDate = buildIcsDate(job.pbancEndYmd);
+  const endDate = buildIcsDate(job.pbancEndYmd, 1);
+  const uid = `${job.recrutPblntSn}@public-job-portal`;
+  const dtStamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+
+  const lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Public Job Portal//Recruitment Deadline//KO',
+    'CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT',
+    `UID:${uid}`,
+    `DTSTAMP:${dtStamp}`,
+    `DTSTART;VALUE=DATE:${startDate}`,
+    `DTEND;VALUE=DATE:${endDate}`,
+    `SUMMARY:${escapeIcsText(`[마감] ${job.recrutPbancTtl}`)}`,
+    `DESCRIPTION:${escapeIcsText(`${job.instNm} 채용공고 마감일`)}`,
+    `LOCATION:${escapeIcsText(job.workRgnNmLst || '온라인/기관별 상이')}`,
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ];
+
+  return lines.join('\r\n');
+}
+
+export function downloadJobDeadlineIcs(job: Job): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const ics = createJobDeadlineIcs(job);
+  const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = `job-deadline-${job.recrutPblntSn}.ics`;
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  URL.revokeObjectURL(url);
 }

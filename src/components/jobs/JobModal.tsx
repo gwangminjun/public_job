@@ -7,6 +7,7 @@ import {
   getDdayText,
   formatDate,
   isEndingSoon,
+  downloadJobDeadlineIcs,
 } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -173,6 +174,13 @@ export function JobModal({ job, onClose }: JobModalProps) {
               상세 페이지
             </Link>
             <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+            <button
+              type="button"
+              onClick={() => downloadJobDeadlineIcs(job)}
+              className="inline-flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-xs px-3 py-1.5 rounded-md text-gray-700 dark:text-gray-300"
+            >
+              일정 저장(.ics)
+            </button>
             <ShareButton
               title={job.recrutPbancTtl}
               text={`${job.instNm} 채용공고를 확인해보세요!`}

@@ -6,6 +6,11 @@ import { useFilterPresetStore } from '@/store/filterPresetStore';
 import { REGIONS, HIRE_TYPES, RECRUIT_TYPES, NCS_TYPES, EDUCATION_TYPES } from '@/lib/utils';
 import { SortType } from '@/lib/types';
 
+interface SearchSuggestion {
+  text: string;
+  type: 'institution' | 'keyword';
+}
+
 export function SearchFilter() {
   const {
     keyword,
@@ -36,15 +41,62 @@ export function SearchFilter() {
   const [showFilters, setShowFilters] = useState(false);
   const [presetName, setPresetName] = useState('');
   const [selectedPresetId, setSelectedPresetId] = useState('');
+  const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
 
   useEffect(() => {
     setSearchInput(keyword);
   }, [keyword]);
 
+  useEffect(() => {
+    const query = searchInput.trim();
+
+    if (!query) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch(`/api/jobs/suggestions?q=${encodeURIComponent(query)}&limit=8`, {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          setSuggestions([]);
+          return;
+        }
+
+        const data: { suggestions?: SearchSuggestion[] } = await response.json();
+        const nextSuggestions = Array.isArray(data.suggestions) ? data.suggestions : [];
+        setSuggestions(nextSuggestions);
+        setShowSuggestions(nextSuggestions.length > 0);
+      } catch (error) {
+        if ((error as Error).name !== 'AbortError') {
+          setSuggestions([]);
+        }
+      }
+    }, 200);
+
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
+  }, [searchInput]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setKeyword(searchInput);
+    setShowSuggestions(false);
+  };
+
+  const handleSuggestionClick = (value: string) => {
+    setSearchInput(value);
+    setKeyword(value);
+    setShowSuggestions(false);
   };
 
   const activeFilterCount =
@@ -109,9 +161,37 @@ export function SearchFilter() {
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
+            onFocus={() => {
+              if (suggestions.length > 0) {
+                setShowSuggestions(true);
+              }
+            }}
+            onBlur={() => {
+              window.setTimeout(() => setShowSuggestions(false), 120);
+            }}
             placeholder="공고명, 기관명으로 검색..."
             className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 dark:placeholder-gray-500"
           />
+
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="absolute z-20 mt-1 w-full rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-lg overflow-hidden">
+              {suggestions.map((suggestion) => (
+                <button
+                  key={`${suggestion.type}-${suggestion.text}`}
+                  type="button"
+                  onClick={() => handleSuggestionClick(suggestion.text)}
+                  className="w-full px-3 py-2.5 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm text-gray-800 dark:text-gray-100 truncate">{suggestion.text}</span>
+                    <span className="text-[11px] rounded-full px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 shrink-0">
+                      {suggestion.type === 'institution' ? '기관' : '직무'}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <button
           type="submit"
