@@ -24,6 +24,7 @@ export default function Home() {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'map' | 'insight'>('list');
   const [activeStatFilter, setActiveStatFilter] = useState<StatType | null>(null);
+  const [showPresetPanel, setShowPresetPanel] = useState(false);
 
   const { data, isLoading, error } = useJobs(activeStatFilter || '');
   const { data: mapData, isLoading: isMapLoading } = useMapJobs(activeStatFilter || '');
@@ -107,7 +108,11 @@ export default function Home() {
         <UrlFilterSync />
       </Suspense>
 
-      <Header />
+      <Header
+        showPresetToggle
+        isPresetPanelVisible={showPresetPanel}
+        onTogglePresetPanel={() => setShowPresetPanel((prev) => !prev)}
+      />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 py-8 w-full">
         <div className="mb-6">
@@ -122,7 +127,7 @@ export default function Home() {
         </div>
 
         <div className="mb-6">
-          <SearchFilter />
+          <SearchFilter showPresetPanel={showPresetPanel} />
         </div>
 
         {error && (
