@@ -107,7 +107,7 @@ type PopupProps = {
 
 type MarkerClusterGroupProps = {
   chunkedLoading?: boolean;
-  iconCreateFunction?: (cluster: { getChildCount: () => number }) => DivIcon | undefined;
+  iconCreateFunction?: (cluster: { getChildCount: () => number }) => DivIcon;
   children?: ReactNode;
 };
 
@@ -146,12 +146,8 @@ function formatClusterCount(count: number): string {
 
 function createClusterIcon(
   cluster: { getChildCount: () => number },
-  leaflet: LeafletModule | null
-): DivIcon | undefined {
-  if (!leaflet) {
-    return undefined;
-  }
-
+  leaflet: LeafletModule
+): DivIcon {
   const count = cluster.getChildCount();
   const tier = count < 10 ? 'sm' : count < 30 ? 'md' : count < 80 ? 'lg' : 'xl';
   const sizeByTier: Record<typeof tier, number> = {
@@ -202,15 +198,11 @@ function escapeHtml(value: string): string {
 }
 
 function createJobMarkerIcon(
-  leaflet: LeafletModule | null,
+  leaflet: LeafletModule,
   ddayText: string,
   priority: MarkerPriority,
   isActive: boolean
-): DivIcon | undefined {
-  if (!leaflet) {
-    return undefined;
-  }
-
+): DivIcon {
   const activeClass = isActive ? 'is-active' : '';
 
   return leaflet.divIcon({
@@ -285,7 +277,7 @@ export function JobMapView({ jobs, onJobClick, isLoading = false }: JobMapViewPr
   }, []);
 
   const clusterIconCreateFunction = useMemo(
-    () => (cluster: { getChildCount: () => number }) => createClusterIcon(cluster, leaflet),
+    () => (leaflet ? (cluster: { getChildCount: () => number }) => createClusterIcon(cluster, leaflet) : undefined),
     [leaflet]
   );
 
@@ -361,37 +353,39 @@ export function JobMapView({ jobs, onJobClick, isLoading = false }: JobMapViewPr
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          <MarkerClusterGroup chunkedLoading iconCreateFunction={clusterIconCreateFunction}>
-            {jobsWithPosition.map(({ job, region, position, ddayText, markerPriority }) => {
-              const isActiveRegion = region === activeRegion;
-              const markerIcon = createJobMarkerIcon(leaflet, ddayText, markerPriority, isActiveRegion);
+          {leaflet && clusterIconCreateFunction && (
+            <MarkerClusterGroup chunkedLoading iconCreateFunction={clusterIconCreateFunction}>
+              {jobsWithPosition.map(({ job, region, position, ddayText, markerPriority }) => {
+                const isActiveRegion = region === activeRegion;
+                const markerIcon = createJobMarkerIcon(leaflet, ddayText, markerPriority, isActiveRegion);
 
-              return (
-                <Marker
-                  key={job.recrutPblntSn}
-                  position={position}
-                  icon={markerIcon}
-                  eventHandlers={{ click: () => setSelectedRegion(region) }}
-                >
-                  <Popup>
-                    <div className="min-w-[220px]">
-                      <p className="text-xs text-blue-600 font-medium mb-1">{region}</p>
-                      <p className="text-sm font-semibold mb-1">{job.recrutPbancTtl}</p>
-                      <p className="text-xs text-gray-600 mb-2">{job.instNm}</p>
-                      <p className="text-xs text-gray-500 mb-3">{ddayText}</p>
-                      <button
-                        type="button"
-                        onClick={() => onJobClick(job)}
-                        className="w-full rounded-md bg-blue-600 px-3 py-1.5 text-xs text-white hover:bg-blue-700"
-                      >
-                        상세 보기
-                      </button>
-                    </div>
-                  </Popup>
-                </Marker>
-              );
-            })}
-          </MarkerClusterGroup>
+                return (
+                  <Marker
+                    key={job.recrutPblntSn}
+                    position={position}
+                    icon={markerIcon}
+                    eventHandlers={{ click: () => setSelectedRegion(region) }}
+                  >
+                    <Popup>
+                      <div className="min-w-[220px]">
+                        <p className="text-xs text-blue-600 font-medium mb-1">{region}</p>
+                        <p className="text-sm font-semibold mb-1">{job.recrutPbancTtl}</p>
+                        <p className="text-xs text-gray-600 mb-2">{job.instNm}</p>
+                        <p className="text-xs text-gray-500 mb-3">{ddayText}</p>
+                        <button
+                          type="button"
+                          onClick={() => onJobClick(job)}
+                          className="w-full rounded-md bg-blue-600 px-3 py-1.5 text-xs text-white hover:bg-blue-700"
+                        >
+                          상세 보기
+                        </button>
+                      </div>
+                    </Popup>
+                  </Marker>
+                );
+              })}
+            </MarkerClusterGroup>
+          )}
         </MapContainer>
       </div>
 
