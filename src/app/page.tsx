@@ -125,33 +125,6 @@ export default function Home() {
           <SearchFilter />
         </div>
 
-        <section className="mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 md:p-6 transition-colors duration-300">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">최근 본 공고</h2>
-            <span className="text-xs text-gray-500 dark:text-gray-400">최대 5개 표시</span>
-          </div>
-
-          {latestRecentJobs.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">아직 열람한 공고가 없습니다.</p>
-          ) : (
-            <div className="space-y-2">
-              {latestRecentJobs.map(({ job, viewedAt }) => (
-                <button
-                  key={job.recrutPblntSn}
-                  onClick={() => handleJobClick(job)}
-                  className="w-full text-left rounded-lg px-3 py-2 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors"
-                >
-                  <p className="text-sm font-medium text-gray-900 dark:text-white line-clamp-1">{job.recrutPbancTtl}</p>
-                  <div className="mt-1 flex items-center justify-between gap-3 text-xs text-gray-500 dark:text-gray-400">
-                    <span className="truncate">{job.instNm}</span>
-                    <span className="shrink-0">열람 {formatRecentViewedAt(viewedAt)}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </section>
-
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300">
             데이터를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.
@@ -230,6 +203,33 @@ export default function Home() {
             <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
           </div>
         )}
+
+        <section className="mt-8 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 md:p-6 transition-colors duration-300">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">최근 본 공고</h2>
+            <span className="text-xs text-gray-500 dark:text-gray-400">최대 5개 표시</span>
+          </div>
+
+          {latestRecentJobs.length === 0 ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400">아직 열람한 공고가 없습니다.</p>
+          ) : (
+            <div className="space-y-2">
+              {latestRecentJobs.map(({ job, viewedAt }) => (
+                <button
+                  key={job.recrutPblntSn}
+                  onClick={() => handleJobClick(job)}
+                  className="w-full text-left rounded-lg px-3 py-2 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors"
+                >
+                  <p className="text-sm font-medium text-gray-900 dark:text-white line-clamp-1">{job.recrutPbancTtl}</p>
+                  <div className="mt-1 flex items-center justify-between gap-3 text-xs text-gray-500 dark:text-gray-400">
+                    <span className="truncate">{job.instNm}</span>
+                    <span className="shrink-0">열람 {formatRecentViewedAt(viewedAt)}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
       </main>
 
       <Footer />
