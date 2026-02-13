@@ -136,6 +136,14 @@ const MarkerClusterGroup = dynamic(
   { ssr: false }
 );
 
+function formatClusterCount(count: number): string {
+  if (count >= 1000) {
+    return '999+';
+  }
+
+  return count.toString();
+}
+
 function createClusterIcon(
   cluster: { getChildCount: () => number },
   leaflet: LeafletModule | null
@@ -152,9 +160,17 @@ function createClusterIcon(
     lg: 56,
     xl: 68,
   };
+  const countLabel = formatClusterCount(count);
 
   return leaflet.divIcon({
-    html: `<span>${count}</span>`,
+    html: `
+      <span class="job-cluster-shell">
+        <span class="job-cluster-core">
+          <strong class="job-cluster-count">${countLabel}</strong>
+          <span class="job-cluster-unit">공고</span>
+        </span>
+      </span>
+    `,
     className: `job-cluster-icon job-cluster-icon--${tier}`,
     iconSize: [sizeByTier[tier], sizeByTier[tier]],
   });

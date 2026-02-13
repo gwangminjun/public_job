@@ -89,51 +89,191 @@ body {
   animation: fadeIn 0.3s ease-out;
 }
 
+@keyframes clusterPulse {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(0.96);
+    opacity: 0.55;
+  }
+}
+
 .job-cluster-icon {
-  background: radial-gradient(circle at 30% 30%, #60a5fa, #2563eb);
+  background: transparent;
+  border: 0;
+}
+
+.job-cluster-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.job-cluster-shell::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  border: 2px solid rgba(59, 130, 246, 0.35);
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.28), rgba(59, 130, 246, 0));
+}
+
+.job-cluster-shell::after {
+  content: '';
+  position: absolute;
+  inset: -9px;
+  border-radius: 9999px;
+  border: 1px solid rgba(37, 99, 235, 0.28);
+  opacity: 0.75;
+}
+
+.job-cluster-core {
+  position: relative;
+  width: 100%;
+  height: 100%;
   border: 2px solid #dbeafe;
   border-radius: 9999px;
+  background: radial-gradient(circle at 32% 30%, #93c5fd, #2563eb 70%);
   color: #ffffff;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+  gap: 1px;
+  font-weight: 800;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.38);
+}
+
+.job-cluster-count {
+  display: block;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.job-cluster-unit {
+  display: block;
+  line-height: 1;
+  opacity: 0.95;
+  letter-spacing: -0.01em;
 }
 
 .job-cluster-icon--sm {
+  font-size: 10px;
+}
+
+.job-cluster-icon--sm .job-cluster-count {
   font-size: 12px;
 }
 
+.job-cluster-icon--sm .job-cluster-unit {
+  font-size: 7px;
+}
+
 .job-cluster-icon--md {
-  font-size: 13px;
+  font-size: 11px;
+}
+
+.job-cluster-icon--md .job-cluster-core {
   border-width: 2.5px;
 }
 
-.job-cluster-icon--lg {
+.job-cluster-icon--md .job-cluster-count {
   font-size: 14px;
+}
+
+.job-cluster-icon--md .job-cluster-unit {
+  font-size: 8px;
+}
+
+.job-cluster-icon--lg {
+  font-size: 12px;
+}
+
+.job-cluster-icon--lg .job-cluster-shell::before {
+  border-color: rgba(234, 88, 12, 0.32);
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.26), rgba(234, 88, 12, 0));
+}
+
+.job-cluster-icon--lg .job-cluster-shell::after {
+  border-color: rgba(194, 65, 12, 0.3);
+  animation: clusterPulse 1.9s ease-in-out infinite;
+}
+
+.job-cluster-icon--lg .job-cluster-core {
   border-width: 3px;
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.45);
+  border-color: #ffedd5;
+  background: radial-gradient(circle at 32% 30%, #fdba74, #ea580c 72%);
+  box-shadow: 0 12px 24px rgba(194, 65, 12, 0.4);
+}
+
+.job-cluster-icon--lg .job-cluster-count {
+  font-size: 17px;
+}
+
+.job-cluster-icon--lg .job-cluster-unit {
+  font-size: 9px;
 }
 
 .job-cluster-icon--xl {
-  font-size: 16px;
+  font-size: 12px;
+}
+
+.job-cluster-icon--xl .job-cluster-shell::before {
+  border-color: rgba(220, 38, 38, 0.34);
+  background: radial-gradient(circle, rgba(252, 165, 165, 0.24), rgba(220, 38, 38, 0));
+}
+
+.job-cluster-icon--xl .job-cluster-shell::after {
+  border-color: rgba(185, 28, 28, 0.3);
+  animation: clusterPulse 1.7s ease-in-out infinite;
+}
+
+.job-cluster-icon--xl .job-cluster-core {
   border-width: 3px;
-  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.55);
+  border-color: #fee2e2;
+  background: radial-gradient(circle at 32% 30%, #fca5a5, #dc2626 72%);
+  box-shadow: 0 14px 28px rgba(185, 28, 28, 0.46);
+}
+
+.job-cluster-icon--xl .job-cluster-count {
+  font-size: 20px;
+}
+
+.job-cluster-icon--xl .job-cluster-unit {
+  font-size: 10px;
 }
 
 .dark .job-cluster-icon {
-  background: radial-gradient(circle at 30% 30%, #3b82f6, #1d4ed8);
+  filter: saturate(1.08);
+}
+
+.dark .job-cluster-shell::before {
+  border-color: rgba(59, 130, 246, 0.45);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.22), rgba(30, 64, 175, 0));
+}
+
+.dark .job-cluster-shell::after {
+  border-color: rgba(96, 165, 250, 0.28);
+}
+
+.dark .job-cluster-core {
   border-color: #1e3a8a;
-  box-shadow: 0 8px 18px rgba(30, 64, 175, 0.45);
+  box-shadow: 0 10px 22px rgba(30, 64, 175, 0.5);
 }
 
-.dark .job-cluster-icon--lg {
-  box-shadow: 0 10px 22px rgba(30, 64, 175, 0.58);
+.dark .job-cluster-icon--lg .job-cluster-core {
+  border-color: rgba(194, 65, 12, 0.65);
 }
 
-.dark .job-cluster-icon--xl {
-  box-shadow: 0 12px 26px rgba(30, 64, 175, 0.68);
+.dark .job-cluster-icon--xl .job-cluster-core {
+  border-color: rgba(185, 28, 28, 0.72);
 }
 
 .job-marker-icon {
