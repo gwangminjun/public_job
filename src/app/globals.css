@@ -135,3 +135,115 @@ body {
 .dark .job-cluster-icon--xl {
   box-shadow: 0 12px 26px rgba(30, 64, 175, 0.68);
 }
+
+.job-marker-icon {
+  background: transparent;
+  border: 0;
+}
+
+.job-marker-core {
+  position: relative;
+  width: 46px;
+  height: 58px;
+  display: block;
+}
+
+.job-marker-core::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 14px;
+  width: 28px;
+  height: 28px;
+  transform: translateX(-50%) rotate(45deg);
+  border-radius: 8px 8px 8px 2px;
+  background: #2563eb;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
+}
+
+.job-marker-core::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 22px;
+  width: 10px;
+  height: 10px;
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.65);
+}
+
+.job-marker-label {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  min-width: 38px;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #ffffff;
+  background: #1d4ed8;
+  box-shadow: 0 6px 14px rgba(29, 78, 216, 0.35);
+}
+
+.job-marker-icon--urgent .job-marker-core::before {
+  background: #dc2626;
+  box-shadow: 0 8px 18px rgba(220, 38, 38, 0.4);
+}
+
+.job-marker-icon--urgent .job-marker-label {
+  background: #b91c1c;
+  box-shadow: 0 6px 14px rgba(185, 28, 28, 0.45);
+}
+
+.job-marker-icon--soon .job-marker-core::before {
+  background: #ea580c;
+  box-shadow: 0 8px 18px rgba(234, 88, 12, 0.38);
+}
+
+.job-marker-icon--soon .job-marker-label {
+  background: #c2410c;
+  box-shadow: 0 6px 14px rgba(194, 65, 12, 0.42);
+}
+
+.job-marker-icon--normal .job-marker-core::before {
+  background: #2563eb;
+}
+
+.job-marker-icon--normal .job-marker-label {
+  background: #1d4ed8;
+}
+
+.job-marker-icon--closed .job-marker-core::before {
+  background: #6b7280;
+  box-shadow: 0 8px 18px rgba(75, 85, 99, 0.35);
+}
+
+.job-marker-icon--closed .job-marker-label {
+  background: #4b5563;
+  box-shadow: 0 6px 14px rgba(55, 65, 81, 0.32);
+}
+
+.job-marker-icon.is-active .job-marker-core::before {
+  width: 32px;
+  height: 32px;
+  top: 12px;
+}
+
+.job-marker-icon.is-active .job-marker-label {
+  top: -2px;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.75), 0 8px 16px rgba(30, 64, 175, 0.4);
+}
+
+.dark .job-marker-label {
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.45);
+}
+
+.dark .job-marker-icon.is-active .job-marker-label {
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.8), 0 8px 18px rgba(37, 99, 235, 0.5);
+}

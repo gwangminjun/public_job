@@ -1,9 +1,10 @@
-'use client';
+﻿'use client';
 
 import dynamic from 'next/dynamic';
-import { ComponentType, ReactNode, useMemo, useState } from 'react';
+import { ComponentType, ReactNode, useEffect, useMemo, useState } from 'react';
+import type { DivIcon, Icon } from 'leaflet';
 import { Job } from '@/lib/types';
-import { getDdayText } from '@/lib/utils';
+import { getDday, getDdayText } from '@/lib/utils';
 
 interface JobMapViewProps {
   jobs: Job[];
@@ -14,6 +15,17 @@ interface JobMapViewProps {
 type RegionPoint = {
   lat: number;
   lng: number;
+};
+
+type LeafletModule = typeof import('leaflet');
+type MarkerPriority = 'urgent' | 'soon' | 'normal' | 'closed';
+
+type MarkerWithPosition = {
+  job: Job;
+  region: string;
+  position: [number, number];
+  ddayText: string;
+  markerPriority: MarkerPriority;
 };
 
 const REGION_POINTS: Record<string, RegionPoint> = {
@@ -42,12 +54,14 @@ const REGION_ALIASES: Record<string, string> = {
   인천광역시: '인천',
   경기도: '경기',
   강원도: '강원',
+  강원특별자치도: '강원',
   세종특별자치시: '세종',
   충청남도: '충남',
   대전광역시: '대전',
   충청북도: '충북',
   경상북도: '경북',
   전라북도: '전북',
+  전북특별자치도: '전북',
   대구광역시: '대구',
   울산광역시: '울산',
   경상남도: '경남',
@@ -59,6 +73,11 @@ const REGION_ALIASES: Record<string, string> = {
 
 const DEFAULT_CENTER: [number, number] = [36.25, 127.9];
 const DEFAULT_ZOOM = 7;
+const LEAFLET_MARKER_ASSET = {
+  iconUrl: '/leaflet/marker-icon.png',
+  iconRetinaUrl: '/leaflet/marker-icon-2x.png',
+  shadowUrl: '/leaflet/marker-shadow.png',
+} as const;
 
 type MapContainerProps = {
   center: [number, number];
@@ -75,6 +94,7 @@ type TileLayerProps = {
 
 type MarkerProps = {
   position: [number, number];
+  icon?: Icon | DivIcon;
   eventHandlers?: {
     click?: () => void;
   };
@@ -87,7 +107,7 @@ type PopupProps = {
 
 type MarkerClusterGroupProps = {
   chunkedLoading?: boolean;
-  iconCreateFunction?: (cluster: { getChildCount: () => number }) => unknown;
+  iconCreateFunction?: (cluster: { getChildCount: () => number }) => DivIcon | undefined;
   children?: ReactNode;
 };
 
@@ -116,7 +136,14 @@ const MarkerClusterGroup = dynamic(
   { ssr: false }
 );
 
-function createClusterIcon(cluster: { getChildCount: () => number }): unknown {
+function createClusterIcon(
+  cluster: { getChildCount: () => number },
+  leaflet: LeafletModule | null
+): DivIcon | undefined {
+  if (!leaflet) {
+    return undefined;
+  }
+
   const count = cluster.getChildCount();
   const tier = count < 10 ? 'sm' : count < 30 ? 'md' : count < 80 ? 'lg' : 'xl';
   const sizeByTier: Record<typeof tier, number> = {
@@ -125,22 +152,57 @@ function createClusterIcon(cluster: { getChildCount: () => number }): unknown {
     lg: 56,
     xl: 68,
   };
-  const size = sizeByTier[tier];
-
-  const leaflet = (globalThis as {
-    L?: {
-      divIcon: (options: { html: string; className: string; iconSize: [number, number] }) => unknown;
-    };
-  }).L;
-
-  if (!leaflet?.divIcon) {
-    return undefined;
-  }
 
   return leaflet.divIcon({
     html: `<span>${count}</span>`,
     className: `job-cluster-icon job-cluster-icon--${tier}`,
-    iconSize: [size, size],
+    iconSize: [sizeByTier[tier], sizeByTier[tier]],
+  });
+}
+
+function getMarkerPriority(dday: number): MarkerPriority {
+  if (dday < 0) {
+    return 'closed';
+  }
+
+  if (dday <= 3) {
+    return 'urgent';
+  }
+
+  if (dday <= 10) {
+    return 'soon';
+  }
+
+  return 'normal';
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function createJobMarkerIcon(
+  leaflet: LeafletModule | null,
+  ddayText: string,
+  priority: MarkerPriority,
+  isActive: boolean
+): DivIcon | undefined {
+  if (!leaflet) {
+    return undefined;
+  }
+
+  const activeClass = isActive ? 'is-active' : '';
+
+  return leaflet.divIcon({
+    html: `<span class="job-marker-core"><span class="job-marker-label">${escapeHtml(ddayText)}</span></span>`,
+    className: `job-marker-icon job-marker-icon--${priority} ${activeClass}`,
+    iconSize: [46, 58],
+    iconAnchor: [23, 54],
+    popupAnchor: [0, -48],
   });
 }
 
@@ -183,6 +245,33 @@ function buildJobPosition(base: RegionPoint, index: number, jobId: number): [num
 
 export function JobMapView({ jobs, onJobClick, isLoading = false }: JobMapViewProps) {
   const [selectedRegion, setSelectedRegion] = useState<string>('');
+  const [leaflet, setLeaflet] = useState<LeafletModule | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    import('leaflet')
+      .then((module) => {
+        if (!mounted) {
+          return;
+        }
+
+        module.Icon.Default.mergeOptions(LEAFLET_MARKER_ASSET);
+        setLeaflet(module);
+      })
+      .catch(() => {
+        // Keep map interactive even if icon setup fails.
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const clusterIconCreateFunction = useMemo(
+    () => (cluster: { getChildCount: () => number }) => createClusterIcon(cluster, leaflet),
+    [leaflet]
+  );
 
   const regionBuckets = useMemo(() => {
     const buckets = new Map<string, Job[]>();
@@ -202,15 +291,21 @@ export function JobMapView({ jobs, onJobClick, isLoading = false }: JobMapViewPr
       .sort((a, b) => b.count - a.count);
   }, [jobs]);
 
-  const jobsWithPosition = useMemo(() => {
+  const jobsWithPosition = useMemo<MarkerWithPosition[]>(() => {
     return regionBuckets.flatMap((bucket) => {
       const point = REGION_POINTS[bucket.region] || REGION_POINTS.해외;
 
-      return bucket.jobs.map((job, index) => ({
-        job,
-        region: bucket.region,
-        position: buildJobPosition(point, index, job.recrutPblntSn),
-      }));
+      return bucket.jobs.map((job, index) => {
+        const dday = getDday(job.pbancEndYmd);
+
+        return {
+          job,
+          region: bucket.region,
+          position: buildJobPosition(point, index, job.recrutPblntSn),
+          ddayText: getDdayText(job.pbancEndYmd),
+          markerPriority: getMarkerPriority(dday),
+        };
+      });
     });
   }, [regionBuckets]);
 
@@ -238,7 +333,9 @@ export function JobMapView({ jobs, onJobClick, isLoading = false }: JobMapViewPr
     <section className="rounded-xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 md:p-6 shadow-sm transition-colors duration-300">
       <div className="mb-3 flex items-center justify-between gap-2">
         <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white">지역별 채용 지도</h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400">전체 채용 {jobs.length.toLocaleString()}건, 확대하면 개별 공고 마커를 확인할 수 있습니다.</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          전체 채용 {jobs.length.toLocaleString()}건을 표시하며 개별 공고 마커를 확인할 수 있습니다.
+        </p>
       </div>
 
       <div className="h-[500px] rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -248,30 +345,36 @@ export function JobMapView({ jobs, onJobClick, isLoading = false }: JobMapViewPr
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterIcon}>
-            {jobsWithPosition.map(({ job, region, position }) => (
-              <Marker
-                key={job.recrutPblntSn}
-                position={position}
-                eventHandlers={{ click: () => setSelectedRegion(region) }}
-              >
-                <Popup>
-                  <div className="min-w-[220px]">
-                    <p className="text-xs text-blue-600 font-medium mb-1">{region}</p>
-                    <p className="text-sm font-semibold mb-1">{job.recrutPbancTtl}</p>
-                    <p className="text-xs text-gray-600 mb-2">{job.instNm}</p>
-                    <p className="text-xs text-gray-500 mb-3">{getDdayText(job.pbancEndYmd)}</p>
-                    <button
-                      type="button"
-                      onClick={() => onJobClick(job)}
-                      className="w-full rounded-md bg-blue-600 px-3 py-1.5 text-xs text-white hover:bg-blue-700"
-                    >
-                      상세 보기
-                    </button>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
+          <MarkerClusterGroup chunkedLoading iconCreateFunction={clusterIconCreateFunction}>
+            {jobsWithPosition.map(({ job, region, position, ddayText, markerPriority }) => {
+              const isActiveRegion = region === activeRegion;
+              const markerIcon = createJobMarkerIcon(leaflet, ddayText, markerPriority, isActiveRegion);
+
+              return (
+                <Marker
+                  key={job.recrutPblntSn}
+                  position={position}
+                  icon={markerIcon}
+                  eventHandlers={{ click: () => setSelectedRegion(region) }}
+                >
+                  <Popup>
+                    <div className="min-w-[220px]">
+                      <p className="text-xs text-blue-600 font-medium mb-1">{region}</p>
+                      <p className="text-sm font-semibold mb-1">{job.recrutPbancTtl}</p>
+                      <p className="text-xs text-gray-600 mb-2">{job.instNm}</p>
+                      <p className="text-xs text-gray-500 mb-3">{ddayText}</p>
+                      <button
+                        type="button"
+                        onClick={() => onJobClick(job)}
+                        className="w-full rounded-md bg-blue-600 px-3 py-1.5 text-xs text-white hover:bg-blue-700"
+                      >
+                        상세 보기
+                      </button>
+                    </div>
+                  </Popup>
+                </Marker>
+              );
+            })}
           </MarkerClusterGroup>
         </MapContainer>
       </div>
