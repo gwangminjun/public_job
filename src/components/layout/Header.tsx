@@ -6,17 +6,7 @@ import { useBookmarkStore } from '@/store/bookmarkStore';
 import { useMounted } from '@/hooks/useMounted';
 import { useTheme } from 'next-themes';
 
-interface HeaderProps {
-  showPresetToggle?: boolean;
-  isPresetPanelVisible?: boolean;
-  onTogglePresetPanel?: () => void;
-}
-
-export function Header({
-  showPresetToggle = false,
-  isPresetPanelVisible = false,
-  onTogglePresetPanel,
-}: HeaderProps) {
+export function Header() {
   const pathname = usePathname();
   const mounted = useMounted();
   const bookmarks = useBookmarkStore((state) => state.bookmarks);
@@ -60,20 +50,6 @@ export function Header({
                 </span>
               )}
             </Link>
-            {showPresetToggle && (
-              <button
-                type="button"
-                onClick={onTogglePresetPanel}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  isPresetPanelVisible
-                    ? 'bg-white text-blue-700 shadow-sm'
-                    : 'text-white hover:bg-white/10'
-                }`}
-                aria-pressed={isPresetPanelVisible}
-              >
-                필터 프리셋
-              </button>
-            )}
           </nav>
 
           <button

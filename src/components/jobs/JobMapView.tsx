@@ -166,6 +166,7 @@ function createClusterIcon(
     html: `
       <span class="job-cluster-shell">
         <span class="job-cluster-core">
+          <span class="job-cluster-dot" aria-hidden="true"></span>
           <strong class="job-cluster-count">${countLabel}</strong>
           <span class="job-cluster-unit">공고</span>
         </span>
@@ -213,6 +214,7 @@ function createJobMarkerIcon(
     html: `
       <span class="job-marker-core">
         <span class="job-marker-halo"></span>
+        <span class="job-marker-stem"></span>
         <span class="job-marker-label">${escapeHtml(ddayText)}</span>
       </span>
     `,
@@ -360,6 +362,7 @@ export function JobMapView({ jobs, onJobClick, isLoading = false }: JobMapViewPr
         <span className="inline-flex items-center rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2.5 py-1 text-gray-600 dark:text-gray-300">🟠 D-10 이내</span>
         <span className="inline-flex items-center rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2.5 py-1 text-gray-600 dark:text-gray-300">🔵 진행중</span>
         <span className="inline-flex items-center rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2.5 py-1 text-gray-600 dark:text-gray-300">⚪ 마감</span>
+        <span className="inline-flex items-center rounded-full border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 text-blue-700 dark:text-blue-200">🧩 클러스터 자동 그룹화</span>
       </div>
 
       <div className="h-[500px] rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">

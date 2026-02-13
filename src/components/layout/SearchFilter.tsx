@@ -13,9 +13,15 @@ interface SearchSuggestion {
 
 interface SearchFilterProps {
   showPresetPanel?: boolean;
+  isPresetPanelVisible?: boolean;
+  onTogglePresetPanel?: () => void;
 }
 
-export function SearchFilter({ showPresetPanel = false }: SearchFilterProps) {
+export function SearchFilter({
+  showPresetPanel = false,
+  isPresetPanelVisible = false,
+  onTogglePresetPanel,
+}: SearchFilterProps) {
   const {
     keyword,
     setKeyword,
@@ -203,6 +209,20 @@ export function SearchFilter({ showPresetPanel = false }: SearchFilterProps) {
         >
           검색
         </button>
+        {onTogglePresetPanel && (
+          <button
+            type="button"
+            onClick={onTogglePresetPanel}
+            className={`px-4 py-2.5 rounded-lg font-medium transition-colors border ${
+              isPresetPanelVisible
+                ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-700'
+                : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600'
+            }`}
+            aria-pressed={isPresetPanelVisible}
+          >
+            필터 프리셋
+          </button>
+        )}
       </form>
 
       {/* 필터 프리셋 */}

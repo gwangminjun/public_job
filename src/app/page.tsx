@@ -108,11 +108,7 @@ export default function Home() {
         <UrlFilterSync />
       </Suspense>
 
-      <Header
-        showPresetToggle
-        isPresetPanelVisible={showPresetPanel}
-        onTogglePresetPanel={() => setShowPresetPanel((prev) => !prev)}
-      />
+      <Header />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 py-8 w-full">
         <section className="relative overflow-hidden rounded-2xl border border-blue-100/70 dark:border-blue-900/50 bg-gradient-to-br from-blue-50 via-indigo-50 to-white dark:from-gray-800 dark:via-gray-800 dark:to-gray-900 p-5 md:p-7 mb-6">
@@ -158,7 +154,11 @@ export default function Home() {
         </div>
 
         <div className="mb-6">
-          <SearchFilter showPresetPanel={showPresetPanel} />
+          <SearchFilter
+            showPresetPanel={showPresetPanel}
+            isPresetPanelVisible={showPresetPanel}
+            onTogglePresetPanel={() => setShowPresetPanel((prev) => !prev)}
+          />
         </div>
 
         {error && (
