@@ -108,6 +108,10 @@ type PopupProps = {
 type MarkerClusterGroupProps = {
   chunkedLoading?: boolean;
   iconCreateFunction?: (cluster: { getChildCount: () => number }) => DivIcon;
+  maxClusterRadius?: number;
+  spiderfyOnMaxZoom?: boolean;
+  showCoverageOnHover?: boolean;
+  removeOutsideVisibleBounds?: boolean;
   children?: ReactNode;
 };
 
@@ -206,7 +210,12 @@ function createJobMarkerIcon(
   const activeClass = isActive ? 'is-active' : '';
 
   return leaflet.divIcon({
-    html: `<span class="job-marker-core"><span class="job-marker-label">${escapeHtml(ddayText)}</span></span>`,
+    html: `
+      <span class="job-marker-core">
+        <span class="job-marker-halo"></span>
+        <span class="job-marker-label">${escapeHtml(ddayText)}</span>
+      </span>
+    `,
     className: `job-marker-icon job-marker-icon--${priority} ${activeClass}`,
     iconSize: [46, 58],
     iconAnchor: [23, 54],
@@ -342,8 +351,15 @@ export function JobMapView({ jobs, onJobClick, isLoading = false }: JobMapViewPr
       <div className="mb-3 flex items-center justify-between gap-2">
         <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white">지역별 채용 지도</h3>
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          전체 채용 {jobs.length.toLocaleString()}건을 표시하며 개별 공고 마커를 확인할 수 있습니다.
+          전체 채용 {jobs.length.toLocaleString()}건을 클러스터링해 표시하며 확대 시 개별 마커를 확인할 수 있습니다.
         </p>
+      </div>
+
+      <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
+        <span className="inline-flex items-center rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2.5 py-1 text-gray-600 dark:text-gray-300">🔴 D-3 이내</span>
+        <span className="inline-flex items-center rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2.5 py-1 text-gray-600 dark:text-gray-300">🟠 D-10 이내</span>
+        <span className="inline-flex items-center rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2.5 py-1 text-gray-600 dark:text-gray-300">🔵 진행중</span>
+        <span className="inline-flex items-center rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2.5 py-1 text-gray-600 dark:text-gray-300">⚪ 마감</span>
       </div>
 
       <div className="h-[500px] rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -354,7 +370,14 @@ export function JobMapView({ jobs, onJobClick, isLoading = false }: JobMapViewPr
           />
 
           {leaflet && clusterIconCreateFunction && (
-            <MarkerClusterGroup chunkedLoading iconCreateFunction={clusterIconCreateFunction}>
+            <MarkerClusterGroup
+              chunkedLoading
+              spiderfyOnMaxZoom
+              showCoverageOnHover={false}
+              removeOutsideVisibleBounds
+              maxClusterRadius={58}
+              iconCreateFunction={clusterIconCreateFunction}
+            >
               {jobsWithPosition.map(({ job, region, position, ddayText, markerPriority }) => {
                 const isActiveRegion = region === activeRegion;
                 const markerIcon = createJobMarkerIcon(leaflet, ddayText, markerPriority, isActiveRegion);

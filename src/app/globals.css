@@ -104,6 +104,21 @@ body {
   }
 }
 
+@keyframes markerHaloPulse {
+  0% {
+    transform: translateX(-50%) scale(0.92);
+    opacity: 0.5;
+  }
+  70% {
+    transform: translateX(-50%) scale(1.16);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-50%) scale(1.16);
+    opacity: 0;
+  }
+}
+
 .job-cluster-icon {
   background: transparent;
   border: 0;
@@ -288,6 +303,19 @@ body {
   display: block;
 }
 
+.job-marker-halo {
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  width: 26px;
+  height: 26px;
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  background: rgba(59, 130, 246, 0.3);
+  filter: blur(1px);
+  animation: markerHaloPulse 1.9s ease-out infinite;
+}
+
 .job-marker-core::before {
   content: '';
   position: absolute;
@@ -336,6 +364,10 @@ body {
   box-shadow: 0 8px 18px rgba(220, 38, 38, 0.4);
 }
 
+.job-marker-icon--urgent .job-marker-halo {
+  background: rgba(220, 38, 38, 0.34);
+}
+
 .job-marker-icon--urgent .job-marker-label {
   background: #b91c1c;
   box-shadow: 0 6px 14px rgba(185, 28, 28, 0.45);
@@ -344,6 +376,10 @@ body {
 .job-marker-icon--soon .job-marker-core::before {
   background: #ea580c;
   box-shadow: 0 8px 18px rgba(234, 88, 12, 0.38);
+}
+
+.job-marker-icon--soon .job-marker-halo {
+  background: rgba(234, 88, 12, 0.32);
 }
 
 .job-marker-icon--soon .job-marker-label {
@@ -355,6 +391,10 @@ body {
   background: #2563eb;
 }
 
+.job-marker-icon--normal .job-marker-halo {
+  background: rgba(37, 99, 235, 0.3);
+}
+
 .job-marker-icon--normal .job-marker-label {
   background: #1d4ed8;
 }
@@ -362,6 +402,12 @@ body {
 .job-marker-icon--closed .job-marker-core::before {
   background: #6b7280;
   box-shadow: 0 8px 18px rgba(75, 85, 99, 0.35);
+}
+
+.job-marker-icon--closed .job-marker-halo {
+  background: rgba(107, 114, 128, 0.28);
+  animation: none;
+  opacity: 0.45;
 }
 
 .job-marker-icon--closed .job-marker-label {
@@ -373,6 +419,11 @@ body {
   width: 32px;
   height: 32px;
   top: 12px;
+}
+
+.job-marker-icon.is-active .job-marker-halo {
+  width: 30px;
+  height: 30px;
 }
 
 .job-marker-icon.is-active .job-marker-label {

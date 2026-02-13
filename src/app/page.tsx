@@ -115,6 +115,37 @@ export default function Home() {
       />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 py-8 w-full">
+        <section className="relative overflow-hidden rounded-2xl border border-blue-100/70 dark:border-blue-900/50 bg-gradient-to-br from-blue-50 via-indigo-50 to-white dark:from-gray-800 dark:via-gray-800 dark:to-gray-900 p-5 md:p-7 mb-6">
+          <div className="pointer-events-none absolute -top-14 -right-12 h-44 w-44 rounded-full bg-blue-300/20 blur-2xl dark:bg-blue-500/20" />
+          <div className="pointer-events-none absolute -bottom-16 -left-10 h-44 w-44 rounded-full bg-indigo-300/20 blur-2xl dark:bg-indigo-500/20" />
+
+          <div className="relative flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="inline-flex items-center rounded-full bg-blue-600 text-white px-3 py-1 text-xs font-semibold shadow-sm">
+                공공기관 채용 대시보드
+              </p>
+              <h1 className="mt-3 text-2xl md:text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+                원하는 채용 공고를 더 빠르게 찾으세요
+              </h1>
+              <p className="mt-2 text-sm md:text-base text-gray-600 dark:text-gray-300">
+                검색 · 필터 · 지도 · 트렌드 분석까지 한 화면에서 탐색할 수 있습니다.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 text-xs md:text-sm">
+              <div className="rounded-lg border border-white/70 dark:border-gray-700 bg-white/80 dark:bg-gray-800/90 px-3 py-2 text-center text-gray-700 dark:text-gray-200">
+                실시간 공고
+              </div>
+              <div className="rounded-lg border border-white/70 dark:border-gray-700 bg-white/80 dark:bg-gray-800/90 px-3 py-2 text-center text-gray-700 dark:text-gray-200">
+                지역 지도
+              </div>
+              <div className="rounded-lg border border-white/70 dark:border-gray-700 bg-white/80 dark:bg-gray-800/90 px-3 py-2 text-center text-gray-700 dark:text-gray-200">
+                트렌드 분석
+              </div>
+            </div>
+          </div>
+        </section>
+
         <div className="mb-6">
           <StatsPanel
             totalCount={stats.totalCount}
@@ -168,32 +199,32 @@ export default function Home() {
               )}
             </div>
 
-            <div className="inline-flex rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-1">
+            <div className="inline-flex rounded-xl border border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-800/95 p-1.5 shadow-sm">
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
-                className={`px-3 py-1.5 text-sm rounded-md transition-colors ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${viewMode === 'list' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
               >
-                리스트
+                목록
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('calendar')}
-                className={`px-3 py-1.5 text-sm rounded-md transition-colors ${viewMode === 'calendar' ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${viewMode === 'calendar' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
               >
                 캘린더
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('map')}
-                className={`px-3 py-1.5 text-sm rounded-md transition-colors ${viewMode === 'map' ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${viewMode === 'map' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
               >
                 지도
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('insight')}
-                className={`px-3 py-1.5 text-sm rounded-md transition-colors ${viewMode === 'insight' ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${viewMode === 'insight' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
               >
                 분석
               </button>
