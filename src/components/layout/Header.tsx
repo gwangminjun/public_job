@@ -5,22 +5,29 @@ import { usePathname } from 'next/navigation';
 import { useBookmarkStore } from '@/store/bookmarkStore';
 import { useMounted } from '@/hooks/useMounted';
 import { useTheme } from 'next-themes';
+import { useTranslation } from 'react-i18next';
 
 export function Header() {
   const pathname = usePathname();
   const mounted = useMounted();
   const bookmarks = useBookmarkStore((state) => state.bookmarks);
   const { theme, setTheme } = useTheme();
+  const { t, i18n } = useTranslation();
+
+  const currentLanguage = i18n.resolvedLanguage === 'en' ? 'en' : 'ko';
+  const toggleLanguage = () => {
+    void i18n.changeLanguage(currentLanguage === 'ko' ? 'en' : 'ko');
+  };
 
   return (
     <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-md dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-8 flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="text-center md:text-left">
           <Link href="/" className="text-2xl md:text-3xl font-bold hover:text-blue-100 transition-colors">
-            공공기관 채용정보
+            {t('header.title')}
           </Link>
           <p className="mt-2 text-blue-100 text-sm md:text-base">
-            공공데이터포털 API를 활용한 실시간 채용정보 서비스
+            {t('header.subtitle')}
           </p>
         </div>
 
@@ -33,7 +40,7 @@ export function Header() {
                   ? 'bg-white text-blue-700 shadow-sm' 
                   : 'text-white hover:bg-white/10'}`}
             >
-              채용공고
+              {t('header.navJobs')}
             </Link>
             <Link
               href="/bookmarks"
@@ -42,7 +49,7 @@ export function Header() {
                   ? 'bg-white text-blue-700 shadow-sm' 
                   : 'text-white hover:bg-white/10'}`}
             >
-              관심공고
+              {t('header.navBookmarks')}
               {mounted && bookmarks.length > 0 && (
                 <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full
                   ${pathname === '/bookmarks' ? 'bg-blue-100 text-blue-700' : 'bg-red-500 text-white'}`}>
@@ -53,9 +60,18 @@ export function Header() {
           </nav>
 
           <button
+            type="button"
+            onClick={toggleLanguage}
+            className="px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-xs font-semibold"
+            aria-label={t('header.language')}
+          >
+            {currentLanguage.toUpperCase()}
+          </button>
+
+          <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-            aria-label="Toggle Dark Mode"
+            aria-label={t('header.toggleTheme')}
           >
             {mounted ? (
               theme === 'dark' ? (

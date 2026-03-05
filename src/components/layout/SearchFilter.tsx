@@ -5,6 +5,7 @@ import { useFilterStore } from '@/store/filterStore';
 import { useFilterPresetStore } from '@/store/filterPresetStore';
 import { REGIONS, HIRE_TYPES, RECRUIT_TYPES, NCS_TYPES, EDUCATION_TYPES } from '@/lib/utils';
 import { SortType } from '@/lib/types';
+import { useTranslation } from 'react-i18next';
 
 interface SearchSuggestion {
   text: string;
@@ -22,6 +23,8 @@ export function SearchFilter({
   isPresetPanelVisible = false,
   onTogglePresetPanel,
 }: SearchFilterProps) {
+  const { t } = useTranslation();
+
   const {
     keyword,
     setKeyword,
@@ -179,7 +182,7 @@ export function SearchFilter({
             onBlur={() => {
               window.setTimeout(() => setShowSuggestions(false), 120);
             }}
-            placeholder="공고명, 기관명으로 검색..."
+            placeholder={t('search.placeholder')}
             className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 dark:placeholder-gray-500"
           />
 
@@ -195,7 +198,7 @@ export function SearchFilter({
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-sm text-gray-800 dark:text-gray-100 truncate">{suggestion.text}</span>
                     <span className="text-[11px] rounded-full px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 shrink-0">
-                      {suggestion.type === 'institution' ? '기관' : '직무'}
+                      {suggestion.type === 'institution' ? t('search.suggestionInstitution') : t('search.suggestionKeyword')}
                     </span>
                   </div>
                 </button>
@@ -207,7 +210,7 @@ export function SearchFilter({
           type="submit"
           className="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
         >
-          검색
+          {t('search.submit')}
         </button>
         {onTogglePresetPanel && (
           <button
@@ -220,7 +223,7 @@ export function SearchFilter({
             }`}
             aria-pressed={isPresetPanelVisible}
           >
-            필터 프리셋
+            {t('search.presetToggle')}
           </button>
         )}
       </form>
@@ -234,7 +237,7 @@ export function SearchFilter({
                 type="text"
                 value={presetName}
                 onChange={(e) => setPresetName(e.target.value)}
-                placeholder="필터 프리셋 이름"
+                placeholder={t('search.presetNamePlaceholder')}
                 className="flex-1 min-w-0 px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
@@ -243,7 +246,7 @@ export function SearchFilter({
                 disabled={!presetName.trim()}
                 className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                저장
+                {t('search.save')}
               </button>
             </div>
 
@@ -253,7 +256,7 @@ export function SearchFilter({
                 onChange={(e) => setSelectedPresetId(e.target.value)}
                 className="flex-1 min-w-0 px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">프리셋 선택</option>
+                <option value="">{t('search.presetSelect')}</option>
                 {presets.map((preset) => (
                   <option key={preset.id} value={preset.id}>
                     {preset.name}
@@ -266,7 +269,7 @@ export function SearchFilter({
                 disabled={!selectedPresetId}
                 className="px-4 py-2 text-sm rounded-lg bg-gray-700 text-white hover:bg-gray-800 dark:bg-gray-600 dark:hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                불러오기
+                {t('search.load')}
               </button>
               <button
                 type="button"
@@ -274,12 +277,12 @@ export function SearchFilter({
                 disabled={!selectedPresetId}
                 className="px-4 py-2 text-sm rounded-lg text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                삭제
+                {t('search.remove')}
               </button>
             </div>
           </div>
           <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-            현재 필터 조건을 이름으로 저장하고 빠르게 다시 불러올 수 있습니다.
+            {t('search.presetHelp')}
           </p>
         </div>
       )}
@@ -298,7 +301,7 @@ export function SearchFilter({
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
-          상세 필터 {activeFilterCount > 0 && `(${activeFilterCount})`}
+          {t('search.detailFilter')} {activeFilterCount > 0 && `(${activeFilterCount})`}
         </button>
 
         <div className="flex items-center gap-4">
@@ -307,9 +310,9 @@ export function SearchFilter({
             onChange={(e) => setSort(e.target.value as SortType)}
             className="text-sm border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1.5 px-3"
           >
-            <option value="latest">최신순</option>
-            <option value="deadline">마감임박순</option>
-            <option value="personnel">채용인원순</option>
+            <option value="latest">{t('search.sortLatest')}</option>
+            <option value="deadline">{t('search.sortDeadline')}</option>
+            <option value="personnel">{t('search.sortPersonnel')}</option>
           </select>
 
           <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -319,7 +322,7 @@ export function SearchFilter({
               onChange={(e) => setOnlyOngoing(e.target.checked)}
               className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
             />
-            <span className="text-sm text-gray-600 dark:text-gray-400">진행중인 공고만</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">{t('search.onlyOngoing')}</span>
           </label>
         </div>
       </div>
@@ -329,7 +332,7 @@ export function SearchFilter({
       {showFilters && (
         <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 space-y-4">
           {/* 지역 */}
-          <FilterSection title="근무지역">
+          <FilterSection title={t('search.sectionRegion')}>
             <div className="flex flex-wrap gap-2">
               {REGIONS.map((region) => (
                 <FilterChip
@@ -343,7 +346,7 @@ export function SearchFilter({
           </FilterSection>
 
           {/* 고용형태 */}
-          <FilterSection title="고용형태">
+          <FilterSection title={t('search.sectionHireType')}>
             <div className="flex flex-wrap gap-2">
               {HIRE_TYPES.map((type) => (
                 <FilterChip
@@ -357,7 +360,7 @@ export function SearchFilter({
           </FilterSection>
 
           {/* 채용구분 */}
-          <FilterSection title="채용구분">
+          <FilterSection title={t('search.sectionRecruitType')}>
             <div className="flex flex-wrap gap-2">
               {RECRUIT_TYPES.map((type) => (
                 <FilterChip
@@ -371,7 +374,7 @@ export function SearchFilter({
           </FilterSection>
 
           {/* NCS 직무분류 */}
-          <FilterSection title="직무분야 (NCS)">
+          <FilterSection title={t('search.sectionNcs')}>
             <div className="flex flex-wrap gap-2">
               {NCS_TYPES.map((type) => (
                 <FilterChip
@@ -385,7 +388,7 @@ export function SearchFilter({
           </FilterSection>
 
           {/* 학력정보 */}
-          <FilterSection title="학력">
+          <FilterSection title={t('search.sectionEducation')}>
             <div className="flex flex-wrap gap-2">
               {EDUCATION_TYPES.map((type) => (
                 <FilterChip
@@ -404,7 +407,7 @@ export function SearchFilter({
               onClick={resetFilters}
               className="text-sm text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
             >
-              필터 초기화
+              {t('search.reset')}
             </button>
           )}
         </div>

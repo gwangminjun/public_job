@@ -19,8 +19,10 @@ import { useBookmarkStore } from '@/store/bookmarkStore';
 import { useRecentViewedStore } from '@/store/recentViewedStore';
 import { Job } from '@/lib/types';
 import { formatRecentViewedAt } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 export default function Home() {
+  const { t } = useTranslation();
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'map' | 'insight'>('list');
   const [activeStatFilter, setActiveStatFilter] = useState<StatType | null>(null);
@@ -86,9 +88,9 @@ export default function Home() {
         <JobCalendar jobs={bookmarks} onJobClick={handleJobClick} />
       ) : (
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-10 text-center">
-          <p className="text-base font-medium text-gray-900 dark:text-white">캘린더에 표시할 즐겨찾기 공고가 없습니다.</p>
+          <p className="text-base font-medium text-gray-900 dark:text-white">{t('home.calendarEmptyTitle')}</p>
           <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            리스트에서 하트 버튼을 눌러 공고를 추가하면 캘린더에서 마감일 기준으로 모아볼 수 있습니다.
+            {t('home.calendarEmptyDesc')}
           </p>
         </div>
       );
@@ -117,26 +119,26 @@ export default function Home() {
 
           <div className="relative flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="inline-flex items-center rounded-full bg-blue-600 text-white px-3 py-1 text-xs font-semibold shadow-sm">
-                공공기관 채용 대시보드
+          <p className="inline-flex items-center rounded-full bg-blue-600 text-white px-3 py-1 text-xs font-semibold shadow-sm">
+                {t('home.heroBadge')}
               </p>
               <h1 className="mt-3 text-2xl md:text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-                원하는 채용 공고를 더 빠르게 찾으세요
+                {t('home.heroTitle')}
               </h1>
               <p className="mt-2 text-sm md:text-base text-gray-600 dark:text-gray-300">
-                검색 · 필터 · 지도 · 트렌드 분석까지 한 화면에서 탐색할 수 있습니다.
+                {t('home.heroDesc')}
               </p>
             </div>
 
             <div className="grid grid-cols-3 gap-2 text-xs md:text-sm">
               <div className="rounded-lg border border-white/70 dark:border-gray-700 bg-white/80 dark:bg-gray-800/90 px-3 py-2 text-center text-gray-700 dark:text-gray-200">
-                실시간 공고
+                {t('home.cardRealtime')}
               </div>
               <div className="rounded-lg border border-white/70 dark:border-gray-700 bg-white/80 dark:bg-gray-800/90 px-3 py-2 text-center text-gray-700 dark:text-gray-200">
-                지역 지도
+                {t('home.cardMap')}
               </div>
               <div className="rounded-lg border border-white/70 dark:border-gray-700 bg-white/80 dark:bg-gray-800/90 px-3 py-2 text-center text-gray-700 dark:text-gray-200">
-                트렌드 분석
+                {t('home.cardTrend')}
               </div>
             </div>
           </div>
@@ -163,7 +165,7 @@ export default function Home() {
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300">
-            데이터를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.
+            {t('home.loadError')}
           </div>
         )}
 
@@ -171,30 +173,30 @@ export default function Home() {
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2 flex-wrap">
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                총 <span className="font-semibold text-gray-900 dark:text-white">{data.totalCount?.toLocaleString()}</span>개의 채용공고
+                {t('home.totalJobs', { count: data.totalCount || 0 })}
               </p>
 
               {activeStatFilter === 'institutions' && (
                 <span className="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2.5 py-1 text-xs font-medium">
-                  기관별 모아보기 적용됨
+                  {t('home.institutionGrouping')}
                 </span>
               )}
 
               {viewMode === 'calendar' && (
                 <span className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2.5 py-1 text-xs font-medium">
-                  캘린더는 즐겨찾기 공고만 표시 ({bookmarks.length}건)
+                  {t('home.calendarBookmarkOnly', { count: bookmarks.length })}
                 </span>
               )}
 
               {viewMode === 'map' && (
                 <span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2.5 py-1 text-xs font-medium">
-                  지도 뷰는 현재 필터 기준 전체 공고({mapData?.totalCount?.toLocaleString() || 0}건)로 표시됩니다
+                  {t('home.mapUsesAll', { count: mapData?.totalCount || 0 })}
                 </span>
               )}
 
               {viewMode === 'insight' && (
                 <span className="inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 px-2.5 py-1 text-xs font-medium">
-                  분석 뷰는 현재 필터 기준 전체 공고({mapData?.totalCount?.toLocaleString() || 0}건)를 집계합니다
+                  {t('home.insightUsesAll', { count: mapData?.totalCount || 0 })}
                 </span>
               )}
             </div>
@@ -205,28 +207,28 @@ export default function Home() {
                 onClick={() => setViewMode('list')}
                 className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${viewMode === 'list' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
               >
-                목록
+                {t('home.viewList')}
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('calendar')}
                 className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${viewMode === 'calendar' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
               >
-                캘린더
+                {t('home.viewCalendar')}
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('map')}
                 className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${viewMode === 'map' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
               >
-                지도
+                {t('home.viewMap')}
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('insight')}
                 className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${viewMode === 'insight' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
               >
-                분석
+                {t('home.viewInsight')}
               </button>
             </div>
           </div>
@@ -242,12 +244,12 @@ export default function Home() {
 
         <section className="mt-8 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 md:p-6 transition-colors duration-300">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">최근 본 공고</h2>
-            <span className="text-xs text-gray-500 dark:text-gray-400">최대 5개 표시</span>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('home.recentTitle')}</h2>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{t('home.recentCap')}</span>
           </div>
 
           {latestRecentJobs.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">아직 열람한 공고가 없습니다.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('home.recentEmpty')}</p>
           ) : (
             <div className="space-y-2">
               {latestRecentJobs.map(({ job, viewedAt }) => (
@@ -259,7 +261,7 @@ export default function Home() {
                   <p className="text-sm font-medium text-gray-900 dark:text-white line-clamp-1">{job.recrutPbancTtl}</p>
                   <div className="mt-1 flex items-center justify-between gap-3 text-xs text-gray-500 dark:text-gray-400">
                     <span className="truncate">{job.instNm}</span>
-                    <span className="shrink-0">열람 {formatRecentViewedAt(viewedAt)}</span>
+                    <span className="shrink-0">{t('home.viewedAt', { time: formatRecentViewedAt(viewedAt) })}</span>
                   </div>
                 </button>
               ))}

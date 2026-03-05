@@ -1,6 +1,7 @@
 'use client';
 
 import { formatNumber } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 export type StatType = 'total' | 'endingSoon' | 'newJobs' | 'institutions';
 
@@ -14,40 +15,42 @@ interface StatsPanelProps {
 }
 
 export function StatsPanel({ totalCount, endingSoon, newJobs, institutions, activeStatFilter, onStatClick }: StatsPanelProps) {
+  const { t } = useTranslation();
+
   const stats: { key: StatType; label: string; value: number; suffix: string; subLabel?: string; color: string; desc: string }[] = [
     {
       key: 'total',
-      label: '전체 채용',
+      label: t('stats.totalLabel'),
       value: totalCount,
-      suffix: '건',
+      suffix: t('stats.unitJobs'),
       color: 'from-blue-500 to-blue-600',
-      desc: '필터 초기화',
+      desc: t('stats.totalDesc'),
     },
     {
       key: 'endingSoon',
-      label: '마감 임박',
+      label: t('stats.endingSoonLabel'),
       value: endingSoon,
-      suffix: '건',
-      subLabel: '(3일 이내)',
+      suffix: t('stats.unitJobs'),
+      subLabel: t('stats.endingSoonSub'),
       color: 'from-red-500 to-red-600',
-      desc: '마감 임박 공고만 보기',
+      desc: t('stats.endingSoonDesc'),
     },
     {
       key: 'newJobs',
-      label: '신규 등록',
+      label: t('stats.newJobsLabel'),
       value: newJobs,
-      suffix: '건',
-      subLabel: '(7일 이내)',
+      suffix: t('stats.unitJobs'),
+      subLabel: t('stats.newJobsSub'),
       color: 'from-green-500 to-green-600',
-      desc: '신규 등록 공고만 보기',
+      desc: t('stats.newJobsDesc'),
     },
     {
       key: 'institutions',
-      label: '등록 기관',
+      label: t('stats.institutionsLabel'),
       value: institutions,
-      suffix: '개',
+      suffix: t('stats.unitOrgs'),
       color: 'from-purple-500 to-purple-600',
-      desc: '기관별 모아보기',
+      desc: t('stats.institutionsDesc'),
     },
   ];
 
