@@ -1,15 +1,13 @@
 ﻿'use client';
 
 import { ReactNode, Suspense, useCallback, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Header } from '@/components/layout/Header';
 import { SearchFilter } from '@/components/layout/SearchFilter';
 import { UrlFilterSync } from '@/components/layout/UrlFilterSync';
 import { Footer } from '@/components/layout/Footer';
 import { StatsPanel, StatType } from '@/components/stats/StatsPanel';
-import { JobTrendDashboard } from '@/components/stats/JobTrendDashboard';
 import { JobList } from '@/components/jobs/JobList';
-import { JobCalendar } from '@/components/jobs/JobCalendar';
-import { JobMapView } from '@/components/jobs/JobMapView';
 import { JobModal } from '@/components/jobs/JobModal';
 import { Pagination } from '@/components/ui/Pagination';
 import { useJobs } from '@/hooks/useJobs';
@@ -21,6 +19,21 @@ import { Job } from '@/lib/types';
 import { formatRecentViewedAt } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
+const JobCalendar = dynamic(
+  () => import('@/components/jobs/JobCalendar').then((mod) => mod.JobCalendar),
+  { loading: () => <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-10 text-center text-sm text-gray-500 dark:text-gray-400">캘린더 로딩 중...</div> }
+);
+
+const JobMapView = dynamic(
+  () => import('@/components/jobs/JobMapView').then((mod) => mod.JobMapView),
+  { ssr: false, loading: () => <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-10 text-center text-sm text-gray-500 dark:text-gray-400">지도 로딩 중...</div> }
+);
+
+const JobTrendDashboard = dynamic(
+  () => import('@/components/stats/JobTrendDashboard').then((mod) => mod.JobTrendDashboard),
+  { loading: () => <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-10 text-center text-sm text-gray-500 dark:text-gray-400">분석 패널 로딩 중...</div> }
+);
+
 export default function Home() {
   const { t } = useTranslation();
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
@@ -29,7 +42,8 @@ export default function Home() {
   const [showPresetPanel, setShowPresetPanel] = useState(false);
 
   const { data, isLoading, error } = useJobs(activeStatFilter || '');
-  const { data: mapData, isLoading: isMapLoading } = useMapJobs(activeStatFilter || '');
+  const needsMapDataset = viewMode === 'map' || viewMode === 'insight';
+  const { data: mapData, isLoading: isMapLoading } = useMapJobs(activeStatFilter || '', needsMapDataset);
 
   const { page, limit, setPage } = useFilterStore();
   const bookmarks = useBookmarkStore((state) => state.bookmarks);

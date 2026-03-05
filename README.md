@@ -229,7 +229,12 @@ npm run dev      # 개발 서버 실행
 npm run build    # 프로덕션 빌드
 npm run start    # 프로덕션 서버 실행
 npm run lint     # ESLint 검사
+npm run lighthouse:mobile   # 모바일 Lighthouse JSON 리포트 생성
+npm run lighthouse:desktop  # 데스크탑 Lighthouse JSON 리포트 생성
+npm run perf:audit          # 빌드 + 모바일/데스크탑 Lighthouse + 점수 요약
 ```
+
+Lighthouse 리포트는 `.lighthouse/mobile.json`, `.lighthouse/desktop.json`에 저장됩니다.
 
 ## 라이선스
 
@@ -250,7 +255,8 @@ MIT License
 - **공고 비교 고도화**: 추천 3개 자동 선택 + 2~3개 공고 항목별 비교(기관/지역/자격요건/급여 힌트) 완료
 - **캘린더 운영 개선**: 셀 간소화, 날짜별 상세 목록 패널, 오늘 복귀 버튼, 진행중 공고만 표시, 즐겨찾기 전용 캘린더 적용 완료
 - **3개월차(11주차)**: PWA 오프라인 캐시 + i18next 다국어(ko/en) 전환 적용 완료
-- **미구현**: 12주차 항목은 예정 작업
+- **3개월차(12주차)**: 메인 뷰 지연 로딩(캘린더/지도/분석), 지도 데이터 조건부 fetch, 핵심 시나리오(필터→북마크→캘린더→지원) 점검 완료
+- **미구현**: 없음 (로드맵 항목 기준)
 
 ## 일정
 
@@ -372,7 +378,7 @@ MIT License
   - `i18next` 기반 다국어 UI 처리 (영어/한국어)
 - **난이도:** 중
 
-### 12주차: 최종 통합 테스트 및 배포 안정화
+### 12주차: 최종 통합 테스트 및 배포 안정화 (✅ 완료)
 
 - **핵심 과제:** 서비스 퀄리티 마감
 - **세부 내용:**

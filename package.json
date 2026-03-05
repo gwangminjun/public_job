@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "lighthouse:prepare": "node -e \"require('fs').mkdirSync('.lighthouse',{recursive:true})\"",
+    "lighthouse:mobile": "npm run lighthouse:prepare && start-server-and-test \"next start -p 4173\" http://localhost:4173 \"lighthouse http://localhost:4173 --quiet --chrome-flags=\\\"--headless --no-sandbox --disable-dev-shm-usage --user-data-dir=.lighthouse/chrome-mobile\\\" --output=json --output-path=./.lighthouse/mobile.json\"",
+    "lighthouse:desktop": "npm run lighthouse:prepare && start-server-and-test \"next start -p 4173\" http://localhost:4173 \"lighthouse http://localhost:4173 --preset=desktop --quiet --chrome-flags=\\\"--headless --no-sandbox --disable-dev-shm-usage --user-data-dir=.lighthouse/chrome-desktop\\\" --output=json --output-path=./.lighthouse/desktop.json\"",
+    "perf:audit": "npm run build && npm run lighthouse:mobile && npm run lighthouse:desktop && node scripts/lighthouse-summary.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.20",
@@ -31,6 +35,8 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.4",
+    "lighthouse": "^13.0.3",
+    "start-server-and-test": "^2.1.5",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

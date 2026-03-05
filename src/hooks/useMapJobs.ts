@@ -38,7 +38,7 @@ async function fetchMapJobs(params: {
   return response.json();
 }
 
-export function useMapJobs(statFilter: string = '') {
+export function useMapJobs(statFilter: string = '', enabled = true) {
   const {
     keyword,
     onlyOngoing,
@@ -77,6 +77,7 @@ export function useMapJobs(statFilter: string = '') {
         sort,
         statFilter,
       }),
+    enabled,
     staleTime: 1000 * 60 * 5,
   });
 }
