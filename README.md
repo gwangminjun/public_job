@@ -90,6 +90,12 @@ src/
 ├── i18n/
 │   ├── client.ts                     # i18next 클라이언트 설정
 │   └── resources.ts                  # ko/en 번역 리소스
+├── lib/supabase/
+│   ├── env.ts                        # Supabase 환경변수 로더
+│   ├── client.ts                     # 브라우저용 Supabase 클라이언트
+│   ├── server.ts                     # 서버용 Supabase 클라이언트
+│   ├── admin.ts                      # 서비스 롤용 Supabase 클라이언트
+│   └── middleware.ts                 # Supabase 세션 갱신 헬퍼
 ├── store/
 │   ├── filterStore.ts                # Zustand 필터 상태 관리
 │   ├── bookmarkStore.ts              # 관심 공고 저장
@@ -104,6 +110,12 @@ public/
 ├── offline.html                      # 오프라인 폴백 페이지
 ├── icon-192.svg                      # PWA 아이콘(192)
 └── icon-512.svg                      # PWA 아이콘(512)
+
+supabase/
+└── migrations/
+    └── 0001_init_public_job.sql      # Supabase 초기 스키마 + RLS 정책
+
+middleware.ts                          # App Router 미들웨어(Supabase 세션 갱신)
 ```
 
 ## 시작하기
@@ -126,11 +138,29 @@ npm install
 
 ### 환경 변수 설정
 
-`.env.local` 파일을 생성하고 API 키를 설정합니다:
+`.env.local` 파일을 생성하고 키를 설정합니다 (`.env.example` 참고):
 
 ```env
 DATA_GO_KR_API_KEY=your_api_key_here
+
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT-REF.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SUPABASE_SERVICE_ROLE_KEY
 ```
+
+### Supabase 적용 준비
+
+1. Supabase SQL Editor에서 `supabase/migrations/0001_init_public_job.sql` 실행
+2. Authentication > Providers에서 로그인 방식(Email OTP 또는 OAuth) 활성화
+3. 프로젝트 환경변수에 위 3개 Supabase 키 등록
+4. 앱 재시작 후 `middleware.ts`를 통해 세션 갱신 체인 동작 확인
+
+생성되는 연동 골격 파일:
+
+- `src/lib/supabase/client.ts` (브라우저 클라이언트)
+- `src/lib/supabase/server.ts` (서버 컴포넌트/Route Handler 클라이언트)
+- `src/lib/supabase/admin.ts` (서비스 롤 전용 클라이언트)
+- `src/lib/supabase/middleware.ts` + `middleware.ts` (세션 갱신)
 
 ### 개발 서버 실행
 

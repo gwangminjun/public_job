@@ -13,6 +13,8 @@
     "perf:audit": "npm run build && npm run lighthouse:mobile && npm run lighthouse:desktop && node scripts/lighthouse-summary.mjs"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.9.0",
+    "@supabase/supabase-js": "^2.98.0",
     "@tanstack/react-query": "^5.90.20",
     "date-fns": "^4.1.0",
     "i18next": "^25.8.14",
@@ -36,6 +38,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.4",
     "lighthouse": "^13.0.3",
+    "pg": "^8.20.0",
     "start-server-and-test": "^2.1.5",
     "tailwindcss": "^4",
     "typescript": "^5"
