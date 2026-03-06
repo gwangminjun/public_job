@@ -7,6 +7,7 @@
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT-REF.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+NEXT_PUBLIC_SITE_URL=https://YOUR_DEPLOY_DOMAIN
 SUPABASE_SERVICE_ROLE_KEY=YOUR_SUPABASE_SERVICE_ROLE_KEY
 ```
 
@@ -29,6 +30,17 @@ Supabase Dashboard > SQL Editor에서 아래 파일 내용을 실행합니다.
 - 서버 클라이언트: `src/lib/supabase/server.ts`
 - 관리자(서비스롤) 클라이언트: `src/lib/supabase/admin.ts`
 - 세션 갱신 미들웨어: `src/lib/supabase/middleware.ts`, `middleware.ts`
+
+## 3-1. 인증 리다이렉트 URL 설정(중요)
+
+Supabase Dashboard > Authentication > URL Configuration에서 아래를 확인합니다.
+
+- Site URL: `https://YOUR_DEPLOY_DOMAIN`
+- Redirect URLs:
+  - `https://YOUR_DEPLOY_DOMAIN/auth/login`
+  - (선택) `http://localhost:3000/auth/login`
+
+`/auth/login` 페이지는 회원가입/인증메일 재전송 시 `emailRedirectTo`로 사용됩니다.
 
 ## 4. 다음 구현 단계(권장)
 

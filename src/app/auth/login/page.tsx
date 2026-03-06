@@ -11,18 +11,71 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [message, setMessage] = useState('');
+  const [needsEmailConfirm, setNeedsEmailConfirm] = useState(false);
+
+  const getEmailRedirectTo = () => {
+    const envBase = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+
+    if (envBase) {
+      return `${envBase.replace(/\/$/, '')}/auth/login`;
+    }
+
+    if (typeof window !== 'undefined') {
+      return `${window.location.origin}/auth/login`;
+    }
+
+    return undefined;
+  };
+
+  const isEmailNotConfirmedError = (errorMessage: string) => {
+    const normalized = errorMessage.toLowerCase();
+    return normalized.includes('email not confirmed') || normalized.includes('email_not_confirmed');
+  };
+
+  const handleResendConfirmEmail = async () => {
+    if (!email.trim()) {
+      setMessage('인증 메일 재전송을 위해 이메일을 입력해 주세요.');
+      return;
+    }
+
+    setResending(true);
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: {
+        emailRedirectTo: getEmailRedirectTo(),
+      },
+    });
+
+    if (error) {
+      setMessage(`인증 메일 재전송 실패: ${error.message}`);
+      setResending(false);
+      return;
+    }
+
+    setMessage('인증 메일을 다시 보냈습니다. 메일함(스팸함 포함)을 확인해 주세요.');
+    setResending(false);
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     setMessage('');
+    setNeedsEmailConfirm(false);
 
     try {
       if (mode === 'login') {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
+          if (isEmailNotConfirmedError(error.message)) {
+            setNeedsEmailConfirm(true);
+            setMessage('이메일 인증이 아직 완료되지 않았습니다. 인증 메일을 확인한 뒤 다시 로그인해 주세요.');
+            return;
+          }
+
           setMessage(`로그인 실패: ${error.message}`);
           return;
         }
@@ -33,13 +86,20 @@ export default function LoginPage() {
         return;
       }
 
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: getEmailRedirectTo(),
+        },
+      });
       if (error) {
         setMessage(`회원가입 실패: ${error.message}`);
         return;
       }
 
-      setMessage('회원가입 요청이 완료되었습니다. 이메일 인증이 필요할 수 있습니다.');
+      setNeedsEmailConfirm(true);
+      setMessage('회원가입 요청이 완료되었습니다. 이메일 인증 링크를 클릭한 뒤 로그인해 주세요.');
     } finally {
       setLoading(false);
     }
@@ -85,6 +145,22 @@ export default function LoginPage() {
             <p className="text-sm text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20 rounded-md px-3 py-2">
               {message}
             </p>
+          )}
+
+          {needsEmailConfirm && (
+            <div className="rounded-md border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 px-3 py-3">
+              <p className="text-sm text-amber-800 dark:text-amber-300">
+                1) 가입한 이메일의 인증 링크를 클릭하세요. 2) 스팸함/프로모션함도 확인하세요.
+              </p>
+              <button
+                type="button"
+                onClick={handleResendConfirmEmail}
+                disabled={resending}
+                className="mt-2 text-sm font-medium text-amber-700 dark:text-amber-300 hover:underline disabled:opacity-60"
+              >
+                {resending ? '재전송 중...' : '인증 메일 다시 보내기'}
+              </button>
+            </div>
           )}
 
           <button
