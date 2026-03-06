@@ -286,7 +286,9 @@ MIT License
 - **캘린더 운영 개선**: 셀 간소화, 날짜별 상세 목록 패널, 오늘 복귀 버튼, 진행중 공고만 표시, 즐겨찾기 전용 캘린더 적용 완료
 - **3개월차(11주차)**: PWA 오프라인 캐시 + i18next 다국어(ko/en) 전환 적용 완료
 - **3개월차(12주차)**: 메인 뷰 지연 로딩(캘린더/지도/분석), 지도 데이터 조건부 fetch, 핵심 시나리오(필터→북마크→캘린더→지원) 점검 완료
-- **미구현(다음 일정)**: 로그인/사용자 관리 + DB 영속화(4개월차 계획)
+- **4개월차(13주차)**: Supabase 스키마/RLS/미들웨어/환경변수 연동 준비 완료
+- **4개월차(14주차)**: 이메일 로그인/회원가입 + 세션 연동 + 계정 정보(닉네임/언어/테마/타임존) 관리 페이지 구현 완료
+- **미구현(다음 일정)**: 15~16주차 DB 영속화 전환 + 기관 watch 알림 자동화
 
 ## 일정
 
@@ -421,7 +423,7 @@ MIT License
 
 > **목표:** 현재 `localStorage` 중심 개인화 기능을 로그인 사용자 기준 서버 DB(**Supabase PostgreSQL**)로 전환하고, 알림/운영 기반을 마련합니다.
 
-### 13주차: Supabase 인프라 및 스키마 구축
+### 13주차: Supabase 인프라 및 스키마 구축 (✅ 완료)
 
 - **핵심 과제:** 운영 가능한 데이터 저장소 확정
 - **세부 내용:**
@@ -432,23 +434,25 @@ MIT License
 
 #### 13주차 착수 체크리스트 (Supabase)
 
-- [ ] Supabase 프로젝트 3개(dev/stg/prod) 생성 및 Region 확정
-- [ ] `DATABASE_DESIGN.md`의 PostgreSQL enum/extension(`pgcrypto`, `citext`) 적용 가능 여부 확인
-- [ ] Supabase SQL Editor로 초기 스키마 적용 스크립트 작성
-- [ ] RLS(Row Level Security) 기본 정책 설계 (`user_id = auth.uid()`) 및 테스트 테이블 1종 우선 적용
-- [ ] Auth 전략 확정 (Email OTP/Password/Social 중 1차 범위)
-- [ ] 환경변수 설정 (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`)
-- [ ] 로컬/CI 마이그레이션 실행 절차 문서화 (rollback 포함)
+- [x] Supabase 프로젝트 3개(dev/stg/prod) 생성 및 Region 확정
+- [x] `DATABASE_DESIGN.md`의 PostgreSQL enum/extension(`pgcrypto`, `citext`) 적용 가능 여부 확인
+- [x] Supabase SQL Editor로 초기 스키마 적용 스크립트 작성
+- [x] RLS(Row Level Security) 기본 정책 설계 (`user_id = auth.uid()`) 및 테스트 테이블 1종 우선 적용
+- [x] Auth 전략 확정 (Email OTP/Password/Social 중 1차 범위)
+- [x] 환경변수 설정 (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`)
+- [x] 로컬/CI 마이그레이션 실행 절차 문서화 (rollback 포함)
 - [ ] 초기 데이터 마이그레이션 계획 수립 (localStorage -> DB 1회 업로드 API)
 - [ ] 백업/복구 정책 및 운영 알림 설정(Supabase dashboard)
 
-### 14주차: 로그인/세션 및 사용자 관리 기본 기능
+### 14주차: 로그인/세션 및 사용자 관리 기본 기능 (✅ 완료)
 
 - **핵심 과제:** 인증 기반 사용자 식별 도입
 - **세부 내용:**
   - 이메일 로그인(또는 소셜 로그인) + 세션 관리 구현
   - 내 정보 기본 CRUD(닉네임, 언어, 테마, 타임존)
   - 권한/보안 기본 정책(비밀번호 해시, 세션 만료, 감사 로그) 적용
+  - `/auth/login` 로그인/회원가입 UI, `/account` 계정 관리 페이지 추가
+  - 헤더 로그인/로그아웃/계정 이동 동선 연동
 - **난이도:** 높음
 
 ### 15주차: 기존 개인화 기능의 DB 영속화 전환

@@ -2,10 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import { useBookmarkStore } from '@/store/bookmarkStore';
 import { useMounted } from '@/hooks/useMounted';
 import { useTheme } from 'next-themes';
 import { useTranslation } from 'react-i18next';
+import { createSupabaseBrowserClient } from '@/lib/supabase/client';
+import { User } from '@supabase/supabase-js';
 
 export function Header() {
   const pathname = usePathname();
@@ -13,10 +16,40 @@ export function Header() {
   const bookmarks = useBookmarkStore((state) => state.bookmarks);
   const { theme, setTheme } = useTheme();
   const { t, i18n } = useTranslation();
+  const [user, setUser] = useState<User | null>(null);
+  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const init = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (isMounted) {
+        setUser(data.user ?? null);
+      }
+    };
+
+    void init();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
 
   const currentLanguage = i18n.resolvedLanguage === 'en' ? 'en' : 'ko';
   const toggleLanguage = () => {
     void i18n.changeLanguage(currentLanguage === 'ko' ? 'en' : 'ko');
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
   };
 
   return (
@@ -57,7 +90,39 @@ export function Header() {
                 </span>
               )}
             </Link>
+
+            {user ? (
+              <Link
+                href="/account"
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all
+                  ${pathname === '/account'
+                    ? 'bg-white text-blue-700 shadow-sm'
+                    : 'text-white hover:bg-white/10'}`}
+              >
+                {t('header.navAccount')}
+              </Link>
+            ) : (
+              <Link
+                href="/auth/login"
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all
+                  ${pathname === '/auth/login'
+                    ? 'bg-white text-blue-700 shadow-sm'
+                    : 'text-white hover:bg-white/10'}`}
+              >
+                {t('header.navLogin')}
+              </Link>
+            )}
           </nav>
+
+          {user && (
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-xs font-semibold"
+            >
+              {t('header.navLogout')}
+            </button>
+          )}
 
           <button
             type="button"
