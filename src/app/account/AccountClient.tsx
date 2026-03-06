@@ -68,25 +68,29 @@ export function AccountClient({ userId, userEmail }: AccountClientProps) {
     setSaving(true);
     setMessage('');
 
-    const { error: profileError } = await supabase
-      .from('user_profiles')
-      .update({ display_name: form.displayName })
-      .eq('id', userId);
+    const response = await fetch('/api/account/profile', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        displayName: form.displayName,
+        language: form.language,
+        theme: form.theme,
+        timezone: form.timezone,
+      }),
+    });
 
-    const { error: prefError } = await supabase
-      .from('user_preferences')
-      .upsert(
-        {
-          user_id: userId,
-          language: form.language,
-          theme: form.theme,
-          timezone: form.timezone,
-        },
-        { onConflict: 'user_id' }
-      );
+    if (!response.ok) {
+      let detail = '';
+      try {
+        const data = (await response.json()) as { message?: string; code?: string };
+        detail = data.message ? ` (${data.message})` : '';
+      } catch {
+        detail = '';
+      }
 
-    if (profileError || prefError) {
-      setMessage('저장에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      setMessage(`저장에 실패했습니다. 잠시 후 다시 시도해 주세요.${detail}`);
       setSaving(false);
       return;
     }
