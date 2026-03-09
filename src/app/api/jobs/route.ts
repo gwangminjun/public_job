@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Job, JobListResponse } from '@/lib/types';
 import { differenceInCalendarDays, parseISO } from 'date-fns';
+import { getDataGoApiKey } from '@/lib/server/dataGoApiKey';
 
 const API_BASE_URL = 'https://apis.data.go.kr/1051000/recruitment';
 
-function getServiceKey(): string {
-  return (
-    process.env.DATA_GO_KR_API_KEY?.trim() ||
-    process.env.DATA_GO_API_KEY?.trim() ||
-    ''
-  );
-}
+export const dynamic = 'force-dynamic';
 
 // In-memory cache
 let cachedJobs: Job[] = [];
@@ -38,7 +33,7 @@ function isOngoing(endDateStr: string): boolean {
 
 export async function GET(request: NextRequest) {
   try {
-    const serviceKey = getServiceKey();
+    const serviceKey = getDataGoApiKey();
 
     // 환경변수 체크
     if (!serviceKey) {

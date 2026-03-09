@@ -1,15 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Job } from '@/lib/types';
+import { getDataGoApiKey } from '@/lib/server/dataGoApiKey';
 
 const API_BASE_URL = 'https://apis.data.go.kr/1051000/recruitment';
 
-function getServiceKey(): string {
-  return (
-    process.env.DATA_GO_KR_API_KEY?.trim() ||
-    process.env.DATA_GO_API_KEY?.trim() ||
-    ''
-  );
-}
+export const dynamic = 'force-dynamic';
 
 let cachedJobs: Job[] = [];
 let lastFetchTime = 0;
@@ -44,7 +39,7 @@ function rankAndSlice(items: SuggestionItem[], query: string, limit: number): Su
 
 export async function GET(request: NextRequest) {
   try {
-    const serviceKey = getServiceKey();
+    const serviceKey = getDataGoApiKey();
 
     if (!serviceKey) {
       return NextResponse.json(
