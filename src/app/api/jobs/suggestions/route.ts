@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Job } from '@/lib/types';
 
 const API_BASE_URL = 'https://apis.data.go.kr/1051000/recruitment';
-const SERVICE_KEY = process.env.DATA_GO_KR_API_KEY || '';
+
+function getServiceKey(): string {
+  return (
+    process.env.DATA_GO_KR_API_KEY?.trim() ||
+    process.env.DATA_GO_API_KEY?.trim() ||
+    ''
+  );
+}
 
 let cachedJobs: Job[] = [];
 let lastFetchTime = 0;
@@ -37,8 +44,17 @@ function rankAndSlice(items: SuggestionItem[], query: string, limit: number): Su
 
 export async function GET(request: NextRequest) {
   try {
-    if (!SERVICE_KEY) {
-      return NextResponse.json({ resultCode: 500, resultMsg: 'API key not configured', suggestions: [] }, { status: 500 });
+    const serviceKey = getServiceKey();
+
+    if (!serviceKey) {
+      return NextResponse.json(
+        {
+          resultCode: 500,
+          resultMsg: 'API key not configured (set DATA_GO_KR_API_KEY)',
+          suggestions: [],
+        },
+        { status: 500 }
+      );
     }
 
     const { searchParams } = new URL(request.url);
@@ -51,7 +67,7 @@ export async function GET(request: NextRequest) {
 
     const now = Date.now();
     if (cachedJobs.length === 0 || now - lastFetchTime > CACHE_DURATION) {
-      const apiUrl = `${API_BASE_URL}/list?serviceKey=${SERVICE_KEY}&resultType=json&numOfRows=1000&pageNo=1`;
+      const apiUrl = `${API_BASE_URL}/list?serviceKey=${serviceKey}&resultType=json&numOfRows=1000&pageNo=1`;
       const response = await fetch(apiUrl);
 
       if (!response.ok) {

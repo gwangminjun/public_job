@@ -3,7 +3,14 @@ import { Job, JobListResponse } from '@/lib/types';
 import { differenceInCalendarDays, parseISO } from 'date-fns';
 
 const API_BASE_URL = 'https://apis.data.go.kr/1051000/recruitment';
-const SERVICE_KEY = process.env.DATA_GO_KR_API_KEY || '';
+
+function getServiceKey(): string {
+  return (
+    process.env.DATA_GO_KR_API_KEY?.trim() ||
+    process.env.DATA_GO_API_KEY?.trim() ||
+    ''
+  );
+}
 
 // In-memory cache
 let cachedJobs: Job[] = [];
@@ -31,10 +38,16 @@ function isOngoing(endDateStr: string): boolean {
 
 export async function GET(request: NextRequest) {
   try {
+    const serviceKey = getServiceKey();
+
     // 환경변수 체크
-    if (!SERVICE_KEY) {
+    if (!serviceKey) {
       return NextResponse.json(
-        { resultCode: 500, resultMsg: 'API key not configured', result: [] },
+        {
+          resultCode: 500,
+          resultMsg: 'API key not configured (set DATA_GO_KR_API_KEY)',
+          result: [],
+        },
         { status: 500 }
       );
     }
@@ -60,7 +73,7 @@ export async function GET(request: NextRequest) {
     if (cachedJobs.length === 0 || now - lastFetchTime > CACHE_DURATION) {
       console.log('Fetching fresh data from external API...');
       // Fetch a large batch to perform server-side filtering
-      const apiUrl = `${API_BASE_URL}/list?serviceKey=${SERVICE_KEY}&resultType=json&numOfRows=1000&pageNo=1`;
+      const apiUrl = `${API_BASE_URL}/list?serviceKey=${serviceKey}&resultType=json&numOfRows=1000&pageNo=1`;
       
       const response = await fetch(apiUrl);
       if (!response.ok) {
@@ -215,4 +228,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-
