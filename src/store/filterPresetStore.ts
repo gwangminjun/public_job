@@ -5,6 +5,7 @@ import { useFilterStore } from './filterStore';
 
 interface FilterPresetState {
   presets: FilterPreset[];
+  setPresets: (presets: FilterPreset[]) => void;
   savePreset: (name: string, filters: PresetFilters) => void;
   loadPreset: (id: string) => void;
   deletePreset: (id: string) => void;
@@ -14,6 +15,10 @@ export const useFilterPresetStore = create<FilterPresetState>()(
   persist(
     (set, get) => ({
       presets: [],
+
+      setPresets: (presets) => {
+        set({ presets });
+      },
       
       savePreset: (name, filters) => {
         const { presets } = get();

@@ -4,6 +4,7 @@ import { Job } from '@/lib/types';
 
 interface BookmarkState {
   bookmarks: Job[];
+  setBookmarks: (jobs: Job[]) => void;
   addBookmark: (job: Job) => void;
   removeBookmark: (jobId: number) => void;
   toggleBookmark: (job: Job) => void;
@@ -15,6 +16,13 @@ export const useBookmarkStore = create<BookmarkState>()(
   persist(
     (set, get) => ({
       bookmarks: [],
+
+      setBookmarks: (jobs) => {
+        const deduped = jobs.filter(
+          (job, index, arr) => arr.findIndex((candidate) => candidate.recrutPblntSn === job.recrutPblntSn) === index
+        );
+        set({ bookmarks: deduped });
+      },
       
       addBookmark: (job) => {
         const { bookmarks } = get();

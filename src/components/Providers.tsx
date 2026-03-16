@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { I18nProvider } from './I18nProvider';
 import { PwaRegister } from './PwaRegister';
 import { LocalToDbMigration } from './LocalToDbMigration';
+import { UserDataSync } from './UserDataSync';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -26,6 +27,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <PwaRegister />
           <LocalToDbMigration />
+          <UserDataSync />
           {children}
         </ThemeProvider>
       </QueryClientProvider>

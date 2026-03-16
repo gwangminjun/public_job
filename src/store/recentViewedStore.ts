@@ -4,6 +4,7 @@ import { Job, RecentJob } from '@/lib/types';
 
 interface RecentViewedState {
   recentJobs: RecentJob[];
+  setRecentJobs: (recentJobs: RecentJob[]) => void;
   addRecent: (job: Job) => void;
   clearRecent: () => void;
 }
@@ -12,6 +13,12 @@ export const useRecentViewedStore = create<RecentViewedState>()(
   persist(
     (set, get) => ({
       recentJobs: [],
+      setRecentJobs: (recentJobs) => {
+        const normalized = recentJobs
+          .filter((item) => item?.job?.recrutPblntSn)
+          .slice(0, 10);
+        set({ recentJobs: normalized });
+      },
       addRecent: (job) => {
         const { recentJobs } = get();
         const now = new Date().toISOString();
