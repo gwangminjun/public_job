@@ -9,6 +9,23 @@ type UpdateBody = {
   timezone?: string;
 };
 
+function isSchemaCacheTableMissing(message?: string, code?: string): boolean {
+  if (code === 'PGRST205') {
+    return true;
+  }
+
+  const normalized = (message || '').toLowerCase();
+  return (
+    normalized.includes('could not find the table') ||
+    normalized.includes('schema cache') ||
+    normalized.includes('public.user_profiles') ||
+    normalized.includes('public.user_preferences')
+  );
+}
+
+const SCHEMA_GUIDE_MESSAGE =
+  'Supabase 스키마가 아직 적용되지 않았거나 캐시가 갱신되지 않았습니다. SQL Editor에서 supabase/migrations/0001_init_public_job.sql 실행 후 "select pg_notify(\'pgrst\', \'reload schema\');"를 실행해 주세요.';
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createSupabaseServerClient();
@@ -44,6 +61,13 @@ export async function POST(request: NextRequest) {
       );
 
     if (profileError) {
+      if (isSchemaCacheTableMissing(profileError.message, profileError.code)) {
+        return NextResponse.json(
+          { ok: false, message: SCHEMA_GUIDE_MESSAGE, code: profileError.code },
+          { status: 500 }
+        );
+      }
+
       return NextResponse.json(
         { ok: false, message: profileError.message, code: profileError.code },
         { status: 500 }
@@ -63,6 +87,13 @@ export async function POST(request: NextRequest) {
       );
 
     if (prefError) {
+      if (isSchemaCacheTableMissing(prefError.message, prefError.code)) {
+        return NextResponse.json(
+          { ok: false, message: SCHEMA_GUIDE_MESSAGE, code: prefError.code },
+          { status: 500 }
+        );
+      }
+
       return NextResponse.json(
         { ok: false, message: prefError.message, code: prefError.code },
         { status: 500 }

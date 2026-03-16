@@ -147,6 +147,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT-REF.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 NEXT_PUBLIC_SITE_URL=https://YOUR_DEPLOY_DOMAIN
 SUPABASE_SERVICE_ROLE_KEY=YOUR_SUPABASE_SERVICE_ROLE_KEY
+OPS_HEALTHCHECK_SECRET=YOUR_RANDOM_HEALTHCHECK_SECRET
 ```
 
 ### Supabase 적용 준비
@@ -155,6 +156,7 @@ SUPABASE_SERVICE_ROLE_KEY=YOUR_SUPABASE_SERVICE_ROLE_KEY
 2. Authentication > Providers에서 로그인 방식(Email OTP 또는 OAuth) 활성화
 3. 프로젝트 환경변수에 위 3개 Supabase 키 등록
 4. 앱 재시작 후 `middleware.ts`를 통해 세션 갱신 체인 동작 확인
+5. (권장) `OPS_HEALTHCHECK_SECRET` 설정 후 `/api/ops/db-health` 모니터링 연동
 
 생성되는 연동 골격 파일:
 
@@ -162,6 +164,8 @@ SUPABASE_SERVICE_ROLE_KEY=YOUR_SUPABASE_SERVICE_ROLE_KEY
 - `src/lib/supabase/server.ts` (서버 컴포넌트/Route Handler 클라이언트)
 - `src/lib/supabase/admin.ts` (서비스 롤 전용 클라이언트)
 - `src/lib/supabase/middleware.ts` + `middleware.ts` (세션 갱신)
+- `src/app/api/account/migrate-local/route.ts` (localStorage -> DB 1회 업로드)
+- `src/app/api/ops/db-health/route.ts` (DB 헬스체크)
 
 ### 개발 서버 실행
 
@@ -442,8 +446,8 @@ MIT License
 - [x] Auth 전략 확정 (Email OTP/Password/Social 중 1차 범위)
 - [x] 환경변수 설정 (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`)
 - [x] 로컬/CI 마이그레이션 실행 절차 문서화 (rollback 포함)
-- [ ] 초기 데이터 마이그레이션 계획 수립 (localStorage -> DB 1회 업로드 API)
-- [ ] 백업/복구 정책 및 운영 알림 설정(Supabase dashboard)
+- [x] 초기 데이터 마이그레이션 계획 수립 (localStorage -> DB 1회 업로드 API)
+- [x] 백업/복구 정책 및 운영 알림 설정 가이드 문서화 + DB 헬스체크 API 구현
 
 ### 14주차: 로그인/세션 및 사용자 관리 기본 기능 (✅ 완료)
 

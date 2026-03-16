@@ -5,6 +5,7 @@ import { ThemeProvider } from 'next-themes';
 import { useState } from 'react';
 import { I18nProvider } from './I18nProvider';
 import { PwaRegister } from './PwaRegister';
+import { LocalToDbMigration } from './LocalToDbMigration';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -24,6 +25,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <PwaRegister />
+          <LocalToDbMigration />
           {children}
         </ThemeProvider>
       </QueryClientProvider>
