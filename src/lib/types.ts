@@ -91,3 +91,23 @@ export interface FilterPreset {
   filters: PresetFilters;
   createdAt: string;
 }
+
+export interface InstitutionWatchRule {
+  id: string;
+  institutionName: string;
+  checkInterval: 'daily' | 'hourly';
+  active: boolean;
+  lastCheckedAt?: string | null;
+  createdAt: string;
+}
+
+export interface NotificationTarget {
+  id: string;
+  channel: 'slack' | 'kakao' | 'telegram' | 'email';
+  destination: string;
+  verified: boolean;
+  active: boolean;
+  consentedAt?: string | null;
+  optedOutAt?: string | null;
+  createdAt: string;
+}

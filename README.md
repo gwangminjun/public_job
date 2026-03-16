@@ -148,6 +148,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 NEXT_PUBLIC_SITE_URL=https://YOUR_DEPLOY_DOMAIN
 SUPABASE_SERVICE_ROLE_KEY=YOUR_SUPABASE_SERVICE_ROLE_KEY
 OPS_HEALTHCHECK_SECRET=YOUR_RANDOM_HEALTHCHECK_SECRET
+CRON_SECRET=YOUR_RANDOM_CRON_SECRET
 ```
 
 ### Supabase 적용 준비
@@ -294,7 +295,8 @@ MIT License
 - **4개월차(13주차)**: Supabase 스키마/RLS/미들웨어/환경변수 연동 준비 완료
 - **4개월차(14주차)**: 이메일 로그인/회원가입 + 세션 연동 + 계정 정보(닉네임/언어/테마/타임존) 관리 페이지 구현 완료
 - **4개월차(15주차)**: 북마크/최근본/필터 프리셋 DB 로드 + 자동 동기화 + localStorage 1회 마이그레이션 구현 완료
-- **미구현(다음 일정)**: 16주차 기관 watch 알림 자동화
+- **4개월차(16주차)**: 기관 watch 관리 + Slack Webhook 알림 + 일일 크론 엔드포인트 + 회원 탈퇴 기능 구현 완료
+- **미구현(다음 일정)**: 없음 (로드맵 기준)
 
 ## 일정
 
@@ -472,11 +474,14 @@ MIT License
   - `UserDataSync`, `LocalToDbMigration`를 통한 DB 로드/자동 동기화 연결
 - **난이도:** 높음
 
-### 16주차: 기관 watch 일일 점검 + 메신저 알림 MVP
+### 16주차: 기관 watch 일일 점검 + 메신저 알림 MVP (✅ 완료)
 
 - **핵심 과제:** 사용자별 알림 자동화 파이프라인 완성
 - **세부 내용:**
   - 특정 기관 watch 규칙 저장/관리 UI + API 구현
   - 일일 스케줄러(크론)로 신규 공고 점검 및 발송 큐 처리
   - 메신저 채널 1종 연동 + 중복 방지(idempotency key) + 옵트아웃 처리
+  - 회원 탈퇴 기능 추가 (계정 비활성화/개인화 데이터 정리/재로그인 차단 정책 포함)
+  - Slack Incoming Webhook 기반 메시지 발송 및 `/api/cron/institution-watch` 엔드포인트 구현
+  - 계정 페이지에서 기관 watch / Slack Webhook / 회원 탈퇴 관리 지원
 - **난이도:** 매우 높음
