@@ -151,6 +151,10 @@ OPS_HEALTHCHECK_SECRET=YOUR_RANDOM_HEALTHCHECK_SECRET
 CRON_SECRET=YOUR_RANDOM_CRON_SECRET
 ```
 
+`CRON_SECRET`은 **사용자 계정별 값이 아니라 시스템 전역 비밀키**입니다.
+사용자가 관리하는 값으로 DB에 저장하지 않고, Vercel/Supabase 환경변수로만 관리합니다.
+사용자별 알림 제어는 `기관 watch 규칙`과 `Slack Webhook 대상` 데이터로 처리합니다.
+
 ### Supabase 적용 준비
 
 1. Supabase SQL Editor에서 `supabase/migrations/0001_init_public_job.sql` 실행

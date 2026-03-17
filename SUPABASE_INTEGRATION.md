@@ -10,7 +10,14 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 NEXT_PUBLIC_SITE_URL=https://YOUR_DEPLOY_DOMAIN
 SUPABASE_SERVICE_ROLE_KEY=YOUR_SUPABASE_SERVICE_ROLE_KEY
 OPS_HEALTHCHECK_SECRET=YOUR_RANDOM_HEALTHCHECK_SECRET
+CRON_SECRET=YOUR_RANDOM_CRON_SECRET
 ```
+
+중요:
+
+- `CRON_SECRET`은 **시스템 전역 작업용 비밀키**입니다.
+- 사용자 계정별로 DB에 저장하거나 UI에서 수정하게 두지 않습니다.
+- 사용자별 알림 제어는 `institution_watch_rules`, `notification_targets`로 처리합니다.
 
 ## 2. 스키마 적용
 

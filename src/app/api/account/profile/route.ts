@@ -49,6 +49,15 @@ export async function POST(request: NextRequest) {
 
     const admin = createSupabaseAdminClient();
 
+    // Verify user actually exists in auth.users (guards against stale sessions)
+    const { data: authUser, error: authUserError } = await admin.auth.admin.getUserById(user.id);
+    if (authUserError || !authUser?.user) {
+      return NextResponse.json(
+        { ok: false, message: '세션이 만료되었습니다. 다시 로그인해 주세요.' },
+        { status: 401 }
+      );
+    }
+
     const { error: profileError } = await admin
       .from('user_profiles')
       .upsert(
