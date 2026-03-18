@@ -78,8 +78,8 @@ export function Header() {
             <Link
               href="/bookmarks"
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2
-                ${pathname === '/bookmarks' 
-                  ? 'bg-white text-blue-700 shadow-sm' 
+                ${pathname === '/bookmarks'
+                  ? 'bg-white text-blue-700 shadow-sm'
                   : 'text-white hover:bg-white/10'}`}
             >
               {t('header.navBookmarks')}
@@ -90,38 +90,34 @@ export function Header() {
                 </span>
               )}
             </Link>
+          </nav>
 
-            {user ? (
+          {user ? (
+            <>
               <Link
                 href="/account"
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all
+                className={`px-3 py-2 rounded-full text-xs font-semibold transition-colors
                   ${pathname === '/account'
-                    ? 'bg-white text-blue-700 shadow-sm'
-                    : 'text-white hover:bg-white/10'}`}
+                    ? 'bg-white text-blue-700'
+                    : 'bg-white/10 hover:bg-white/20 text-white'}`}
               >
                 {t('header.navAccount')}
               </Link>
-            ) : (
-              <Link
-                href="/auth/login"
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all
-                  ${pathname === '/auth/login'
-                    ? 'bg-white text-blue-700 shadow-sm'
-                    : 'text-white hover:bg-white/10'}`}
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-xs font-semibold"
               >
-                {t('header.navLogin')}
-              </Link>
-            )}
-          </nav>
-
-          {user && (
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-xs font-semibold"
+                {t('header.navLogout')}
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/auth/login"
+              className="px-4 py-2 rounded-full bg-white text-blue-700 text-sm font-semibold shadow-sm hover:bg-blue-50 transition-colors"
             >
-              {t('header.navLogout')}
-            </button>
+              {t('header.navLogin')}
+            </Link>
           )}
 
           <button

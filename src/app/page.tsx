@@ -1,4 +1,9 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: '민준양 포트폴리오 | Dev Projects',
+};
 
 const PROJECTS = [
   {
