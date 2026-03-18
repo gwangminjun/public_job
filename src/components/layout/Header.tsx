@@ -67,10 +67,10 @@ export function Header() {
         <div className="flex items-center gap-4">
           <nav className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full p-1 pl-2 pr-2">
             <Link
-              href="/"
+              href="/public-job"
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all
-                ${pathname === '/' 
-                  ? 'bg-white text-blue-700 shadow-sm' 
+                ${pathname === '/public-job' || pathname?.startsWith('/public-job')
+                  ? 'bg-white text-blue-700 shadow-sm'
                   : 'text-white hover:bg-white/10'}`}
             >
               {t('header.navJobs')}
