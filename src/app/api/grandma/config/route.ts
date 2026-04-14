@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
+import { requireGrandmaAdminRoute } from '@/lib/grandma/auth';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 export async function PUT(request: Request) {
@@ -10,7 +11,12 @@ export async function PUT(request: Request) {
       location?: string;
       location_detail?: string | null;
       host?: string;
+      celebration_video_title?: string | null;
+      celebration_video_url?: string | null;
     };
+
+    const unauthorized = await requireGrandmaAdminRoute();
+    if (unauthorized) return unauthorized;
 
     if (!body.event_date || !body.event_time || !body.location?.trim() || !body.host?.trim()) {
       return NextResponse.json({ error: '필수 항목을 모두 입력해주세요.' }, { status: 400 });
@@ -26,6 +32,8 @@ export async function PUT(request: Request) {
         location: body.location.trim(),
         location_detail: body.location_detail?.trim() || null,
         host: body.host.trim(),
+        celebration_video_title: body.celebration_video_title?.trim() || null,
+        celebration_video_url: body.celebration_video_url?.trim() || null,
       })
       .select()
       .single();
@@ -36,6 +44,7 @@ export async function PUT(request: Request) {
 
     revalidatePath('/grandma');
     revalidatePath('/grandma/admin');
+    revalidatePath('/grandma/video');
 
     return NextResponse.json({ config: data });
   } catch (error) {

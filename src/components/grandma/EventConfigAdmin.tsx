@@ -109,6 +109,27 @@ export function EventConfigAdmin({ initialConfig }: EventConfigAdminProps) {
             style={{ borderColor: '#C49A6C', color: '#3B1F0E', backgroundColor: '#FFFDF7' }}
           />
         </div>
+        <div>
+          <label className="block text-sm font-medium mb-1" style={{ color: '#7B4F2E' }}>축하 영상 제목</label>
+          <input
+            type="text"
+            value={form.celebration_video_title ?? ''}
+            onChange={(e) => updateField('celebration_video_title', e.target.value)}
+            className="w-full rounded-xl border px-3 py-2 text-sm outline-none"
+            style={{ borderColor: '#C49A6C', color: '#3B1F0E', backgroundColor: '#FFFDF7' }}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1" style={{ color: '#7B4F2E' }}>축하 영상 URL</label>
+          <input
+            type="url"
+            value={form.celebration_video_url ?? ''}
+            onChange={(e) => updateField('celebration_video_url', e.target.value)}
+            placeholder="https://www.youtube.com/watch?v=..."
+            className="w-full rounded-xl border px-3 py-2 text-sm outline-none"
+            style={{ borderColor: '#C49A6C', color: '#3B1F0E', backgroundColor: '#FFFDF7' }}
+          />
+        </div>
 
         {(message || error) && (
           <div
