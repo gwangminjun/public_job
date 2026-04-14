@@ -1,6 +1,5 @@
 import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
-import { requireGrandmaAdminPassword } from '@/lib/grandma/auth';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 interface RouteContext {
@@ -9,9 +8,6 @@ interface RouteContext {
 
 export async function PATCH(request: Request, context: RouteContext) {
   try {
-    const unauthorized = await requireGrandmaAdminPassword();
-    if (unauthorized) return unauthorized;
-
     const { id } = await context.params;
     const body = (await request.json()) as { caption?: string | null; taken_year?: number | null };
     const supabase = createSupabaseAdminClient();

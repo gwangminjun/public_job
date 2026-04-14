@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
-import { requireGrandmaAdminPassword } from '@/lib/grandma/auth';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 export async function PUT(request: Request) {
@@ -14,9 +13,6 @@ export async function PUT(request: Request) {
       celebration_video_title?: string | null;
       celebration_video_url?: string | null;
     };
-
-    const unauthorized = await requireGrandmaAdminPassword();
-    if (unauthorized) return unauthorized;
 
     if (!body.event_date || !body.event_time || !body.location?.trim() || !body.host?.trim()) {
       return NextResponse.json({ error: '필수 항목을 모두 입력해주세요.' }, { status: 400 });

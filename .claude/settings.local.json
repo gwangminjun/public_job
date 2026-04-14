@@ -10,7 +10,10 @@
       "Bash(curl -s http://localhost:3000 | grep -o '<title>[^<]*</title>\\\\|안녕하세요\\\\|내 프로젝트\\\\|Coming Soon\\\\|공공기관 채용정보 포털' | head -20)",
       "Bash(curl -s http://localhost:3000/public-job | grep -o '공공기관\\\\|채용정보\\\\|heroBadge\\\\|hero' | head -10)",
       "Bash(taskkill /F /IM node.exe 2>&1)",
-      "Bash(taskkill //F //IM node.exe 2>&1)"
+      "Bash(taskkill //F //IM node.exe 2>&1)",
+      "Bash(ls C:UsersuserIdeaProjectspublic_jobREADME*)",
+      "Bash(ls /c/Users/user/IdeaProjects/public_job/README*)",
+      "Bash(grep '\"\"version\"\"\\\\|\"\"next\"\"\\\\|\"\"typescript\"\"\\\\|\"\"supabase\"\"\\\\|\"\"tailwind\"\"' /c/Users/user/IdeaProjects/public_job/package.json)"
     ]
   }
 }

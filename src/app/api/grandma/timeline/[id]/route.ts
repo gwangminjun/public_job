@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
-import { requireGrandmaAdminPassword } from '@/lib/grandma/auth';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 interface RouteContext {
@@ -9,9 +8,6 @@ interface RouteContext {
 
 export async function PATCH(request: Request, context: RouteContext) {
   try {
-    const unauthorized = await requireGrandmaAdminPassword();
-    if (unauthorized) return unauthorized;
-
     const { id } = await context.params;
     const body = (await request.json()) as {
       year?: number;
@@ -64,9 +60,6 @@ export async function PATCH(request: Request, context: RouteContext) {
 
 export async function DELETE(_: Request, context: RouteContext) {
   try {
-    const unauthorized = await requireGrandmaAdminPassword();
-    if (unauthorized) return unauthorized;
-
     const { id } = await context.params;
     const supabase = createSupabaseAdminClient();
     const { error } = await supabase.from('grandma_timeline').delete().eq('id', id);

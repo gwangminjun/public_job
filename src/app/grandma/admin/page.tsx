@@ -1,23 +1,11 @@
-import { GrandmaAdminGate } from '@/components/grandma/GrandmaAdminGate';
-import { GrandmaAdminLogoutButton } from '@/components/grandma/GrandmaAdminLogoutButton';
 import { PhotoAdmin } from '@/components/grandma/PhotoAdmin';
 import { EventConfigAdmin } from '@/components/grandma/EventConfigAdmin';
 import { TimelineAdmin } from '@/components/grandma/TimelineAdmin';
-import { isGrandmaAdminAuthorized, isGrandmaAdminConfigured } from '@/lib/grandma/auth';
 import { getGrandmaConfig, getGrandmaPhotos, getGrandmaTimeline } from '@/lib/grandma/server';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
-  const [authorized, configured] = await Promise.all([
-    isGrandmaAdminAuthorized(),
-    Promise.resolve(isGrandmaAdminConfigured()),
-  ]);
-
-  if (!authorized) {
-    return <GrandmaAdminGate configured={configured} />;
-  }
-
   const [photos, config, timeline] = await Promise.all([
     getGrandmaPhotos(),
     getGrandmaConfig(),
@@ -33,9 +21,6 @@ export default async function AdminPage() {
         <p className="text-sm" style={{ color: '#A07850' }}>
           잔치 정보, 타임라인, 사진첩 콘텐츠를 한 곳에서 관리합니다.
         </p>
-        <div className="mt-4 flex justify-center">
-          <GrandmaAdminLogoutButton />
-        </div>
       </div>
 
       <div className="space-y-10">
