@@ -13,6 +13,51 @@ interface SelectedPreview {
   previewUrl: string;
 }
 
+function loadImage(file: File): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const image = new window.Image();
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(image);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error('이미지를 불러오지 못했습니다.'));
+    };
+    image.src = objectUrl;
+  });
+}
+
+async function optimizeImageFile(file: File): Promise<File> {
+  const image = await loadImage(file);
+  const maxDimension = 1920;
+  const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
+  const width = Math.max(1, Math.round(image.width * scale));
+  const height = Math.max(1, Math.round(image.height * scale));
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+
+  const context = canvas.getContext('2d');
+  if (!context) {
+    return file;
+  }
+
+  context.drawImage(image, 0, 0, width, height);
+
+  const blob = await new Promise<Blob | null>((resolve) => {
+    canvas.toBlob((value) => resolve(value), 'image/webp', 0.86);
+  });
+
+  if (!blob) {
+    return file;
+  }
+
+  const nextName = file.name.replace(/\.[^.]+$/, '') || 'grandma-photo';
+  return new File([blob], `${nextName}.webp`, { type: 'image/webp' });
+}
+
 export function PhotoAdmin({ initialPhotos }: PhotoAdminProps) {
   const [photos, setPhotos] = useState<GrandmaPhoto[]>(initialPhotos);
   const [uploading, setUploading] = useState(false);
@@ -69,8 +114,9 @@ export function PhotoAdmin({ initialPhotos }: PhotoAdminProps) {
 
     try {
       for (const [index, selected] of selectedFiles.entries()) {
+        const optimizedFile = await optimizeImageFile(selected.file);
         const formData = new FormData();
-        formData.append('file', selected.file);
+        formData.append('file', optimizedFile);
         formData.append('caption', caption);
         formData.append('takenYear', takenYear);
 
@@ -335,6 +381,9 @@ export function PhotoAdmin({ initialPhotos }: PhotoAdminProps) {
             >
               {uploading ? '업로드 중...' : `${selectedFiles.length || 0}장 업로드`}
             </button>
+            <p className="text-xs" style={{ color: '#A07850' }}>
+              업로드 전 최대 1920px로 리사이즈하고 WebP로 변환해 용량을 줄여요.
+            </p>
           </div>
         </div>
       </section>

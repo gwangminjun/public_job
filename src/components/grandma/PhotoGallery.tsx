@@ -91,7 +91,7 @@ export function PhotoGallery({ photos }: PhotoGalleryProps) {
   return (
     <>
       {years.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 mb-6 print:hidden">
           <button
             onClick={() => setFilterYear(null)}
             className="px-3 py-1 rounded-full text-sm font-medium border transition-colors"
@@ -126,12 +126,12 @@ export function PhotoGallery({ photos }: PhotoGalleryProps) {
           <p className="text-sm">아직 사진이 없습니다.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 grandma-print-grid print:grid-cols-3 print:gap-4">
           {filtered.map((photo) => (
             <button
               key={photo.id}
               onClick={() => setActivePhotoId(photo.id)}
-              className="group relative aspect-square rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 border"
+              className="group relative aspect-square rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 border print:break-inside-avoid print:shadow-none"
               style={{ borderColor: '#E8C99A' }}
             >
               <Image
@@ -141,14 +141,19 @@ export function PhotoGallery({ photos }: PhotoGalleryProps) {
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
                 sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
               />
-              {photo.taken_year && (
-                <span
-                  className="absolute top-2 left-2 text-xs font-medium px-2 py-0.5 rounded-full"
-                  style={{ backgroundColor: 'rgba(123,79,46,0.75)', color: 'white' }}
-                >
-                  {photo.taken_year}
-                </span>
-              )}
+               {photo.taken_year && (
+                 <span
+                   className="absolute top-2 left-2 text-xs font-medium px-2 py-0.5 rounded-full print:bg-white/90 print:text-[#5C3317]"
+                   style={{ backgroundColor: 'rgba(123,79,46,0.75)', color: 'white' }}
+                 >
+                   {photo.taken_year}
+                 </span>
+               )}
+               {photo.caption && (
+                 <span className="hidden print:block absolute bottom-2 left-2 right-2 text-[11px] font-medium rounded-xl px-2 py-1" style={{ backgroundColor: 'rgba(255,255,255,0.92)', color: '#5C3317' }}>
+                   {photo.caption}
+                 </span>
+               )}
             </button>
           ))}
         </div>

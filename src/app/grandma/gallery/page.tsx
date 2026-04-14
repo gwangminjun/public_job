@@ -1,4 +1,5 @@
 import { PhotoGallery } from '@/components/grandma/PhotoGallery';
+import { GrandmaPrintButton } from '@/components/grandma/GrandmaPrintButton';
 import { getGrandmaPhotos } from '@/lib/grandma/server';
 
 export const revalidate = 60;
@@ -15,6 +16,10 @@ export default async function GalleryPage() {
         <p className="text-sm" style={{ color: '#A07850' }}>
           할머니와 함께한 소중한 추억들
         </p>
+      </div>
+
+      <div className="flex justify-center mb-6">
+        <GrandmaPrintButton />
       </div>
 
       <PhotoGallery photos={photos} />
