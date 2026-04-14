@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
-import { requireGrandmaAdminRoute } from '@/lib/grandma/auth';
+import { requireGrandmaAdminPassword } from '@/lib/grandma/auth';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 export async function PUT(request: Request) {
@@ -15,7 +15,7 @@ export async function PUT(request: Request) {
       celebration_video_url?: string | null;
     };
 
-    const unauthorized = await requireGrandmaAdminRoute();
+    const unauthorized = await requireGrandmaAdminPassword();
     if (unauthorized) return unauthorized;
 
     if (!body.event_date || !body.event_time || !body.location?.trim() || !body.host?.trim()) {

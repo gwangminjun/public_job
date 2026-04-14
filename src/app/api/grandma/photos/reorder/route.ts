@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
-import { requireGrandmaAdminRoute } from '@/lib/grandma/auth';
+import { requireGrandmaAdminPassword } from '@/lib/grandma/auth';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 export async function PUT(request: Request) {
   try {
-    const unauthorized = await requireGrandmaAdminRoute();
+    const unauthorized = await requireGrandmaAdminPassword();
     if (unauthorized) return unauthorized;
 
     const body = (await request.json()) as { ids?: string[] };
