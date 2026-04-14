@@ -1,5 +1,11 @@
 import Link from 'next/link';
 import { Countdown } from '@/components/grandma/Countdown';
+import {
+  buildEventDateTime,
+  formatEventDateLabel,
+  formatEventTimeLabel,
+} from '@/lib/grandma/shared';
+import { getGrandmaConfig } from '@/lib/grandma/server';
 
 const MENU_CARDS = [
   {
@@ -22,7 +28,9 @@ const MENU_CARDS = [
   },
 ];
 
-export default function GrandmaHomePage() {
+export default async function GrandmaHomePage() {
+  const config = await getGrandmaConfig();
+
   return (
     <div>
       {/* 히어로 섹션 */}
@@ -47,7 +55,7 @@ export default function GrandmaHomePage() {
             할머니의 소중한 80번째 생신
           </p>
           <p className="text-base mb-10" style={{ color: '#A07850' }}>
-            2026년 4월 25일 (토)
+            {formatEventDateLabel(config.event_date)}
           </p>
 
           {/* 카운트다운 */}
@@ -58,7 +66,7 @@ export default function GrandmaHomePage() {
             <p className="text-sm font-semibold mb-4" style={{ color: '#A07850' }}>
               🎉 잔치까지 남은 시간
             </p>
-            <Countdown />
+            <Countdown targetIso={buildEventDateTime(config)} />
           </div>
         </div>
       </section>
@@ -76,19 +84,19 @@ export default function GrandmaHomePage() {
             <div>
               <p className="text-2xl mb-2">📅</p>
               <p className="font-semibold mb-1">일시</p>
-              <p>2026년 4월 25일 (토)</p>
-              <p>오후 12시</p>
+              <p>{formatEventDateLabel(config.event_date)}</p>
+              <p>{formatEventTimeLabel(config.event_time)}</p>
             </div>
             <div>
               <p className="text-2xl mb-2">📍</p>
               <p className="font-semibold mb-1">장소</p>
-              <p>가족 모임 장소</p>
-              <p className="text-xs opacity-70 mt-1">추후 업데이트</p>
+              <p>{config.location}</p>
+              <p className="text-xs opacity-70 mt-1">{config.location_detail ?? '상세 정보 없음'}</p>
             </div>
             <div>
               <p className="text-2xl mb-2">👨‍👩‍👧‍👦</p>
               <p className="font-semibold mb-1">주최</p>
-              <p>온 가족이 함께</p>
+              <p>{config.host}</p>
               <p className="text-xs opacity-70 mt-1">소중한 분들과 함께</p>
             </div>
           </div>

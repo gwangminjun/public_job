@@ -1,8 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
-const PARTY_DATE = new Date('2026-04-25T12:00:00+09:00');
+import { useEffect, useMemo, useState } from 'react';
 
 interface TimeLeft {
   days: number;
@@ -11,8 +9,8 @@ interface TimeLeft {
   seconds: number;
 }
 
-function calcTimeLeft(): TimeLeft {
-  const diff = PARTY_DATE.getTime() - Date.now();
+function calcTimeLeft(targetDate: Date): TimeLeft {
+  const diff = targetDate.getTime() - Date.now();
   if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
   return {
     days: Math.floor(diff / (1000 * 60 * 60 * 24)),
@@ -26,19 +24,26 @@ function pad(n: number) {
   return String(n).padStart(2, '0');
 }
 
-export function Countdown() {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(calcTimeLeft());
-  const [mounted, setMounted] = useState(false);
+interface CountdownProps {
+  targetIso: string;
+}
+
+export function Countdown({ targetIso }: CountdownProps) {
+  const targetDate = useMemo(() => new Date(targetIso), [targetIso]);
+  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
   useEffect(() => {
-    setMounted(true);
-    const id = setInterval(() => setTimeLeft(calcTimeLeft()), 1000);
-    return () => clearInterval(id);
-  }, []);
+    const timeoutId = window.setTimeout(() => setTimeLeft(calcTimeLeft(targetDate)), 0);
+    const id = setInterval(() => setTimeLeft(calcTimeLeft(targetDate)), 1000);
+    return () => {
+      window.clearTimeout(timeoutId);
+      clearInterval(id);
+    };
+  }, [targetDate]);
+
+  if (!timeLeft) return null;
 
   const isDDay = timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 0;
-
-  if (!mounted) return null;
 
   if (isDDay) {
     return (
