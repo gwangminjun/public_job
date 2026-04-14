@@ -169,7 +169,7 @@ export function PhotoAdmin({ initialPhotos }: PhotoAdminProps) {
                 placeholder="예: 결혼식 날, 손자와 함께"
                 maxLength={50}
                 className="w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2"
-                style={{ borderColor: '#C49A6C' }}
+                style={{ borderColor: '#C49A6C', color: '#3B1F0E', backgroundColor: '#FFFDF7' }}
               />
             </div>
             <div>
@@ -180,7 +180,7 @@ export function PhotoAdmin({ initialPhotos }: PhotoAdminProps) {
                 value={takenYear}
                 onChange={(e) => setTakenYear(e.target.value)}
                 className="w-full rounded-xl border px-3 py-2 text-sm outline-none"
-                style={{ borderColor: '#C49A6C' }}
+                style={{ borderColor: '#C49A6C', color: '#3B1F0E', backgroundColor: '#FFFDF7' }}
               >
                 <option value="">연도 선택</option>
                 {years.map((y) => (

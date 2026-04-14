@@ -90,7 +90,7 @@ export function GuestbookForm({ onAdded }: GuestbookFormProps) {
             maxLength={20}
             required
             className="w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2"
-            style={{ borderColor: '#C49A6C' }}
+            style={{ borderColor: '#C49A6C', color: '#3B1F0E', backgroundColor: '#FFFDF7' }}
           />
         </div>
 
@@ -131,7 +131,7 @@ export function GuestbookForm({ onAdded }: GuestbookFormProps) {
             required
             rows={3}
             className="w-full rounded-xl border px-3 py-2 text-sm outline-none resize-none focus:ring-2"
-            style={{ borderColor: '#C49A6C' }}
+            style={{ borderColor: '#C49A6C', color: '#3B1F0E', backgroundColor: '#FFFDF7' }}
           />
           <p className="text-right text-xs mt-1" style={{ color: '#A07850' }}>
             {message.length}/300
