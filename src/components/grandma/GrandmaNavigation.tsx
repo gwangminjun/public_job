@@ -9,6 +9,7 @@ const PRIMARY_LINKS = [
   { href: '/grandma/timeline', label: '발자취', emoji: '📖' },
   { href: '/grandma/gallery', label: '사진첩', emoji: '📷' },
   { href: '/grandma/guestbook', label: '방명록', emoji: '✉️' },
+  { href: '/grandma/video', label: '영상', emoji: '🎬' },
 ];
 
 const EXTRA_LINKS = [{ href: '/grandma/admin', label: '관리', emoji: '🛠️' }];
@@ -83,7 +84,7 @@ export function GrandmaNavigation() {
       )}
 
       <div className="md:hidden fixed bottom-3 left-3 right-3 z-30 rounded-3xl border shadow-xl px-2 py-2" style={{ backgroundColor: 'rgba(255,250,243,0.96)', borderColor: '#E8C99A', backdropFilter: 'blur(12px)' }}>
-        <div className="grid grid-cols-4 gap-1">
+        <div className="grid grid-cols-5 gap-1">
           {PRIMARY_LINKS.map((link) => {
             const active = isActive(pathname, link.href);
 
