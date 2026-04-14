@@ -25,6 +25,8 @@ export interface GrandmaEventConfig {
   location: string;
   location_detail: string | null;
   host: string;
+  celebration_video_title: string | null;
+  celebration_video_url: string | null;
 }
 
 export interface GrandmaGuestbookEntry {
@@ -42,6 +44,8 @@ export const DEFAULT_GRANDMA_EVENT_CONFIG: GrandmaEventConfig = {
   location: '가족 모임 장소',
   location_detail: '추후 업데이트',
   host: '온 가족이 함께',
+  celebration_video_title: '축하 영상',
+  celebration_video_url: null,
 };
 
 export const DEFAULT_GRANDMA_TIMELINE: GrandmaTimelineEvent[] = [
@@ -152,4 +156,57 @@ export function formatEventTimeLabel(eventTime: string): string {
   }
 
   return `${period} ${displayHour}시 ${minute}분`;
+}
+
+export function isGrandmaEventDay(eventDate: string): boolean {
+  const seoulToday = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+
+  return seoulToday === eventDate;
+}
+
+export function getGrandmaSiteUrl() {
+  const envBase = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+
+  if (envBase) {
+    return `${envBase.replace(/\/$/, '')}/grandma`;
+  }
+
+  return 'https://public-job.vercel.app/grandma';
+}
+
+export function getEmbedVideoUrl(videoUrl: string | null) {
+  if (!videoUrl) return null;
+
+  try {
+    const parsed = new URL(videoUrl);
+
+    if (parsed.hostname.includes('youtube.com')) {
+      const videoId = parsed.searchParams.get('v');
+      return videoId ? `https://www.youtube.com/embed/${videoId}` : videoUrl;
+    }
+
+    if (parsed.hostname.includes('youtu.be')) {
+      const videoId = parsed.pathname.replace('/', '');
+      return videoId ? `https://www.youtube.com/embed/${videoId}` : videoUrl;
+    }
+
+    if (parsed.hostname.includes('vimeo.com')) {
+      const videoId = parsed.pathname.split('/').filter(Boolean).pop();
+      return videoId ? `https://player.vimeo.com/video/${videoId}` : videoUrl;
+    }
+
+    return videoUrl;
+  } catch {
+    return videoUrl;
+  }
+}
+
+export function isEmbeddableVideo(videoUrl: string | null) {
+  if (!videoUrl) return false;
+  return /youtube\.com|youtu\.be|vimeo\.com/i.test(videoUrl);
 }

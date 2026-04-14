@@ -53,6 +53,11 @@ export async function getGrandmaPhotos(): Promise<GrandmaPhoto[]> {
   }));
 }
 
+export async function getGrandmaHeroPhotos(limit = 5): Promise<GrandmaPhoto[]> {
+  const photos = await getGrandmaPhotos();
+  return photos.slice(0, limit);
+}
+
 export async function getGrandmaGuestbook(): Promise<GrandmaGuestbookEntry[]> {
   const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase
