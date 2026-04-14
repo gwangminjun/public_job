@@ -1,26 +1,10 @@
-import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { PhotoGallery, GrandmaPhoto } from '@/components/grandma/PhotoGallery';
+import { PhotoGallery } from '@/components/grandma/PhotoGallery';
+import { getGrandmaPhotos } from '@/lib/grandma/server';
 
 export const revalidate = 60;
 
-async function getPhotos(): Promise<GrandmaPhoto[]> {
-  const supabase = await createSupabaseServerClient();
-
-  const { data, error } = await supabase
-    .from('grandma_photos')
-    .select('id, storage_path, caption, taken_year, created_at')
-    .order('taken_year', { ascending: true });
-
-  if (error || !data) return [];
-
-  return data.map((row) => ({
-    ...row,
-    publicUrl: supabase.storage.from('grandma-photos').getPublicUrl(row.storage_path).data.publicUrl,
-  }));
-}
-
 export default async function GalleryPage() {
-  const photos = await getPhotos();
+  const photos = await getGrandmaPhotos();
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">

@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useRef, useTransition } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
-import { createSupabaseBrowserClient } from '@/lib/supabase/client';
-import { GrandmaPhoto } from './PhotoGallery';
+import { GrandmaPhoto } from '@/lib/grandma/shared';
 
 interface PhotoAdminProps {
   initialPhotos: GrandmaPhoto[];
@@ -18,10 +17,9 @@ export function PhotoAdmin({ initialPhotos }: PhotoAdminProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [savingOrder, setSavingOrder] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-
-  const supabase = createSupabaseBrowserClient();
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -45,29 +43,23 @@ export function PhotoAdmin({ initialPhotos }: PhotoAdminProps) {
     setError(null);
 
     try {
-      const ext = selectedFile.name.split('.').pop();
-      const path = `photos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('caption', caption);
+      formData.append('takenYear', takenYear);
 
-      const { error: storageError } = await supabase.storage
-        .from('grandma-photos')
-        .upload(path, selectedFile, { cacheControl: '3600', upsert: false });
+      const response = await fetch('/api/grandma/photos', {
+        method: 'POST',
+        body: formData,
+      });
 
-      if (storageError) throw storageError;
+      const result = (await response.json()) as { photo?: GrandmaPhoto; error?: string };
 
-      const { data: insertData, error: dbError } = await supabase
-        .from('grandma_photos')
-        .insert({
-          storage_path: path,
-          caption: caption.trim() || null,
-          taken_year: takenYear ? parseInt(takenYear, 10) : null,
-        })
-        .select()
-        .single();
+      if (!response.ok || !result.photo) {
+        throw new Error(result.error ?? '사진 업로드에 실패했습니다.');
+      }
 
-      if (dbError) throw dbError;
-
-      const publicUrl = supabase.storage.from('grandma-photos').getPublicUrl(path).data.publicUrl;
-      setPhotos((prev) => [...prev, { ...insertData, publicUrl }]);
+      setPhotos((prev) => [...prev, result.photo as GrandmaPhoto]);
 
       // 초기화
       setCaption('');
@@ -90,17 +82,68 @@ export function PhotoAdmin({ initialPhotos }: PhotoAdminProps) {
 
   async function handleDelete(photo: GrandmaPhoto) {
     setDeleteId(photo.id);
-    startTransition(async () => {
-      try {
-        await supabase.storage.from('grandma-photos').remove([photo.storage_path]);
-        await supabase.from('grandma_photos').delete().eq('id', photo.id);
-        setPhotos((prev) => prev.filter((p) => p.id !== photo.id));
-      } catch {
-        setError('삭제 중 오류가 발생했습니다.');
-      } finally {
-        setDeleteId(null);
+    try {
+      const response = await fetch('/api/grandma/photos', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: photo.id, storage_path: photo.storage_path }),
+      });
+
+      const result = (await response.json()) as { success?: boolean; error?: string };
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error ?? '삭제 중 오류가 발생했습니다.');
       }
-    });
+
+      setPhotos((prev) => prev.filter((p) => p.id !== photo.id));
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : '삭제 중 오류가 발생했습니다.');
+    } finally {
+      setDeleteId(null);
+    }
+  }
+
+  async function persistOrder(nextPhotos: GrandmaPhoto[], previousPhotos: GrandmaPhoto[]) {
+    setSavingOrder(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/grandma/photos/reorder', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: nextPhotos.map((photo) => photo.id) }),
+      });
+
+      const result = (await response.json()) as { success?: boolean; error?: string };
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error ?? '사진 순서 저장에 실패했습니다.');
+      }
+
+      setPhotos(nextPhotos.map((photo, index) => ({ ...photo, sort_order: (index + 1) * 10 })));
+    } catch (orderError) {
+      setError(orderError instanceof Error ? orderError.message : '사진 순서 저장에 실패했습니다.');
+      setPhotos(previousPhotos);
+    } finally {
+      setSavingOrder(false);
+    }
+  }
+
+  function handleDrop(targetId: string) {
+    if (!draggedId || draggedId === targetId) return;
+
+    const currentIndex = photos.findIndex((photo) => photo.id === draggedId);
+    const targetIndex = photos.findIndex((photo) => photo.id === targetId);
+
+    if (currentIndex < 0 || targetIndex < 0) return;
+
+    const nextPhotos = [...photos];
+    const [moved] = nextPhotos.splice(currentIndex, 1);
+    nextPhotos.splice(targetIndex, 0, moved);
+    const previousPhotos = [...photos];
+    setPhotos(nextPhotos);
+    setDraggedId(null);
+    void persistOrder(nextPhotos, previousPhotos);
   }
 
   const currentYear = new Date().getFullYear();
@@ -202,9 +245,12 @@ export function PhotoAdmin({ initialPhotos }: PhotoAdminProps) {
 
       {/* 사진 목록 */}
       <section>
-        <h2 className="text-lg font-bold mb-4" style={{ color: '#5C3317' }}>
-          등록된 사진 ({photos.length}장)
-        </h2>
+          <h2 className="text-lg font-bold mb-4" style={{ color: '#5C3317' }}>
+            등록된 사진 ({photos.length}장)
+          </h2>
+          <p className="text-sm mb-4" style={{ color: '#A07850' }}>
+            사진 카드를 드래그해서 사진첩 표시 순서를 바꿀 수 있습니다.
+          </p>
         {photos.length === 0 ? (
           <p className="text-sm text-center py-10" style={{ color: '#A07850' }}>
             아직 등록된 사진이 없습니다.
@@ -212,11 +258,16 @@ export function PhotoAdmin({ initialPhotos }: PhotoAdminProps) {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {photos.map((photo) => (
-              <div
-                key={photo.id}
-                className="group relative aspect-square rounded-2xl overflow-hidden border shadow-sm"
-                style={{ borderColor: '#E8C99A' }}
-              >
+                <div
+                  key={photo.id}
+                  draggable
+                  onDragStart={() => setDraggedId(photo.id)}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={() => handleDrop(photo.id)}
+                  onDragEnd={() => setDraggedId(null)}
+                  className="group relative aspect-square rounded-2xl overflow-hidden border shadow-sm"
+                  style={{ borderColor: draggedId === photo.id ? '#7B4F2E' : '#E8C99A' }}
+                >
                 <Image
                   src={photo.publicUrl}
                   alt={photo.caption ?? ''}
@@ -231,7 +282,7 @@ export function PhotoAdmin({ initialPhotos }: PhotoAdminProps) {
                   )}
                   <button
                     onClick={() => handleDelete(photo)}
-                    disabled={deleteId === photo.id || isPending}
+                    disabled={deleteId === photo.id || savingOrder}
                     className="px-3 py-1 rounded-lg text-xs font-semibold text-white transition-colors"
                     style={{ backgroundColor: 'rgba(185,28,28,0.85)' }}
                   >
@@ -246,6 +297,12 @@ export function PhotoAdmin({ initialPhotos }: PhotoAdminProps) {
                     {photo.taken_year}
                   </span>
                 )}
+                <span
+                  className="absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.88)', color: '#5C3317' }}
+                >
+                  {photo.sort_order}
+                </span>
               </div>
             ))}
           </div>

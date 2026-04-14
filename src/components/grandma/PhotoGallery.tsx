@@ -2,14 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-
-export interface GrandmaPhoto {
-  id: string;
-  storage_path: string;
-  caption: string | null;
-  taken_year: number | null;
-  publicUrl: string;
-}
+import { GrandmaPhoto } from '@/lib/grandma/shared';
 
 interface PhotoGalleryProps {
   photos: GrandmaPhoto[];
