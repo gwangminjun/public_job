@@ -163,7 +163,7 @@ export function PhotoAdmin({ initialPhotos }: PhotoAdminProps) {
                 placeholder="예: 결혼식 날, 손자와 함께"
                 maxLength={50}
                 className="w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2"
-                style={{ borderColor: '#C49A6C', focusRingColor: '#7B4F2E' }}
+                style={{ borderColor: '#C49A6C' }}
               />
             </div>
             <div>
