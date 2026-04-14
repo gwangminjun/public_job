@@ -1,34 +1,56 @@
-import { redirect } from 'next/navigation';
+import { createHash, timingSafeEqual } from 'node:crypto';
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
 
-export async function getGrandmaAdminUser() {
-  const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.auth.getUser();
+export const GRANDMA_ADMIN_COOKIE = 'grandma_admin_session';
 
-  if (error || !data.user) {
+function hashPassword(value: string) {
+  return createHash('sha256').update(value).digest('hex');
+}
+
+function getConfiguredPassword() {
+  return process.env.GRANDMA_ADMIN_PASSWORD?.trim() ?? '';
+}
+
+function safeCompare(left: string, right: string) {
+  const leftBuffer = Buffer.from(left);
+  const rightBuffer = Buffer.from(right);
+
+  if (leftBuffer.length !== rightBuffer.length) {
+    return false;
+  }
+
+  return timingSafeEqual(leftBuffer, rightBuffer);
+}
+
+export function isGrandmaAdminConfigured() {
+  return getConfiguredPassword().length > 0;
+}
+
+export async function isGrandmaAdminAuthorized() {
+  const configuredPassword = getConfiguredPassword();
+  if (!configuredPassword) {
+    return false;
+  }
+
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get(GRANDMA_ADMIN_COOKIE)?.value;
+  if (!sessionToken) {
+    return false;
+  }
+
+  return safeCompare(sessionToken, hashPassword(configuredPassword));
+}
+
+export async function requireGrandmaAdminPassword() {
+  const authorized = await isGrandmaAdminAuthorized();
+  if (authorized) {
     return null;
   }
 
-  return data.user;
+  return NextResponse.json({ error: '관리 비밀번호가 필요합니다.' }, { status: 401 });
 }
 
-export async function requireGrandmaAdminPage() {
-  const user = await getGrandmaAdminUser();
-
-  if (!user) {
-    redirect('/auth/login?redirectTo=/grandma/admin');
-  }
-
-  return user;
-}
-
-export async function requireGrandmaAdminRoute() {
-  const user = await getGrandmaAdminUser();
-
-  if (!user) {
-    return NextResponse.json({ error: '로그인이 필요한 관리자 기능입니다.' }, { status: 401 });
-  }
-
-  return null;
+export function buildGrandmaAdminSession(password: string) {
+  return hashPassword(password);
 }
