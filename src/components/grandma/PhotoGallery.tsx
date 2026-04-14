@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { GrandmaPhoto } from '@/lib/grandma/shared';
 
@@ -9,18 +9,87 @@ interface PhotoGalleryProps {
 }
 
 export function PhotoGallery({ photos }: PhotoGalleryProps) {
-  const [lightbox, setLightbox] = useState<GrandmaPhoto | null>(null);
+  const [activePhotoId, setActivePhotoId] = useState<string | null>(null);
   const [filterYear, setFilterYear] = useState<number | null>(null);
+  const [shareMessage, setShareMessage] = useState<string | null>(null);
 
-  const years = Array.from(
-    new Set(photos.map((p) => p.taken_year).filter(Boolean) as number[])
-  ).sort((a, b) => a - b);
+  const years = useMemo(
+    () => Array.from(new Set(photos.map((photo) => photo.taken_year).filter(Boolean) as number[])).sort((a, b) => a - b),
+    [photos]
+  );
 
-  const filtered = filterYear ? photos.filter((p) => p.taken_year === filterYear) : photos;
+  const filtered = useMemo(
+    () => (filterYear ? photos.filter((photo) => photo.taken_year === filterYear) : photos),
+    [filterYear, photos]
+  );
+
+  const activeIndex = activePhotoId ? filtered.findIndex((photo) => photo.id === activePhotoId) : -1;
+  const lightbox = activeIndex >= 0 ? filtered[activeIndex] : null;
+
+  const closeLightbox = useCallback(() => {
+    setActivePhotoId(null);
+    setShareMessage(null);
+  }, []);
+
+  const moveLightbox = useCallback(
+    (direction: 'prev' | 'next') => {
+      if (!lightbox || filtered.length === 0) return;
+
+      const nextIndex = direction === 'prev'
+        ? (activeIndex <= 0 ? filtered.length - 1 : activeIndex - 1)
+        : (activeIndex === filtered.length - 1 ? 0 : activeIndex + 1);
+
+      setActivePhotoId(filtered[nextIndex]?.id ?? null);
+    },
+    [activeIndex, filtered, lightbox]
+  );
+
+  async function handleShare(photo: GrandmaPhoto) {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: '할머니 팔순 사진첩',
+          text: photo.caption ?? '추억 사진을 함께 봐주세요.',
+          url: photo.publicUrl,
+        });
+      } else {
+        await navigator.clipboard.writeText(photo.publicUrl);
+      }
+
+      setShareMessage('사진 링크를 공유할 수 있도록 준비했어요.');
+      window.setTimeout(() => setShareMessage(null), 2000);
+    } catch {
+      setShareMessage('공유를 취소했거나 지원되지 않는 환경입니다.');
+      window.setTimeout(() => setShareMessage(null), 2000);
+    }
+  }
+
+  useEffect(() => {
+    if (!lightbox) return undefined;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        closeLightbox();
+      }
+
+      if (event.key === 'ArrowLeft') {
+        moveLightbox('prev');
+      }
+
+      if (event.key === 'ArrowRight') {
+        moveLightbox('next');
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [closeLightbox, lightbox, moveLightbox]);
 
   return (
     <>
-      {/* 연도 필터 */}
       {years.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-6">
           <button
@@ -34,18 +103,18 @@ export function PhotoGallery({ photos }: PhotoGalleryProps) {
           >
             전체
           </button>
-          {years.map((y) => (
+          {years.map((year) => (
             <button
-              key={y}
-              onClick={() => setFilterYear(y)}
+              key={year}
+              onClick={() => setFilterYear(year)}
               className="px-3 py-1 rounded-full text-sm font-medium border transition-colors"
               style={
-                filterYear === y
+                filterYear === year
                   ? { backgroundColor: '#7B4F2E', color: 'white', borderColor: '#7B4F2E' }
                   : { backgroundColor: 'white', color: '#7B4F2E', borderColor: '#C49A6C' }
               }
             >
-              {y}년
+              {year}년
             </button>
           ))}
         </div>
@@ -61,7 +130,7 @@ export function PhotoGallery({ photos }: PhotoGalleryProps) {
           {filtered.map((photo) => (
             <button
               key={photo.id}
-              onClick={() => setLightbox(photo)}
+              onClick={() => setActivePhotoId(photo.id)}
               className="group relative aspect-square rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 border"
               style={{ borderColor: '#E8C99A' }}
             >
@@ -85,47 +154,104 @@ export function PhotoGallery({ photos }: PhotoGalleryProps) {
         </div>
       )}
 
-      {/* 라이트박스 */}
       {lightbox && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}
-          onClick={() => setLightbox(null)}
+          style={{ backgroundColor: 'rgba(0,0,0,0.88)' }}
+          onClick={closeLightbox}
         >
           <div
-            className="relative max-w-lg w-full rounded-3xl overflow-hidden shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
+            className="relative max-w-4xl w-full rounded-[2rem] overflow-hidden shadow-2xl border"
+            style={{ borderColor: 'rgba(255,255,255,0.12)' }}
+            onClick={(event) => event.stopPropagation()}
           >
-            <div className="relative w-full" style={{ aspectRatio: '4/3' }}>
+            <div className="relative w-full bg-black" style={{ aspectRatio: '4 / 3' }}>
               <Image
                 src={lightbox.publicUrl}
                 alt={lightbox.caption ?? ''}
                 fill
                 className="object-contain"
-                sizes="512px"
+                sizes="(max-width: 1024px) 100vw, 1024px"
               />
+
+              {filtered.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => moveLightbox('prev')}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full text-2xl text-white"
+                    style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
+                    aria-label="이전 사진"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveLightbox('next')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full text-2xl text-white"
+                    style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
+                    aria-label="다음 사진"
+                  >
+                    ›
+                  </button>
+                </>
+              )}
+
+              <button
+                onClick={closeLightbox}
+                className="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center text-white text-lg font-bold"
+                style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+              >
+                ×
+              </button>
             </div>
-            {(lightbox.caption || lightbox.taken_year) && (
-              <div className="p-4 text-center" style={{ backgroundColor: '#FFFAF3' }}>
-                {lightbox.caption && (
-                  <p className="font-medium text-sm" style={{ color: '#5C3317' }}>
-                    {lightbox.caption}
-                  </p>
-                )}
-                {lightbox.taken_year && (
-                  <p className="text-xs mt-1" style={{ color: '#A07850' }}>
-                    {lightbox.taken_year}년
-                  </p>
-                )}
+
+            <div className="p-4 md:p-5" style={{ backgroundColor: '#FFFAF3' }}>
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div>
+                  {lightbox.caption ? (
+                    <p className="font-medium text-sm md:text-base" style={{ color: '#5C3317' }}>
+                      {lightbox.caption}
+                    </p>
+                  ) : (
+                    <p className="font-medium text-sm md:text-base" style={{ color: '#A07850' }}>
+                      설명이 없는 사진입니다.
+                    </p>
+                  )}
+                  {lightbox.taken_year && (
+                    <p className="text-xs mt-1" style={{ color: '#A07850' }}>
+                      {lightbox.taken_year}년 촬영
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleShare(lightbox)}
+                    className="px-4 py-2 rounded-full text-sm font-semibold border"
+                    style={{ borderColor: '#C49A6C', color: '#7B4F2E', backgroundColor: '#FFFDF7' }}
+                  >
+                    공유하기
+                  </button>
+                  {filtered.length > 1 && (
+                    <div className="px-4 py-2 rounded-full text-sm font-semibold" style={{ backgroundColor: '#FFF3DC', color: '#7B4F2E' }}>
+                      {activeIndex + 1} / {filtered.length}
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
-            <button
-              onClick={() => setLightbox(null)}
-              className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center text-white text-lg font-bold"
-              style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
-            >
-              ×
-            </button>
+
+              {shareMessage && (
+                <p className="mt-3 text-xs" style={{ color: '#A07850' }}>
+                  {shareMessage}
+                </p>
+              )}
+
+              <p className="mt-3 text-xs" style={{ color: '#A07850' }}>
+                키보드 방향키로 사진을 넘기고, `Esc`로 닫을 수 있어요.
+              </p>
+            </div>
           </div>
         </div>
       )}
