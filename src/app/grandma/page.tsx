@@ -96,7 +96,7 @@ export default function GrandmaHomePage() {
       </section>
 
       {/* 메뉴 카드 */}
-      <section className="max-w-2xl mx-auto px-4 pb-16">
+      <section className="max-w-2xl mx-auto px-4 pb-10">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {MENU_CARDS.map((card) => (
             <Link
@@ -117,6 +117,17 @@ export default function GrandmaHomePage() {
             </Link>
           ))}
         </div>
+      </section>
+
+      {/* 관리자 버튼 */}
+      <section className="max-w-2xl mx-auto px-4 pb-16 text-center">
+        <Link
+          href="/grandma/admin"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium border transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
+          style={{ backgroundColor: '#FFFAF3', borderColor: '#C49A6C', color: '#7B4F2E' }}
+        >
+          🛠️ 사진 관리
+        </Link>
       </section>
     </div>
   );
