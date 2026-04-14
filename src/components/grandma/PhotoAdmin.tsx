@@ -76,7 +76,13 @@ export function PhotoAdmin({ initialPhotos }: PhotoAdminProps) {
       setSelectedFile(null);
       if (fileRef.current) fileRef.current.value = '';
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : '업로드 중 오류가 발생했습니다.');
+      if (e instanceof Error) {
+        setError(e.message);
+      } else if (typeof e === 'object' && e !== null && 'message' in e) {
+        setError(String((e as { message: unknown }).message));
+      } else {
+        setError(JSON.stringify(e));
+      }
     } finally {
       setUploading(false);
     }
