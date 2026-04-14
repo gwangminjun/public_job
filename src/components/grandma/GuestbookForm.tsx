@@ -1,58 +1,55 @@
 'use client';
 
 import { useState } from 'react';
-import { createSupabaseBrowserClient } from '@/lib/supabase/client';
+import { GrandmaGuestbookEntry } from '@/lib/grandma/shared';
 
 const EMOJIS = ['❤️', '🌸', '🎂', '🥰', '🙏', '🌺', '✨', '💐'];
 
-export interface GuestbookEntry {
-  id: string;
-  name: string;
-  message: string;
-  emoji: string;
-  created_at: string;
-}
-
 interface GuestbookFormProps {
-  onAdded: (entry: GuestbookEntry) => void;
+  onAdded: (entry: GrandmaGuestbookEntry) => void;
 }
 
 export function GuestbookForm({ onAdded }: GuestbookFormProps) {
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
   const [emoji, setEmoji] = useState('❤️');
+  const [deletePin, setDeletePin] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const supabase = createSupabaseBrowserClient();
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim() || !message.trim()) return;
+    if (!name.trim() || !message.trim() || !/^\d{4}$/.test(deletePin)) return;
 
     setSubmitting(true);
     setError(null);
 
-    const { data, error: dbError } = await supabase
-      .from('grandma_guestbook')
-      .insert({ name: name.trim(), message: message.trim(), emoji })
-      .select()
-      .single();
+    try {
+      const response = await fetch('/api/grandma/guestbook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, message, emoji, deletePin }),
+      });
 
-    setSubmitting(false);
+      const result = (await response.json()) as { entry?: GrandmaGuestbookEntry; error?: string };
 
-    if (dbError) {
-      setError('메시지 전송에 실패했습니다. 다시 시도해주세요.');
-      return;
+      if (!response.ok || !result.entry) {
+        throw new Error(result.error ?? '메시지 전송에 실패했습니다. 다시 시도해주세요.');
+      }
+
+      onAdded(result.entry);
+      setName('');
+      setMessage('');
+      setEmoji('❤️');
+      setDeletePin('');
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : '메시지 전송에 실패했습니다.');
+    } finally {
+      setSubmitting(false);
     }
-
-    onAdded(data as GuestbookEntry);
-    setName('');
-    setMessage('');
-    setEmoji('❤️');
-    setSuccess(true);
-    setTimeout(() => setSuccess(false), 3000);
   }
 
   return (
@@ -76,7 +73,7 @@ export function GuestbookForm({ onAdded }: GuestbookFormProps) {
         </div>
       )}
 
-      <div className="space-y-4">
+        <div className="space-y-4">
         {/* 이름 */}
         <div>
           <label className="block text-xs font-semibold mb-1" style={{ color: '#7B4F2E' }}>
@@ -138,9 +135,30 @@ export function GuestbookForm({ onAdded }: GuestbookFormProps) {
           </p>
         </div>
 
+        <div>
+          <label className="block text-xs font-semibold mb-1" style={{ color: '#7B4F2E' }}>
+            삭제 비밀번호
+          </label>
+          <input
+            type="password"
+            inputMode="numeric"
+            pattern="[0-9]{4}"
+            value={deletePin}
+            onChange={(e) => setDeletePin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+            placeholder="4자리 숫자"
+            maxLength={4}
+            required
+            className="w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2"
+            style={{ borderColor: '#C49A6C', color: '#3B1F0E', backgroundColor: '#FFFDF7' }}
+          />
+          <p className="text-right text-xs mt-1" style={{ color: '#A07850' }}>
+            본인 메시지를 지울 때 사용합니다.
+          </p>
+        </div>
+
         <button
           type="submit"
-          disabled={submitting || !name.trim() || !message.trim()}
+          disabled={submitting || !name.trim() || !message.trim() || !/^\d{4}$/.test(deletePin)}
           className="w-full py-2.5 rounded-xl font-semibold text-sm text-white transition-opacity disabled:opacity-50"
           style={{ backgroundColor: '#7B4F2E' }}
         >

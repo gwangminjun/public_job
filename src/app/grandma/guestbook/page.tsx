@@ -1,23 +1,10 @@
-import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { GuestbookList } from '@/components/grandma/GuestbookList';
-import { GuestbookEntry } from '@/components/grandma/GuestbookForm';
+import { getGrandmaGuestbook } from '@/lib/grandma/server';
 
 export const revalidate = 0;
 
-async function getEntries(): Promise<GuestbookEntry[]> {
-  const supabase = await createSupabaseServerClient();
-
-  const { data, error } = await supabase
-    .from('grandma_guestbook')
-    .select('id, name, message, emoji, created_at')
-    .order('created_at', { ascending: false });
-
-  if (error || !data) return [];
-  return data as GuestbookEntry[];
-}
-
 export default async function GuestbookPage() {
-  const entries = await getEntries();
+  const entries = await getGrandmaGuestbook();
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
