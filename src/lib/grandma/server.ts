@@ -3,6 +3,7 @@ import {
   DEFAULT_GRANDMA_EVENT_CONFIG,
   DEFAULT_GRANDMA_TIMELINE,
   GrandmaEventConfig,
+  GrandmaGuestbookEntry,
   GrandmaPhoto,
   GrandmaTimelineEvent,
 } from './shared';
@@ -50,4 +51,18 @@ export async function getGrandmaPhotos(): Promise<GrandmaPhoto[]> {
     ...row,
     publicUrl: supabase.storage.from('grandma-photos').getPublicUrl(row.storage_path).data.publicUrl,
   }));
+}
+
+export async function getGrandmaGuestbook(): Promise<GrandmaGuestbookEntry[]> {
+  const supabase = createSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from('grandma_guestbook')
+    .select('id, name, message, emoji, created_at')
+    .order('created_at', { ascending: false });
+
+  if (error || !data) {
+    return [];
+  }
+
+  return data;
 }

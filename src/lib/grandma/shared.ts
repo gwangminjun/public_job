@@ -27,6 +27,14 @@ export interface GrandmaEventConfig {
   host: string;
 }
 
+export interface GrandmaGuestbookEntry {
+  id: string;
+  name: string;
+  message: string;
+  emoji: string;
+  created_at: string;
+}
+
 export const DEFAULT_GRANDMA_EVENT_CONFIG: GrandmaEventConfig = {
   id: 1,
   event_date: '2026-04-25',
