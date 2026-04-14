@@ -280,6 +280,71 @@ Lighthouse 리포트는 `.lighthouse/mobile.json`, `.lighthouse/desktop.json`에
 
 MIT License
 
+---
+
+## 🎂 할머니 팔순 기념 사이트 (`/grandma`)
+
+가족을 위한 팔순잔치 기념 미니 사이트입니다. 공공정보 포털과 동일한 프로젝트 내 `/grandma` 경로로 운영됩니다.
+
+### 주요 기능
+
+- **메인 페이지** (`/grandma`): 잔치 D-day 카운트다운, 잔치 안내(일시/장소/주최), 메뉴 카드 네비게이션
+- **80년의 발자취** (`/grandma/timeline`): 연도별 인생 타임라인 (탄생 → 결혼 → 손자 탄생 → 팔순)
+- **사진첩** (`/grandma/gallery`): Supabase Storage에 저장된 가족 사진 갤러리
+- **방명록** (`/grandma/guestbook`): 이모지 선택 + 이름 + 메시지 남기기, 실시간 목록 표시
+- **사진 관리** (`/grandma/admin`): 사진 업로드(캡션·촬영연도 포함) 및 삭제 관리 페이지
+  - 메인 페이지 하단 **사진 관리** 버튼으로 바로 접근 가능
+
+### 기술 연동
+
+- **Supabase Storage**: `grandma-photos` 버킷에 이미지 저장, Public URL로 갤러리 조회
+- **Supabase DB**: `grandma_photos` (사진 메타), `grandma_guestbook` (방명록) 테이블
+- **RLS 정책**: `anon` / `authenticated` 권한으로 INSERT · SELECT · DELETE 허용
+- **Next.js Image**: `*.supabase.co` 도메인 `remotePatterns` 등록으로 외부 이미지 허용
+
+### Supabase 초기 설정
+
+```sql
+-- 사진 테이블
+create table grandma_photos (
+  id uuid primary key default gen_random_uuid(),
+  storage_path text not null,
+  caption text,
+  taken_year int,
+  created_at timestamptz default now()
+);
+
+-- 방명록 테이블
+create table grandma_guestbook (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  message text not null,
+  emoji text not null default '❤️',
+  created_at timestamptz default now()
+);
+
+-- RLS 활성화 + 정책 설정
+alter table grandma_photos enable row level security;
+alter table grandma_guestbook enable row level security;
+
+create policy "allow all grandma_photos" on grandma_photos for all to anon, authenticated using (true) with check (true);
+create policy "allow all grandma_guestbook" on grandma_guestbook for all to anon, authenticated using (true) with check (true);
+```
+
+Storage 버킷 생성: 대시보드 → Storage → New bucket → 이름 `grandma-photos` → **Public** 체크
+
+### 개선 이력
+
+| 날짜 | 내용 |
+|------|------|
+| 2026-04-14 | 사진 관리 페이지 메인 접근 버튼 추가 |
+| 2026-04-14 | `focusRingColor` CSS 타입 에러 수정 |
+| 2026-04-14 | Supabase 이미지 도메인 `remotePatterns` 등록 (400 에러 수정) |
+| 2026-04-14 | 업로드 에러 메시지 실제 원인 표출로 개선 |
+| 2026-04-14 | 모든 입력창 글자색(`#3B1F0E`) · 배경색(`#FFFDF7`) 통일 |
+
+---
+
 ## 현재 구현 완료 범위
 
 - **1개월차(1~4주차)**: 서버 사이드 필터링/정렬, URL 상태 동기화, 관심 공고 저장, 공유 기능 및 안정화 완료
