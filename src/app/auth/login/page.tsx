@@ -1,12 +1,13 @@
 'use client';
 
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, Suspense, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,6 +16,7 @@ export default function LoginPage() {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [message, setMessage] = useState('');
   const [needsEmailConfirm, setNeedsEmailConfirm] = useState(false);
+  const redirectTo = searchParams.get('redirectTo') || '/account';
 
   const getEmailRedirectTo = () => {
     const envBase = process.env.NEXT_PUBLIC_SITE_URL?.trim();
@@ -80,8 +82,8 @@ export default function LoginPage() {
           return;
         }
 
-        setMessage('로그인 성공! 계정 페이지로 이동합니다.');
-        router.push('/account');
+        setMessage('로그인 성공! 요청한 페이지로 이동합니다.');
+        router.push(redirectTo);
         router.refresh();
         return;
       }
@@ -187,5 +189,13 @@ export default function LoginPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageContent />
+    </Suspense>
   );
 }

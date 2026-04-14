@@ -1,11 +1,14 @@
 import { PhotoAdmin } from '@/components/grandma/PhotoAdmin';
 import { EventConfigAdmin } from '@/components/grandma/EventConfigAdmin';
 import { TimelineAdmin } from '@/components/grandma/TimelineAdmin';
+import { requireGrandmaAdminPage } from '@/lib/grandma/auth';
 import { getGrandmaConfig, getGrandmaPhotos, getGrandmaTimeline } from '@/lib/grandma/server';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
+  await requireGrandmaAdminPage();
+
   const [photos, config, timeline] = await Promise.all([
     getGrandmaPhotos(),
     getGrandmaConfig(),
