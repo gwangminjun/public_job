@@ -95,6 +95,10 @@ export default function HubPage() {
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-6 text-center">
               <p className="text-sm text-gray-400 dark:text-gray-500 font-medium">Coming Soon...</p>
             </div>
+
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-6 text-center">
+              <p className="text-sm text-gray-400 dark:text-gray-500 font-medium">Coming Soon...</p>
+            </div>
           </div>
         </section>
       </main>
