@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { containsBlockedWords } from '@/lib/grandma/moderation';
 import { GrandmaGuestbookEntry } from '@/lib/grandma/shared';
 
 const EMOJIS = ['❤️', '🌸', '🎂', '🥰', '🙏', '🌺', '✨', '💐'];
@@ -21,6 +22,11 @@ export function GuestbookForm({ onAdded }: GuestbookFormProps) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim() || !message.trim() || !/^\d{4}$/.test(deletePin)) return;
+
+    if (containsBlockedWords(name) || containsBlockedWords(message)) {
+      setError('예의를 지키는 축하 메시지만 남길 수 있어요.');
+      return;
+    }
 
     setSubmitting(true);
     setError(null);
