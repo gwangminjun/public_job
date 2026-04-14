@@ -61,6 +61,16 @@ src/
 - 캡션(최대 50자) · 촬영 연도 입력
 - Supabase Storage 업로드 → DB 메타 저장 원자적 처리
 - 등록된 사진 목록 + 호버 시 삭제 버튼
+- 잔치 정보 편집 (`grandma_config`)
+- 타임라인 항목 CRUD (`grandma_timeline`)
+- 사진 순서 드래그 앤 드롭 정렬 (`sort_order`)
+
+### 1단계 구현 완료 (2026-04-14)
+- `grandma_timeline` 테이블 기반으로 타임라인 페이지를 DB 연동으로 전환
+- 관리자 페이지에서 타임라인 추가/수정/삭제 가능
+- `grandma_config` 테이블 기반으로 메인 잔치 정보 및 카운트다운 기준값 관리 가능
+- `grandma_photos.sort_order` 도입 및 관리자 페이지에서 사진 순서 저장 지원
+- 관련 API 라우트 추가: 설정 저장, 타임라인 CRUD, 사진 업로드/삭제/재정렬
 
 ---
 
@@ -126,6 +136,7 @@ create policy "gs_delete" on storage.objects for delete to anon, authenticated u
 | 2026-04-14 | `400 Bad Request (Next.js Image)` — `next.config.ts`에 `*.supabase.co` remotePatterns 등록 |
 | 2026-04-14 | 업로드 에러 메시지 — Supabase 오류 객체 타입 분기로 실제 원인 표출 |
 | 2026-04-14 | 입력창 글자 안 보임 — 모든 input·select·textarea에 `color` / `backgroundColor` 명시 |
+| 2026-04-14 | 1단계 콘텐츠 완성 기능 구현 — 타임라인 DB 관리, 잔치 정보 DB 관리, 사진 순서 정렬 추가 |
 
 ---
 
@@ -133,7 +144,7 @@ create policy "gs_delete" on storage.objects for delete to anon, authenticated u
 
 ### 1단계 — 콘텐츠 완성
 
-#### 1-1. 타임라인 직접 관리
+#### 1-1. 타임라인 직접 관리 (완료)
 - **현재**: 타임라인 데이터가 코드에 하드코딩
 - **개선**: Supabase `grandma_timeline` 테이블로 이관 + 관리자 페이지에서 CRUD
 - **테이블**:
@@ -149,12 +160,12 @@ create policy "gs_delete" on storage.objects for delete to anon, authenticated u
   );
   ```
 
-#### 1-2. 잔치 정보 관리자 편집
+#### 1-2. 잔치 정보 관리자 편집 (완료)
 - **현재**: 날짜·장소·주최 정보가 코드에 고정
 - **개선**: Supabase `grandma_config` 테이블로 분리, 관리자 페이지에서 수정 가능
 - **필드**: `event_date`, `event_time`, `location`, `location_detail`, `host`
 
-#### 1-3. 사진 순서 정렬
+#### 1-3. 사진 순서 정렬 (완료)
 - **현재**: `created_at` 내림차순 고정
 - **개선**: 관리자 드래그 앤 드롭으로 순서 지정 (`sort_order` 컬럼 추가)
 
