@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
+import { requireGrandmaAdminRoute } from '@/lib/grandma/auth';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 export async function POST(request: Request) {
   try {
+    const unauthorized = await requireGrandmaAdminRoute();
+    if (unauthorized) return unauthorized;
+
     const formData = await request.formData();
     const file = formData.get('file');
     const captionValue = formData.get('caption');
@@ -70,6 +74,9 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    const unauthorized = await requireGrandmaAdminRoute();
+    if (unauthorized) return unauthorized;
+
     const body = (await request.json()) as { id?: string; storage_path?: string };
 
     if (!body.id || !body.storage_path) {

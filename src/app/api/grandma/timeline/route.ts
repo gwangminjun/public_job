@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
+import { requireGrandmaAdminRoute } from '@/lib/grandma/auth';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 export async function POST(request: Request) {
   try {
+    const unauthorized = await requireGrandmaAdminRoute();
+    if (unauthorized) return unauthorized;
+
     const body = (await request.json()) as {
       year?: number;
       title?: string;
