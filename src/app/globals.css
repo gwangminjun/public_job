@@ -477,3 +477,35 @@ body {
 .dark .job-marker-icon.is-active .job-marker-label {
   box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.8), 0 8px 18px rgba(37, 99, 235, 0.5);
 }
+
+@keyframes grandmaPetalFall {
+  0% {
+    transform: translateY(-12%) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translateY(110vh) translateX(28px) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+.grandma-petal {
+  position: absolute;
+  top: -10%;
+  font-size: 1.5rem;
+  opacity: 0;
+  animation-name: grandmaPetalFall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@media print {
+  .grandma-print-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
