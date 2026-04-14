@@ -13,6 +13,13 @@ const PROJECTS = [
     href: '/public-job',
     status: 'live' as const,
   },
+  {
+    title: '🌸 할머니 팔순잔치 기념',
+    description: '할머니의 소중한 80번째 생신을 축하하는 가족 기념 사이트 · 카운트다운 · 사진첩 · 방명록',
+    tech: ['Next.js', 'Supabase', 'Tailwind CSS'],
+    href: '/grandma',
+    status: 'live' as const,
+  },
 ];
 
 export default function HubPage() {
