@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
+import { getGrandmaStoragePathFromUrl, GRANDMA_VIDEO_BUCKET } from '@/lib/grandma/shared';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
 export async function PUT(request: Request) {
@@ -12,6 +13,7 @@ export async function PUT(request: Request) {
       host?: string;
       celebration_video_title?: string | null;
       celebration_video_url?: string | null;
+      previous_celebration_video_url?: string | null;
     };
 
     if (!body.event_date || !body.event_time || !body.location?.trim() || !body.host?.trim()) {
@@ -19,6 +21,8 @@ export async function PUT(request: Request) {
     }
 
     const supabase = createSupabaseAdminClient();
+    const previousStoragePath = getGrandmaStoragePathFromUrl(body.previous_celebration_video_url ?? null);
+    const nextStoragePath = getGrandmaStoragePathFromUrl(body.celebration_video_url ?? null);
     const { data, error } = await supabase
       .from('grandma_config')
       .upsert({
@@ -36,6 +40,10 @@ export async function PUT(request: Request) {
 
     if (error || !data) {
       return NextResponse.json({ error: error?.message ?? '잔치 정보 저장에 실패했습니다.' }, { status: 500 });
+    }
+
+    if (previousStoragePath && previousStoragePath !== nextStoragePath) {
+      await supabase.storage.from(GRANDMA_VIDEO_BUCKET).remove([previousStoragePath]);
     }
 
     revalidatePath('/grandma');

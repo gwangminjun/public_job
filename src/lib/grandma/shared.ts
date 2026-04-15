@@ -37,6 +37,8 @@ export interface GrandmaGuestbookEntry {
   created_at: string;
 }
 
+export const GRANDMA_VIDEO_BUCKET = 'grandma-videos';
+
 export const DEFAULT_GRANDMA_EVENT_CONFIG: GrandmaEventConfig = {
   id: 1,
   event_date: '2026-04-25',
@@ -209,4 +211,64 @@ export function getEmbedVideoUrl(videoUrl: string | null) {
 export function isEmbeddableVideo(videoUrl: string | null) {
   if (!videoUrl) return false;
   return /youtube\.com|youtu\.be|vimeo\.com/i.test(videoUrl);
+}
+
+export function getVideoPlatform(videoUrl: string | null) {
+  if (!videoUrl) return null;
+
+  if (/youtube\.com|youtu\.be/i.test(videoUrl)) {
+    return 'YouTube';
+  }
+
+  if (/vimeo\.com/i.test(videoUrl)) {
+    return 'Vimeo';
+  }
+
+  return 'Direct';
+}
+
+export function getVideoThumbnailUrl(videoUrl: string | null) {
+  if (!videoUrl) return null;
+
+  try {
+    const parsed = new URL(videoUrl);
+
+    if (parsed.hostname.includes('youtube.com')) {
+      const videoId = parsed.searchParams.get('v');
+      return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null;
+    }
+
+    if (parsed.hostname.includes('youtu.be')) {
+      const videoId = parsed.pathname.replace('/', '');
+      return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null;
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export function getGrandmaStoragePathFromUrl(videoUrl: string | null) {
+  if (!videoUrl) return null;
+
+  try {
+    const parsed = new URL(videoUrl);
+    const markers = [
+      `/storage/v1/object/public/${GRANDMA_VIDEO_BUCKET}/`,
+      '/storage/v1/object/public/grandma-photos/',
+    ];
+
+    for (const marker of markers) {
+      const markerIndex = parsed.pathname.indexOf(marker);
+
+      if (markerIndex !== -1) {
+        return decodeURIComponent(parsed.pathname.slice(markerIndex + marker.length));
+      }
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
 }
