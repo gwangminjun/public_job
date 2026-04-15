@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { GrandmaEventConfig, GrandmaPhoto, GrandmaTimelineEvent } from '@/lib/grandma/shared';
 import { EventConfigAdmin } from './EventConfigAdmin';
+import { GrandmaVideoAdmin } from './GrandmaVideoAdmin';
 import { PhotoAdmin } from './PhotoAdmin';
 import { TimelineAdmin } from './TimelineAdmin';
 
@@ -18,7 +19,13 @@ const TAB_ITEMS = [
     id: 'config',
     label: '잔치 정보 관리',
     emoji: '🎉',
-    description: '행사 날짜, 장소, 주최, 영상 정보를 관리합니다.',
+    description: '행사 날짜, 장소, 주최 정보를 관리합니다.',
+  },
+  {
+    id: 'video',
+    label: '영상 관리',
+    emoji: '🎬',
+    description: '축하 영상 제목과 링크를 저장하고 미리봅니다.',
   },
   {
     id: 'timeline',
@@ -64,7 +71,7 @@ export function GrandmaAdminTabs({ config, timeline, photos }: GrandmaAdminTabsP
         className="rounded-[2rem] border p-4 md:p-5 shadow-sm"
         style={{ backgroundColor: '#FFFAF3', borderColor: '#E8C99A' }}
       >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
           {TAB_ITEMS.map((item) => {
             const active = item.id === activeTab;
 
@@ -118,6 +125,7 @@ export function GrandmaAdminTabs({ config, timeline, photos }: GrandmaAdminTabsP
       </div>
 
       {activeTab === 'config' && <EventConfigAdmin initialConfig={config} />}
+      {activeTab === 'video' && <GrandmaVideoAdmin initialConfig={config} />}
       {activeTab === 'timeline' && <TimelineAdmin initialEvents={timeline} />}
       {activeTab === 'photos' && <PhotoAdmin initialPhotos={photos} />}
     </div>
