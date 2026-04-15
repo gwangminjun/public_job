@@ -1,6 +1,4 @@
-import { PhotoAdmin } from '@/components/grandma/PhotoAdmin';
-import { EventConfigAdmin } from '@/components/grandma/EventConfigAdmin';
-import { TimelineAdmin } from '@/components/grandma/TimelineAdmin';
+import { GrandmaAdminTabs } from '@/components/grandma/GrandmaAdminTabs';
 import { getGrandmaConfig, getGrandmaPhotos, getGrandmaTimeline } from '@/lib/grandma/server';
 
 export const dynamic = 'force-dynamic';
@@ -23,11 +21,7 @@ export default async function AdminPage() {
         </p>
       </div>
 
-      <div className="space-y-10">
-        <EventConfigAdmin initialConfig={config} />
-        <TimelineAdmin initialEvents={timeline} />
-        <PhotoAdmin initialPhotos={photos} />
-      </div>
+      <GrandmaAdminTabs config={config} timeline={timeline} photos={photos} />
     </div>
   );
 }
