@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef } from 'react';
-import { createSupabaseBrowserClient } from '@/lib/supabase/client';
+import { useEffect, useRef } from 'react';
 import { useBookmarkStore } from '@/store/bookmarkStore';
 import { useRecentViewedStore } from '@/store/recentViewedStore';
 import { useFilterPresetStore } from '@/store/filterPresetStore';
@@ -14,7 +13,6 @@ type UserDataResponse = {
 };
 
 export function UserDataSync() {
-  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const bookmarks = useBookmarkStore((state) => state.bookmarks);
   const setBookmarks = useBookmarkStore((state) => state.setBookmarks);
   const recentJobs = useRecentViewedStore((state) => state.recentJobs);
@@ -28,8 +26,17 @@ export function UserDataSync() {
 
   useEffect(() => {
     let cancelled = false;
+    let unsubscribe: (() => void) | null = null;
 
     const bootstrap = async () => {
+      let supabase;
+      try {
+        const { createSupabaseBrowserClient } = await import('@/lib/supabase/client');
+        supabase = createSupabaseBrowserClient();
+      } catch {
+        return;
+      }
+
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -56,23 +63,22 @@ export function UserDataSync() {
       } catch (error) {
         console.warn('[UserDataSync] bootstrap failed', error);
       }
+
+      const { data: authData } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (!session?.user) {
+          isReadyRef.current = false;
+        }
+      });
+      unsubscribe = () => authData.subscription.unsubscribe();
     };
 
     void bootstrap();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session?.user) {
-        isReadyRef.current = false;
-      }
-    });
-
     return () => {
       cancelled = true;
-      subscription.unsubscribe();
+      unsubscribe?.();
     };
-  }, [supabase, setBookmarks, setPresets, setRecentJobs]);
+  }, [setBookmarks, setPresets, setRecentJobs]);
 
   useEffect(() => {
     if (!isReadyRef.current || isHydratingRef.current) {

@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
-import { createSupabaseBrowserClient } from '@/lib/supabase/client';
+import { useEffect } from 'react';
 import { FilterPreset, Job, RecentJob } from '@/lib/types';
 
 type PersistEnvelope<T> = {
@@ -27,12 +26,18 @@ function readPersistedState<T>(storageKey: string): T | null {
 }
 
 export function LocalToDbMigration() {
-  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
-
   useEffect(() => {
     let cancelled = false;
 
     const run = async () => {
+      let supabase;
+      try {
+        const { createSupabaseBrowserClient } = await import('@/lib/supabase/client');
+        supabase = createSupabaseBrowserClient();
+      } catch {
+        return;
+      }
+
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -85,7 +90,7 @@ export function LocalToDbMigration() {
     return () => {
       cancelled = true;
     };
-  }, [supabase]);
+  }, []);
 
   return null;
 }
