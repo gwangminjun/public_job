@@ -1,12 +1,25 @@
 {
   "framework": "nextjs",
   "regions": ["icn1"],
-    "functions": {
+  "functions": {
     "src/app/api/**/*.ts": {
       "maxDuration": 30
     },
     "src/app/api/cron/pokemon-tcg-sync/route.ts": {
       "maxDuration": 60
+    },
+    "src/app/api/cron/pokemon-kr-sync/route.ts": {
+      "maxDuration": 300
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/pokemon-tcg-sync",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/pokemon-kr-sync",
+      "schedule": "0 4 * * *"
+    }
+  ]
 }

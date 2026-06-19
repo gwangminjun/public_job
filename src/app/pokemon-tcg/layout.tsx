@@ -30,6 +30,12 @@ export default function PokemonTcgLayout({ children }: { children: React.ReactNo
             </Link>
             <span className="w-px h-4 bg-white/30 mx-1" />
             <Link
+              href="/pokemon-tcg/kr/sets"
+              className="px-3 py-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 text-xs transition-colors"
+            >
+              🇰🇷 KR
+            </Link>
+            <Link
               href="/"
               className="px-3 py-1.5 rounded-lg text-white/50 hover:text-white/80 text-xs transition-colors"
             >

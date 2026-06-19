@@ -15,5 +15,8 @@
       "Bash(ls /c/Users/user/IdeaProjects/public_job/README*)",
       "Bash(grep '\"\"version\"\"\\\\|\"\"next\"\"\\\\|\"\"typescript\"\"\\\\|\"\"supabase\"\"\\\\|\"\"tailwind\"\"' /c/Users/user/IdeaProjects/public_job/package.json)"
     ]
+  },
+  "env": {
+    "ECC_SESSION_ID": "grandma-dev"
   }
 }
