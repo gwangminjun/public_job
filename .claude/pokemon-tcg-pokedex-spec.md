@@ -717,7 +717,128 @@ Phase 1 ~ Phase 2 (프로젝트 초기 설정 + 프록시 API Routes) 를 구현
 
 ---
 
-## 15. 참고 링크
+## 15. 데이터베이스 설계 (Supabase)
+
+> **배경**: pokemontcg.io API 응답이 느려 Supabase에 데이터를 캐싱하고 하루 1회 동기화하는 방식으로 전환.  
+> API 라우트 + RSC 서버 fetcher 모두 외부 API 대신 DB에서 읽는다.
+
+### 아키텍처 요약
+
+```
+pokemontcg.io API
+      │  (하루 1회 cron)
+      ▼
+POST /api/cron/pokemon-tcg-sync
+      │ upsert
+      ▼
+Supabase (pokemon_sets, pokemon_cards)
+      │  읽기
+      ▼
+/api/pokemon-tcg/* → 클라이언트
+```
+
+### DDL
+
+Supabase 대시보드 → SQL Editor에서 실행한다.
+
+```sql
+-- ── pokemon_sets ──────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS pokemon_sets (
+  id           TEXT        PRIMARY KEY,
+  name         TEXT        NOT NULL,
+  series       TEXT        NOT NULL,
+  release_date TEXT,
+  total        INTEGER     NOT NULL DEFAULT 0,
+  raw_data     JSONB       NOT NULL DEFAULT '{}',
+  synced_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS pokemon_sets_series_idx
+  ON pokemon_sets (series);
+CREATE INDEX IF NOT EXISTS pokemon_sets_release_date_idx
+  ON pokemon_sets (release_date DESC NULLS LAST);
+
+ALTER TABLE pokemon_sets ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "pokemon_sets public read"
+  ON pokemon_sets FOR SELECT USING (true);
+
+
+-- ── pokemon_cards ─────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS pokemon_cards (
+  id        TEXT        PRIMARY KEY,
+  set_id    TEXT        NOT NULL,          -- pokemon_sets.id 참조 (FK 없음, 동기화 순서로 보장)
+  name      TEXT        NOT NULL,
+  types     TEXT[]      NOT NULL DEFAULT '{}',
+  subtypes  TEXT[]      NOT NULL DEFAULT '{}',
+  rarity    TEXT,
+  hp_int    INTEGER,                       -- hp 문자열 → 정수 변환 (범위 필터용)
+  number    TEXT        NOT NULL DEFAULT '',
+  raw_data  JSONB       NOT NULL DEFAULT '{}',  -- API 원본 camelCase 그대로 저장
+  synced_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS pokemon_cards_set_id_idx
+  ON pokemon_cards (set_id);
+CREATE INDEX IF NOT EXISTS pokemon_cards_name_idx
+  ON pokemon_cards (name);
+CREATE INDEX IF NOT EXISTS pokemon_cards_rarity_idx
+  ON pokemon_cards (rarity);
+CREATE INDEX IF NOT EXISTS pokemon_cards_hp_int_idx
+  ON pokemon_cards (hp_int);
+CREATE INDEX IF NOT EXISTS pokemon_cards_types_idx
+  ON pokemon_cards USING GIN (types);
+CREATE INDEX IF NOT EXISTS pokemon_cards_subtypes_idx
+  ON pokemon_cards USING GIN (subtypes);
+
+ALTER TABLE pokemon_cards ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "pokemon_cards public read"
+  ON pokemon_cards FOR SELECT USING (true);
+```
+
+### 설계 결정
+
+| 항목 | 결정 | 이유 |
+|---|---|---|
+| `raw_data JSONB` | API 원본 camelCase 그대로 저장 | TypeScript 타입으로 바로 캐스팅 가능, 매핑 코드 불필요 |
+| FK 없음 (`set_id`) | 참조 무결성을 앱 레벨로 보장 | 동기화 시 세트 먼저 upsert → 카드 upsert 순서 유지 |
+| `TEXT[]` (types, subtypes) | JSONB 대신 네이티브 배열 | GIN 인덱스 + Supabase `.contains()` 직접 사용 |
+| `hp_int INTEGER` | hp 문자열 파싱 저장 | `hp:[60 TO 100]` 범위 쿼리를 인덱스로 처리 |
+| RLS + public SELECT | 인증 불필요한 공개 데이터 | Anon key로 읽기 허용, 쓰기는 Service Role Key 전용 |
+
+### 동기화 엔드포인트
+
+```
+POST /api/cron/pokemon-tcg-sync
+Header: x-cron-secret: <CRON_SECRET>
+```
+
+**동작 순서:**
+1. pokemontcg.io `/sets?pageSize=250` → `pokemon_sets` upsert
+2. `/cards?page=1` 로 `totalCount` 파악
+3. 나머지 페이지를 5개씩 병렬 요청 (concurrency=5)
+4. 카드 행 변환 → 500장 단위로 청크 upsert
+5. 소요 시간/결과 JSON 반환
+
+**환경변수:** `CRON_SECRET` (기존 job-portal cron과 공유)  
+**Vercel maxDuration:** 60초 (vercel.json에 별도 지정)
+
+### Lucene 쿼리 → Supabase 변환
+
+`cardFilterStore.buildQuery()`가 생성하는 쿼리 문자열을 `src/lib/pokemon/db.ts`의 `parsePokemonQuery()`가 파싱하여 Supabase 필터로 변환한다.
+
+| Lucene 쿼리 | Supabase 필터 |
+|---|---|
+| `name:pikachu*` | `.ilike('name', 'pikachu%')` |
+| `set.id:base1` | `.eq('set_id', 'base1')` |
+| `types:Fire` | `.contains('types', ['Fire'])` |
+| `subtypes:"Stage 1"` | `.contains('subtypes', ['Stage 1'])` |
+| `rarity:"Rare Holo"` | `.eq('rarity', 'Rare Holo')` |
+| `hp:[60 TO 100]` | `.gte('hp_int', 60).lte('hp_int', 100)` |
+| `hp:[60 TO *]` | `.gte('hp_int', 60)` |
+
+---
+
+## 16. 참고 링크
 
 | 자료 | URL |
 |------|-----|

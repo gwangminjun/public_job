@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPokemonApiKey, getPokemonApiBaseUrl } from '@/lib/server/pokemonApiKey';
+import { getCardByIdFromDb } from '@/lib/pokemon/db';
 
 export async function GET(
   _req: NextRequest,
@@ -7,18 +7,9 @@ export async function GET(
 ) {
   try {
     const { cardId } = await params;
-
-    const res = await fetch(`${getPokemonApiBaseUrl()}/cards/${cardId}`, {
-      headers: { 'X-Api-Key': getPokemonApiKey() },
-      next: { revalidate: 600 },
-    });
-
-    if (!res.ok) {
-      return NextResponse.json({ error: 'Card not found' }, { status: res.status });
-    }
-
-    return NextResponse.json(await res.json());
+    const result = await getCardByIdFromDb(cardId);
+    return NextResponse.json(result);
   } catch (error) {
-    return NextResponse.json({ error: String(error) }, { status: 500 });
+    return NextResponse.json({ error: String(error) }, { status: 404 });
   }
 }

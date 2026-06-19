@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPokemonApiKey, getPokemonApiBaseUrl } from '@/lib/server/pokemonApiKey';
+import { getSetByIdFromDb } from '@/lib/pokemon/db';
 
 export async function GET(
   _req: NextRequest,
@@ -7,18 +7,9 @@ export async function GET(
 ) {
   try {
     const { setId } = await params;
-
-    const res = await fetch(`${getPokemonApiBaseUrl()}/sets/${setId}`, {
-      headers: { 'X-Api-Key': getPokemonApiKey() },
-      next: { revalidate: 3600 },
-    });
-
-    if (!res.ok) {
-      return NextResponse.json({ error: 'Set not found' }, { status: res.status });
-    }
-
-    return NextResponse.json(await res.json());
+    const result = await getSetByIdFromDb(setId);
+    return NextResponse.json(result);
   } catch (error) {
-    return NextResponse.json({ error: String(error) }, { status: 500 });
+    return NextResponse.json({ error: String(error) }, { status: 404 });
   }
 }
