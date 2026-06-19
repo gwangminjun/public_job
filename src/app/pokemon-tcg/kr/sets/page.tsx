@@ -14,18 +14,31 @@ function SetCard({ set }: { set: KrSet }) {
       href={`/pokemon-tcg/kr/sets/${set.id}`}
       className="group flex flex-col bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-200 overflow-hidden"
     >
-      <div className="bg-gray-50 dark:bg-gray-900/50 flex items-center justify-center h-24 p-3">
-        {set.symbolUrl ? (
+      {/* 커버 이미지 영역 */}
+      <div className="relative bg-gray-100 dark:bg-gray-900/60 flex items-center justify-center h-36 overflow-hidden">
+        {set.coverImgUrl ? (
           <Image
-            src={set.symbolUrl}
+            src={set.coverImgUrl}
             alt={set.name}
-            width={80}
-            height={80}
-            className="h-16 w-auto object-contain group-hover:scale-105 transition-transform duration-200"
+            fill
+            className="object-contain p-2 group-hover:scale-105 transition-transform duration-200"
             unoptimized
           />
         ) : (
-          <span className="text-4xl">🃏</span>
+          <span className="text-5xl">🃏</span>
+        )}
+        {/* 심볼 뱃지 */}
+        {set.symbolUrl && (
+          <div className="absolute bottom-1.5 right-1.5 bg-white/80 dark:bg-gray-800/80 rounded-full p-0.5 shadow">
+            <Image
+              src={set.symbolUrl}
+              alt=""
+              width={20}
+              height={20}
+              className="h-5 w-auto object-contain"
+              unoptimized
+            />
+          </div>
         )}
       </div>
       <div className="p-3 flex-1">

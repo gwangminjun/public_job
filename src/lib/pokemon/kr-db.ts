@@ -53,6 +53,29 @@ function parseKrQuery(q: string): ParsedKrQuery {
   return result;
 }
 
+// raw_data JSONB → KrSet 타입 변환
+// product JSON은 스네이크_케이스(image_cover_url 등), KrSet은 카멜케이스
+function mapRawToKrSet(raw: Record<string, unknown>): KrSet {
+  const series = Array.isArray(raw.series)
+    ? ((raw.series as string[])[0] ?? 'ETC')
+    : ((raw.series as string) ?? 'ETC');
+
+  return {
+    id: raw.id as string,
+    name: (raw.name as string) ?? '',
+    series,
+    type: (raw.type as string) ?? 'pack',
+    releaseDate: (raw.release_date as string) ?? null,
+    total: raw.total != null ? Number(raw.total) : null,
+    regulation:
+      Array.isArray(raw.regulations)
+        ? (raw.regulations as string[]).join(',') || null
+        : ((raw.regulation as string) ?? null),
+    symbolUrl: (raw.image_symbol_url as string) ?? null,
+    coverImgUrl: (raw.image_cover_url as string) ?? null,
+  };
+}
+
 export async function getKrSetsFromDb(
   params: KrSetSearchParams = {}
 ): Promise<ApiListResponse<KrSet>> {
@@ -77,7 +100,7 @@ export async function getKrSetsFromDb(
   if (error) throw new Error(error.message);
 
   return {
-    data: (data ?? []).map((r) => r.raw_data as KrSet),
+    data: (data ?? []).map((r) => mapRawToKrSet(r.raw_data as Record<string, unknown>)),
     page,
     pageSize,
     count: data?.length ?? 0,
@@ -94,7 +117,7 @@ export async function getKrSetByIdFromDb(setId: string): Promise<ApiSingleRespon
     .single();
 
   if (error || !data) throw new Error(`세트를 찾을 수 없습니다: ${setId}`);
-  return { data: data.raw_data as KrSet };
+  return { data: mapRawToKrSet(data.raw_data as Record<string, unknown>) };
 }
 
 export async function getKrCardsFromDb(
