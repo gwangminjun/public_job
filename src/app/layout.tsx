@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "공공기관 채용정보 | Public Job Portal",
-  description: "공공데이터포털 API를 활용한 실시간 공공기관 채용정보 서비스",
+  title: "minjun의 개발 프로젝트 허브",
+  description: "공공기관 채용정보, 포켓몬 TCG 카드 도감 등 개인 개발 프로젝트 모음",
   manifest: '/manifest.webmanifest',
   icons: {
     icon: [
@@ -25,10 +25,10 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: '/icon-192.svg', sizes: '192x192' }],
   },
-  keywords: ["공공기관", "채용", "취업", "공채", "공무원", "공기업"],
+  keywords: ["개발", "프로젝트", "공공기관", "채용", "포켓몬", "TCG"],
   openGraph: {
-    title: "공공기관 채용정보",
-    description: "공공데이터포털 API를 활용한 실시간 공공기관 채용정보 서비스",
+    title: "minjun의 개발 프로젝트 허브",
+    description: "공공기관 채용정보, 포켓몬 TCG 카드 도감 등 개인 개발 프로젝트 모음",
     type: "website",
   },
 };
