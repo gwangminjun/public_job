@@ -20,6 +20,13 @@ const PROJECTS = [
     href: '/grandma',
     status: 'live' as const,
   },
+  {
+    title: '🃏 Pokemon TCG 카드 도감',
+    description: '포켓몬 카드 게임 영문판 · 한국판 카드 도감 · 세트별 카드 목록 · 카드 검색 · Supabase DB 캐싱',
+    tech: ['Next.js', 'TypeScript', 'Supabase', 'Pokemon TCG API'],
+    href: '/pokemon-tcg',
+    status: 'live' as const,
+  },
 ];
 
 export default function HubPage() {
@@ -91,10 +98,6 @@ export default function HubPage() {
                 </span>
               </Link>
             ))}
-
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-6 text-center">
-              <p className="text-sm text-gray-400 dark:text-gray-500 font-medium">Coming Soon...</p>
-            </div>
 
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-6 text-center">
               <p className="text-sm text-gray-400 dark:text-gray-500 font-medium">Coming Soon...</p>
