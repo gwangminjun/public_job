@@ -38,7 +38,7 @@ export function KrCardGrid({ cards, isLoading }: KrCardGridProps) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
       {cards.map((card) => (
-        <KrCardItem key={card.id} card={card} />
+        <KrCardItem key={card._dbId ?? card.id} card={card} />
       ))}
     </div>
   );
