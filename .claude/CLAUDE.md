@@ -25,6 +25,7 @@ SUPABASE_SERVICE_ROLE_KEY=...
 NEXT_PUBLIC_SITE_URL=https://...              # 배포 도메인 (auth redirect 기준)
 OPS_HEALTHCHECK_SECRET=...                    # /api/ops/db-health 헤더 인증
 CRON_SECRET=...                               # /api/cron/* POST 헤더 인증 (x-cron-secret)
+NEXT_PUBLIC_STUDY_EDIT_SECRET=...             # /api/study/checklist PUT 헤더 인증 (x-study-secret)
 ```
 
 ## Projects
@@ -33,6 +34,8 @@ CRON_SECRET=...                               # /api/cron/* POST 헤더 인증 (
 
 - **공공기관 채용정보 포털** → [`.claude/project-public-job.md`](project-public-job.md)
 - **할머니 팔순잔치 기념 사이트** → [`.claude/project-grandma.md`](project-grandma.md)
+- **여행 플래너 (TREK-inspired)** → [`.claude/project-travel.md`](project-travel.md)
+- **정보보안기사 체크리스트** (`/study`) → 단일 사용자용 D-DAY 학습 체크리스트, 진행 상태는 `study_checklist_state` 테이블(단일 row)에 저장
 
 ## Architecture
 

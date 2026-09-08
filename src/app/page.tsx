@@ -27,6 +27,20 @@ const PROJECTS = [
     href: '/pokemon-tcg',
     status: 'live' as const,
   },
+  {
+    title: '✈️ 여행 플래너',
+    description: 'TREK에서 영감을 받은 여행 계획 도구 · 일자별 일정 · 지도 위치 지정 · 준비물 체크리스트 · 예산 관리',
+    tech: ['Next.js', 'TypeScript', 'Zustand', 'Leaflet'],
+    href: '/travel',
+    status: 'live' as const,
+  },
+  {
+    title: '🔐 정보보안기사 체크리스트',
+    description: '정보보안기사 필기 시험 대비 D-DAY 학습 체크리스트 · 일자별 진행률 · 메모',
+    tech: ['Next.js', 'TypeScript', 'Zustand'],
+    href: '/study',
+    status: 'live' as const,
+  },
 ];
 
 export default function HubPage() {
