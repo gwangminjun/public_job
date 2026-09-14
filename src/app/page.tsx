@@ -41,6 +41,13 @@ const PROJECTS = [
     href: '/study',
     status: 'live' as const,
   },
+  {
+    title: '💌 우리 둘의 일기장',
+    description: '둘이서만 보는 비공개 커플 일기장 · 사진 첨부 · 서로 댓글 · 월별 캘린더',
+    tech: ['Next.js', 'TypeScript', 'Supabase'],
+    href: '/diary',
+    status: 'live' as const,
+  },
 ];
 
 export default function HubPage() {

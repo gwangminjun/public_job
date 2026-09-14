@@ -26,6 +26,10 @@ NEXT_PUBLIC_SITE_URL=https://...              # 배포 도메인 (auth redirect 
 OPS_HEALTHCHECK_SECRET=...                    # /api/ops/db-health 헤더 인증
 CRON_SECRET=...                               # /api/cron/* POST 헤더 인증 (x-cron-secret)
 NEXT_PUBLIC_STUDY_EDIT_SECRET=...             # /api/study/checklist PUT 헤더 인증 (x-study-secret)
+DIARY_SECRET_A=...                            # /diary 작성자 A 비밀번호 (x-diary-secret 헤더 인증, 서버 전용)
+DIARY_SECRET_B=...                            # /diary 작성자 B 비밀번호
+DIARY_AUTHOR_A_NAME=...                       # /diary 작성자 A 표시 이름
+DIARY_AUTHOR_B_NAME=...                       # /diary 작성자 B 표시 이름
 ```
 
 ## Projects
@@ -36,6 +40,7 @@ NEXT_PUBLIC_STUDY_EDIT_SECRET=...             # /api/study/checklist PUT 헤더 
 - **할머니 팔순잔치 기념 사이트** → [`.claude/project-grandma.md`](project-grandma.md)
 - **여행 플래너 (TREK-inspired)** → [`.claude/project-travel.md`](project-travel.md)
 - **정보보안기사 체크리스트** (`/study`) → 단일 사용자용 D-DAY 학습 체크리스트, 진행 상태는 `study_checklist_state` 테이블(단일 row)에 저장
+- **우리 둘의 일기장** (`/diary`) → [`.claude/project-diary.md`](project-diary.md)
 
 ## Architecture
 
