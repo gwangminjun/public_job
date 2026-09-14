@@ -14,11 +14,12 @@ export async function DELETE(request: Request, context: RouteContext) {
 
   const { id } = await context.params;
   const supabase = createSupabaseAdminClient();
-  const { error } = await supabase.from('diary_comments').delete().eq('id', id);
+  const { data, error } = await supabase.from('diary_comments').delete().eq('id', id).eq('author', author).select('id');
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  if (!data?.length) return NextResponse.json({ error: '본인의 댓글만 삭제할 수 있습니다.' }, { status: 403 });
 
   return NextResponse.json({ success: true });
 }

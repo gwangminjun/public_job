@@ -14,9 +14,9 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   const { id } = await context.params;
-  const body = (await request.json()) as { content?: string };
+  const body = await request.json().catch(() => null);
 
-  if (!body.content?.trim()) {
+  if (typeof body?.content !== 'string' || !body.content.trim() || body.content.length > 2000) {
     return NextResponse.json({ error: '댓글 내용을 입력해주세요.' }, { status: 400 });
   }
 

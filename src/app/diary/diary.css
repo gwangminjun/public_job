@@ -40,7 +40,11 @@
 .diary-primary:disabled { opacity: .5; cursor: not-allowed; }
 .diary-field { width: 100%; min-width: 0; min-height: 48px; border: 1px solid var(--diary-border); border-radius: .75rem; background: var(--diary-surface); padding: .75rem 1rem; color: var(--diary-text); font-size: 1rem; }
 .diary-field::placeholder { color: var(--diary-muted); }
-.diary-theme :is(a, button, input, textarea):focus-visible { outline: 2px solid var(--diary-accent); outline-offset: 3px; }
+.diary-theme :is(a, button, input, textarea, select, summary):focus-visible { outline: 2px solid var(--diary-accent); outline-offset: 3px; }
+.diary-theme button { cursor: pointer; }
+.diary-theme button:disabled { cursor: not-allowed; opacity: .5; }
+.diary-theme select { font-size: 1rem; }
+.diary-theme input[type='file'] { overflow: hidden; }
 .diary-entry { transition: border-color .15s, box-shadow .15s; }
 .diary-entry:hover { border-color: var(--diary-accent); box-shadow: 0 6px 24px #30242a0a; }
 .diary-comment { background: var(--diary-bg); border-radius: 1rem; padding: 1rem; }

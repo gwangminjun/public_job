@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { requireDiaryAuthor } from '@/lib/diary/auth';
 import { mapDiaryCommentRow, mapDiaryEntryRow } from '@/lib/diary/server';
+import { readEntryInput, uploadPhotos } from '@/lib/diary/uploads';
+import { validatePhotos } from '@/lib/diary/validation';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -49,13 +51,24 @@ export async function PUT(request: Request, context: RouteContext) {
   }
 
   const { id } = await context.params;
-  const body = (await request.json()) as { content?: string; mood?: string | null; entryDate?: string };
-
-  if (!body.content?.trim() || !body.entryDate) {
-    return NextResponse.json({ error: '날짜와 내용을 입력해주세요.' }, { status: 400 });
-  }
-
   const supabase = createSupabaseAdminClient();
+  let input;
+  try { input = await readEntryInput(request); }
+  catch (error) { return NextResponse.json({ error: error instanceof Error ? error.message : '입력 형식이 올바르지 않습니다.' }, { status: 400 }); }
+  const { body, files } = input;
+  if (typeof body.updatedAt !== 'string' || !Number.isFinite(Date.parse(body.updatedAt))) return NextResponse.json({ error: '수정 버전이 필요합니다.' }, { status: 400 });
+  const { data: original, error: readError } = await supabase.from('diary_entries').select('author, photo_paths, updated_at').eq('id', id).maybeSingle();
+  if (readError) return NextResponse.json({ error: '일기를 불러오지 못했습니다.' }, { status: 500 });
+  if (!original) return NextResponse.json({ error: '일기를 찾을 수 없습니다.' }, { status: 404 });
+  if (original.author !== author) return NextResponse.json({ error: '본인의 일기만 수정할 수 있습니다.' }, { status: 403 });
+  if (original.updated_at !== body.updatedAt) return NextResponse.json({ error: '다른 화면에서 수정한 일기입니다. 입력을 복사한 뒤 새로고침해주세요.' }, { status: 409 });
+  const retained = body.retainedPhotos ?? original.photo_paths;
+  if (!Array.isArray(retained) || retained.some((p) => typeof p !== 'string' || !original.photo_paths.includes(p)) || new Set(retained).size !== retained.length) return NextResponse.json({ error: '사진 선택이 올바르지 않습니다.' }, { status: 400 });
+  const photoError = validatePhotos(files, retained.length);
+  if (photoError) return NextResponse.json({ error: photoError }, { status: 400 });
+  let uploaded: string[];
+  try { uploaded = await uploadPhotos(supabase, files, retained.length); }
+  catch (error) { return NextResponse.json({ error: error instanceof Error ? error.message : '사진 업로드에 실패했습니다.' }, { status: 500 }); }
   const { data, error } = await supabase
     .from('diary_entries')
     .update({
@@ -63,18 +76,21 @@ export async function PUT(request: Request, context: RouteContext) {
       mood: body.mood?.trim() || null,
       entry_date: body.entryDate,
       updated_at: new Date().toISOString(),
+      photo_paths: [...retained, ...uploaded],
     })
     .eq('id', id)
+    .eq('author', author)
+    .eq('updated_at', body.updatedAt)
     .select('id, author, entry_date, mood, content, photo_paths, created_at, updated_at')
-    .single();
+    .maybeSingle();
 
   if (error || !data) {
-    return NextResponse.json({ error: error?.message ?? '일기 수정에 실패했습니다.' }, { status: 500 });
+    if (uploaded.length) await supabase.storage.from('diary-photos').remove(uploaded);
+    return NextResponse.json({ error: error ? '일기 수정에 실패했습니다.' : '일기가 변경되었습니다. 입력을 복사한 뒤 새로고침해주세요.' }, { status: error ? 500 : 409 });
   }
-
-  const entry = await mapDiaryEntryRow(supabase, data);
-
-  return NextResponse.json({ entry });
+  const removed = (original.photo_paths as string[]).filter((p) => !retained.includes(p));
+  if (removed.length) await supabase.storage.from('diary-photos').remove(removed);
+  return NextResponse.json({ entry: { id: data.id } });
 }
 
 export async function DELETE(request: Request, context: RouteContext) {
@@ -86,13 +102,16 @@ export async function DELETE(request: Request, context: RouteContext) {
   const { id } = await context.params;
   const supabase = createSupabaseAdminClient();
 
-  const { data: entryRow } = await supabase.from('diary_entries').select('photo_paths').eq('id', id).single();
-
-  const { error } = await supabase.from('diary_entries').delete().eq('id', id);
+  const { data: entryRow, error: readError } = await supabase.from('diary_entries').select('author, photo_paths, updated_at').eq('id', id).maybeSingle();
+  if (readError) return NextResponse.json({ error: '일기를 불러오지 못했습니다.' }, { status: 500 });
+  if (!entryRow) return NextResponse.json({ error: '일기를 찾을 수 없습니다.' }, { status: 404 });
+  if (entryRow.author !== author) return NextResponse.json({ error: '본인의 일기만 삭제할 수 있습니다.' }, { status: 403 });
+  const { data: deleted, error } = await supabase.from('diary_entries').delete().eq('id', id).eq('author', author).eq('updated_at', entryRow.updated_at).select('id');
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  if (!deleted?.length) return NextResponse.json({ error: '일기가 변경되었습니다. 새로고침 후 다시 시도해주세요.' }, { status: 409 });
 
   if (entryRow?.photo_paths?.length) {
     await supabase.storage.from('diary-photos').remove(entryRow.photo_paths);

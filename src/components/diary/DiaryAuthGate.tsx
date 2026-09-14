@@ -13,7 +13,7 @@ export function DiaryAuthGate({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!mounted) return;
 
-    diaryFetch('/api/diary/entries')
+    diaryFetch('/api/diary/me')
       .then((res) => {
         if (res.ok) {
           setStatus('authorized');
@@ -28,7 +28,8 @@ export function DiaryAuthGate({ children }: { children: React.ReactNode }) {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setDiarySecret(input.trim());
-    const res = await diaryFetch('/api/diary/entries');
+    const res = await diaryFetch('/api/diary/me').catch(() => null);
+    if (!res) { setError('연결하지 못했습니다. 다시 시도해주세요.'); return; }
     if (res.ok) {
       setError('');
       setStatus('authorized');

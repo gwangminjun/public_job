@@ -40,7 +40,8 @@ export async function mapDiaryEntryRow(supabase: SupabaseClient, row: DiaryEntry
     entryDate: row.entry_date,
     mood: row.mood,
     content: row.content,
-    photoUrls: photoUrls.filter(Boolean),
+    photoUrls,
+    photoPaths: row.photo_paths,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

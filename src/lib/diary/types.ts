@@ -17,6 +17,7 @@ export interface DiaryEntry {
   mood: string | null;
   content: string;
   photoUrls: string[];
+  photoPaths?: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -26,3 +27,10 @@ export interface DiaryEntryWithComments extends DiaryEntry {
 }
 
 export const DIARY_MOODS = ['😊', '🥰', '😢', '😡', '😴', '🥳', '😰', '🤔'] as const;
+
+export interface DiaryCalendarData {
+  days: { date: string; count: number; entries: { id: string; author: DiaryAuthor; authorName: string; mood: string | null; excerpt: string }[] }[];
+  summary: { entries: number; days: number; moods: Record<string, number> };
+}
+export interface DiaryIdentity { author: DiaryAuthor; authorName: string; authors: { id: string; name: string }[] }
+export interface DiaryDraft { author: DiaryAuthor; entry_date: string; content: string; mood: string | null; version: string; updated_at: string }
