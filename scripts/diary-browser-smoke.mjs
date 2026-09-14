@@ -38,6 +38,8 @@ try {
       await page.goto(`${base}/diary`, { waitUntil: 'networkidle0' });
       await page.evaluate((value) => document.documentElement.classList.toggle('dark', value === 'dark'), theme);
       await page.waitForSelector('#diary-search');
+      assert.ok(await page.$('button[aria-label="카카오톡으로 일기장 공유"]'));
+      assert.ok(await page.$('button[aria-label="일기장 로그아웃"]'));
       await overflow();
       await page.screenshot({ path: `.diary-check/list-${width}-${theme}.png`, fullPage: true });
       await page.goto(`${base}/diary/calendar`, { waitUntil: 'networkidle0' });

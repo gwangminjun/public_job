@@ -45,6 +45,7 @@
 .diary-theme button:disabled { cursor: not-allowed; opacity: .5; }
 .diary-theme select { font-size: 1rem; }
 .diary-theme input[type='file'] { overflow: hidden; }
+.diary-share-message { position: absolute; right: 1rem; top: calc(100% + .5rem); max-width: min(18rem, calc(100vw - 2rem)); border: 1px solid var(--diary-border); border-radius: .75rem; background: var(--diary-surface); box-shadow: 0 8px 24px #30242a18; color: var(--diary-muted); font-size: .75rem; line-height: 1.5; padding: .5rem .75rem; z-index: 50; }
 .diary-entry { transition: border-color .15s, box-shadow .15s; }
 .diary-entry:hover { border-color: var(--diary-accent); box-shadow: 0 6px 24px #30242a0a; }
 .diary-comment { background: var(--diary-bg); border-radius: 1rem; padding: 1rem; }

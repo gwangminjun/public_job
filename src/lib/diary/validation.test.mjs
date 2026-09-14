@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { validDate, validMonth, validateEntry, validatePhotos, decodeCursor, encodeCursor } from './validation.ts';
+import { diaryShareDetails } from './share.ts';
 
 test('rejects impossible calendar dates and accepts leap day', () => {
   assert.equal(validDate('2026-02-29'), false);
@@ -30,4 +31,11 @@ test('cursor preserves all tie breakers and rejects PostgREST expression injecti
 });
 test('entry validation handles a missing JSON body without throwing', () => {
   assert.equal(validateEntry(null), '입력 형식이 올바르지 않습니다.');
+});
+test('builds a diary-only Kakao share message and canonical diary URL', () => {
+  assert.deepEqual(diaryShareDetails('https://public-job.vercel.app/anything'), {
+    title: '우리 둘의 일기장',
+    text: '우리 둘만 보는 비공개 일기장이에요.\n함께 쌓아 온 하루를 보러 오세요.',
+    url: 'https://public-job.vercel.app/diary',
+  });
 });
