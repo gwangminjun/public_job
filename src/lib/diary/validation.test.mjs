@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { validDate, validMonth, validateEntry, validatePhotos, decodeCursor, encodeCursor } from './validation.ts';
 import { diaryShareDetails } from './share.ts';
+import { calculateAuthorStatistics } from './dashboard.ts';
 
 test('rejects impossible calendar dates and accepts leap day', () => {
   assert.equal(validDate('2026-02-29'), false);
@@ -37,5 +38,19 @@ test('builds a diary-only Kakao share message and canonical diary URL', () => {
     title: '우리 둘의 일기장',
     text: '우리 둘만 보는 비공개 일기장이에요.\n함께 쌓아 온 하루를 보러 오세요.',
     url: 'https://public-job.vercel.app/diary',
+  });
+});
+test('calculates per-author entries, active days, and a deterministic favorite mood', () => {
+  const result = calculateAuthorStatistics([
+    { author: 'A', entryDate: '2026-09-01', mood: '🥰' },
+    { author: 'A', entryDate: '2026-09-01', mood: '😊' },
+    { author: 'A', entryDate: '2026-09-03', mood: '🥰' },
+    { author: 'B', entryDate: '2026-09-02', mood: null },
+    { author: 'B', entryDate: '2026-09-04', mood: '😴' },
+  ]);
+
+  assert.deepEqual(result, {
+    A: { entries: 3, days: 2, favoriteMood: '🥰' },
+    B: { entries: 2, days: 2, favoriteMood: '😴' },
   });
 });

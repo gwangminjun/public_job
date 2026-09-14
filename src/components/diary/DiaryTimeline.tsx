@@ -6,7 +6,44 @@ import { ko } from 'date-fns/locale';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { diaryJson } from '@/lib/diary/client';
-import { DIARY_MOODS, DiaryEntry, DiaryIdentity } from '@/lib/diary/types';
+import { DIARY_MOODS, DiaryAuthor, DiaryDashboard, DiaryEntry, DiaryIdentity } from '@/lib/diary/types';
+
+const authorFallbackNames: Record<DiaryAuthor, string> = { A: 'A', B: 'B' };
+
+function DiaryAuthorColumn({ author, dashboard }: { author: DiaryAuthor; dashboard?: DiaryDashboard }) {
+  const authorSummary = dashboard?.authors.find((item) => item.author === author);
+  const authorName = authorSummary?.authorName ?? authorFallbackNames[author];
+  const { data, isPending, error } = useQuery({
+    queryKey: ['diary', 'entries', 'author-column', author],
+    queryFn: () => diaryJson<{ entries: DiaryEntry[] }>(`/api/diary/entries?author=${author}&limit=6`),
+  });
+  const entries = data?.entries ?? [];
+
+  return <section className="diary-card diary-author-column" aria-labelledby={`diary-author-${author}`}>
+    <div className="flex items-start justify-between gap-3">
+      <div>
+        <p className="diary-eyebrow">{author === 'A' ? '왼쪽 이야기' : '오른쪽 이야기'}</p>
+        <h3 id={`diary-author-${author}`} className="text-xl font-bold mt-1">{authorName}의 일기</h3>
+      </div>
+      <span className="diary-author text-sm shrink-0">{authorName}</span>
+    </div>
+    <dl className="diary-stat-grid" aria-label={`${authorName}의 이번 달 기록 통계`}>
+      <div className="diary-stat"><dt>남긴 일기</dt><dd>{authorSummary?.entries ?? 0}<span>편</span></dd></div>
+      <div className="diary-stat"><dt>기록한 날</dt><dd>{authorSummary?.days ?? 0}<span>일</span></dd></div>
+      <div className="diary-stat"><dt>많았던 기분</dt><dd>{authorSummary?.favoriteMood ?? '—'}</dd></div>
+    </dl>
+    <div className="space-y-2">
+      {isPending && <p role="status" className="diary-muted text-sm py-4">일기를 불러오는 중...</p>}
+      {error && <p role="alert" className="diary-accent text-sm">최근 일기를 불러오지 못했어요.</p>}
+      {!isPending && !error && !entries.length && <p className="diary-muted text-sm py-4">아직 남긴 일기가 없어요.</p>}
+      {entries.map((entry) => <Link key={entry.id} href={`/diary/${entry.id}`} className="diary-author-entry">
+        <time dateTime={entry.entryDate}>{format(parseISO(entry.entryDate), 'M월 d일 (EEE)', { locale: ko })}</time>
+        <p className="line-clamp-2">{entry.mood && `${entry.mood} `}{entry.content}</p>
+      </Link>)}
+    </div>
+    <Link href={`/diary?author=${author}`} className="diary-nav-link text-sm self-start -ml-3">{authorName}의 모든 일기 보기</Link>
+  </section>;
+}
 
 export function DiaryTimeline() {
   const router = useRouter();
@@ -14,7 +51,12 @@ export function DiaryTimeline() {
   const filters = new URLSearchParams();
   for (const key of ['q', 'month', 'author', 'mood']) if (params.get(key)) filters.set(key, params.get(key)!);
   const query = filters.toString();
+  const currentMonth = format(new Date(), 'yyyy-MM');
   const me = useQuery({ queryKey: ['diary', 'me'], queryFn: () => diaryJson<DiaryIdentity>('/api/diary/me') });
+  const dashboard = useQuery({
+    queryKey: ['diary', 'dashboard', currentMonth],
+    queryFn: () => diaryJson<DiaryDashboard>(`/api/diary/dashboard?month=${currentMonth}`),
+  });
   const { data, isPending, error, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } = useInfiniteQuery({
     queryKey: ['diary', 'entries', query], initialPageParam: '',
     queryFn: ({ pageParam }) => diaryJson<{ entries: DiaryEntry[]; nextCursor: string | null }>(`/api/diary/entries?${query}&cursor=${encodeURIComponent(pageParam)}`),
@@ -24,6 +66,23 @@ export function DiaryTimeline() {
   const filterCount = ['month', 'author', 'mood'].filter((key) => filters.has(key)).length;
 
   return <div className="space-y-5">
+    <section className="space-y-4" aria-labelledby="author-diaries">
+      <div>
+        <p className="diary-eyebrow">이번 달의 기록</p>
+        <h2 id="author-diaries" className="text-2xl font-bold tracking-tight mt-1">각자의 하루</h2>
+        <p className="diary-muted text-sm mt-1">서로의 최근 일기와 이번 달 기록을 한눈에 살펴보세요.</p>
+      </div>
+      {dashboard.error && <p role="alert" className="diary-comment diary-accent text-sm">이번 달 통계를 불러오지 못했어요.</p>}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <DiaryAuthorColumn author="A" dashboard={dashboard.data} />
+        <DiaryAuthorColumn author="B" dashboard={dashboard.data} />
+      </div>
+    </section>
+    <section className="space-y-4" aria-labelledby="all-diaries">
+      <div>
+        <p className="diary-eyebrow">모아 보는 기록</p>
+        <h2 id="all-diaries" className="text-2xl font-bold tracking-tight mt-1">모든 일기</h2>
+      </div>
     <form key={query} className="diary-card space-y-4" onSubmit={(event) => {
       event.preventDefault();
       const form = new FormData(event.currentTarget);
@@ -56,5 +115,6 @@ export function DiaryTimeline() {
       ))}</div>}
     </Link>)}
     {hasNextPage && <button disabled={isFetchingNextPage} onClick={() => void fetchNextPage()} className="diary-primary w-full text-sm">{isFetchingNextPage ? '불러오는 중...' : '이전 일기 더 보기'}</button>}
+    </section>
   </div>;
 }

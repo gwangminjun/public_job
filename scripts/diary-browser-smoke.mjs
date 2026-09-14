@@ -24,6 +24,7 @@ page.on('request', async (request) => {
     if (method === 'DELETE') draft = null;
     body = { draft };
   } else if (url.pathname === '/api/diary/calendar') body = { days: [{ date, count: 2, entries: entries.map((entry) => ({ ...entry, excerpt: entry.content })) }], summary: { entries: 2, days: 1, moods: { '🥰': 1, '😊': 1 } } };
+  else if (url.pathname === '/api/diary/dashboard') body = { month: `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`, authors: [{ author: 'A', authorName: '민준', entries: 1, days: 1, favoriteMood: '🥰' }, { author: 'B', authorName: '서연', entries: 1, days: 1, favoriteMood: '😴' }] };
   else if (url.pathname === '/api/diary/entries') body = method === 'GET' ? { entries: url.searchParams.get('q') === '없는검색어' ? [] : entries, nextCursor: null } : { entry: entries[0] };
   else body = entries.find((entry) => url.pathname.includes(entry.id)) ?? {};
   await request.respond({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
@@ -38,6 +39,8 @@ try {
       await page.goto(`${base}/diary`, { waitUntil: 'networkidle0' });
       await page.evaluate((value) => document.documentElement.classList.toggle('dark', value === 'dark'), theme);
       await page.waitForSelector('#diary-search');
+      assert.ok(await page.$('#author-diaries'));
+      assert.equal(await page.$$eval('.diary-author-column', (items) => items.length), 2);
       assert.ok(await page.$('button[aria-label="카카오톡으로 일기장 공유"]'));
       assert.ok(await page.$('button[aria-label="일기장 로그아웃"]'));
       await overflow();

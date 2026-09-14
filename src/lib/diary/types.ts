@@ -34,3 +34,7 @@ export interface DiaryCalendarData {
 }
 export interface DiaryIdentity { author: DiaryAuthor; authorName: string; authors: { id: string; name: string }[] }
 export interface DiaryDraft { author: DiaryAuthor; entry_date: string; content: string; mood: string | null; version: string; updated_at: string }
+export interface DiaryDashboard {
+  month: string;
+  authors: { author: DiaryAuthor; authorName: string; entries: number; days: number; favoriteMood: string | null }[];
+}
