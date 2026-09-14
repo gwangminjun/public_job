@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { DiaryAuthGate } from '@/components/diary/DiaryAuthGate';
+import './diary.css';
 
 export const metadata: Metadata = {
   title: '우리 둘의 일기장',
@@ -10,18 +11,18 @@ export const metadata: Metadata = {
 
 export default function DiaryLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col bg-rose-50 dark:bg-gray-950 dark:text-gray-100">
-      <header className="bg-rose-500 dark:bg-rose-900 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link href="/diary" className="flex items-center gap-2 text-white font-bold">
+    <div className="diary-theme min-h-screen flex flex-col">
+      <header className="diary-header sticky top-0 z-40">
+        <div className="max-w-2xl mx-auto px-4 py-3 flex flex-wrap gap-2 items-center justify-between">
+          <Link href="/diary" className="flex min-h-11 items-center gap-2 font-bold">
             <span className="text-xl">💌</span>
             <span>우리 둘의 일기장</span>
           </Link>
-          <nav className="flex items-center gap-4 text-sm text-rose-100">
-            <Link href="/diary/calendar" className="hover:text-white transition-colors">
+          <nav aria-label="일기장 메뉴" className="flex items-center gap-1 text-sm">
+            <Link href="/diary/calendar" className="diary-nav-link">
               캘린더
             </Link>
-            <Link href="/diary/write" className="hover:text-white transition-colors">
+            <Link href="/diary/write" className="diary-primary inline-flex items-center px-4">
               글쓰기
             </Link>
           </nav>
@@ -29,11 +30,11 @@ export default function DiaryLayout({ children }: { children: React.ReactNode })
       </header>
 
       <DiaryAuthGate>
-        <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-6">{children}</main>
+        <main className="flex-1 max-w-2xl mx-auto w-full min-w-0 px-4 py-6 sm:px-6 sm:py-10">{children}</main>
       </DiaryAuthGate>
 
       <footer className="text-center py-4">
-        <Link href="/" className="text-rose-400 dark:text-rose-500 text-xs hover:underline">
+        <Link href="/" className="diary-muted inline-flex min-h-11 items-center text-xs hover:underline">
           ← 프로젝트 허브
         </Link>
       </footer>

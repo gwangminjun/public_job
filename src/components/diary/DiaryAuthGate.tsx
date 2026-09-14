@@ -45,20 +45,21 @@ export function DiaryAuthGate({ children }: { children: React.ReactNode }) {
   if (status === 'locked') {
     return (
       <div className="flex-1 flex items-center justify-center px-4 py-16">
-        <form onSubmit={handleSubmit} className="w-full max-w-xs flex flex-col gap-3">
+        <form onSubmit={handleSubmit} className="diary-card w-full max-w-sm flex flex-col gap-4">
           <p className="text-center text-2xl mb-2">💌</p>
           <input
+            aria-label="일기장 비밀번호"
             type="password"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="비밀번호"
-            className="rounded-lg border border-rose-300 dark:border-rose-800 bg-white dark:bg-gray-800 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-rose-400"
+            className="diary-field text-center"
             autoFocus
           />
-          {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+          {error && <p className="text-sm diary-accent text-center">{error}</p>}
           <button
             type="submit"
-            className="rounded-lg bg-rose-500 hover:bg-rose-600 text-white py-2 font-medium transition-colors"
+            className="diary-primary py-3"
           >
             들어가기
           </button>

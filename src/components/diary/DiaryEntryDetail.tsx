@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
@@ -52,22 +53,23 @@ export function DiaryEntryDetail({ id }: { id: string }) {
     setSubmitting(false);
   };
 
-  if (isLoading) return <p className="text-center text-gray-400 py-12">불러오는 중...</p>;
-  if (error || !entry) return <p className="text-center text-red-500 py-12">{(error as Error)?.message}</p>;
+  if (isLoading) return <p className="text-center diary-muted py-12">불러오는 중...</p>;
+  if (error || !entry) return <p className="text-center diary-accent py-12">{(error as Error)?.message}</p>;
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="rounded-xl bg-white dark:bg-gray-900 border border-rose-100 dark:border-gray-800 p-5 shadow-sm">
+      <Link href="/diary" className="diary-nav-link self-start text-sm">← 일기 목록</Link>
+      <div className="diary-card">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium text-rose-500">
+          <h1 className="text-lg sm:text-xl font-semibold diary-accent">
             {format(parseISO(entry.entryDate), 'yyyy년 M월 d일 (EEE)', { locale: ko })}
-          </span>
-          <button onClick={handleDeleteEntry} className="text-xs text-gray-400 hover:text-red-500 transition-colors">
+          </h1>
+          <button onClick={handleDeleteEntry} className="diary-delete">
             삭제
           </button>
         </div>
-        <p className="text-xs text-gray-400 mb-3">{entry.authorName}</p>
-        <p className="whitespace-pre-wrap text-gray-800 dark:text-gray-200 mb-3">
+        <p className="text-sm diary-muted mb-6 break-all">{entry.authorName}</p>
+        <p className="whitespace-pre-wrap break-words text-base sm:text-lg leading-8 mb-6">
           {entry.mood ? `${entry.mood} ` : ''}
           {entry.content}
         </p>
@@ -81,44 +83,47 @@ export function DiaryEntryDetail({ id }: { id: string }) {
         )}
       </div>
 
-      <div>
-        <h2 className="text-sm font-semibold text-gray-500 mb-2">댓글 {entry.comments.length}</h2>
-        <div className="flex flex-col gap-2 mb-3">
+      <section className="diary-card" aria-labelledby="diary-comments">
+        <h2 id="diary-comments" className="text-base font-semibold mb-5">댓글 {entry.comments.length}</h2>
+        {entry.comments.length === 0 && <p className="diary-muted text-sm leading-6 mb-5">아직 댓글이 없어요. 따뜻한 한마디를 남겨주세요.</p>}
+        <div className="flex flex-col gap-3 mb-5">
           {entry.comments.map((c) => (
             <div
               key={c.id}
-              className="rounded-lg bg-white dark:bg-gray-900 border border-rose-100 dark:border-gray-800 p-3 text-sm"
+              className="diary-comment text-sm"
             >
               <div className="flex items-center justify-between mb-1">
-                <span className="font-medium text-rose-500">{c.authorName}</span>
+                <span className="font-medium diary-accent break-all">{c.authorName}</span>
                 <button
                   onClick={() => handleDeleteComment(c.id)}
-                  className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+                  className="diary-delete"
                 >
                   삭제
                 </button>
               </div>
-              <p className="text-gray-700 dark:text-gray-300">{c.content}</p>
+              <p className="whitespace-pre-wrap break-words leading-7">{c.content}</p>
             </div>
           ))}
         </div>
 
-        <form onSubmit={handleSubmitComment} className="flex gap-2">
-          <input
+        <form onSubmit={handleSubmitComment} className="flex flex-col sm:flex-row gap-3 border-t border-[var(--diary-border)] pt-5">
+          <textarea
+            aria-label="댓글 내용"
+            rows={2}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder="한마디 남기기..."
-            className="flex-1 rounded-lg border border-rose-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm"
+            className="diary-field flex-1 resize-y"
           />
           <button
             type="submit"
-            disabled={submitting}
-            className="rounded-lg bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white px-4 text-sm font-medium transition-colors"
+            disabled={submitting || !comment.trim()}
+            className="diary-primary px-5 text-sm sm:self-end"
           >
             등록
           </button>
         </form>
-      </div>
+      </section>
     </div>
   );
 }

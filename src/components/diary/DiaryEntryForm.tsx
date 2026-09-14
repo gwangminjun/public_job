@@ -48,51 +48,63 @@ export function DiaryEntryForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="diary-card flex flex-col gap-5">
+      <label className="diary-form-label" htmlFor="entry-date">기록할 날짜</label>
       <input
+        id="entry-date"
+        aria-label="일기 날짜"
         type="date"
         value={entryDate}
         onChange={(e) => setEntryDate(e.target.value)}
-        className="rounded-lg border border-rose-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2"
+        className="diary-field"
       />
 
+      <fieldset>
+        <legend className="diary-form-label mb-3">오늘의 기분 <span className="diary-muted font-normal">· 선택</span></legend>
       <div className="flex gap-2 flex-wrap">
         {DIARY_MOODS.map((m) => (
           <button
             key={m}
             type="button"
             onClick={() => setMood(mood === m ? null : m)}
-            className={`text-xl w-10 h-10 rounded-full border transition-colors ${
-              mood === m ? 'border-rose-500 bg-rose-100 dark:bg-rose-900/40' : 'border-transparent'
-            }`}
+            aria-label={`${m} 기분`}
+            aria-pressed={mood === m}
+            className="diary-mood"
           >
             {m}
           </button>
         ))}
       </div>
+      </fieldset>
 
+      <label className="diary-form-label" htmlFor="entry-content">오늘의 이야기</label>
       <textarea
+        id="entry-content"
+        aria-label="일기 내용"
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder="오늘 있었던 일을 적어보세요..."
         rows={8}
-        className="rounded-lg border border-rose-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 resize-none"
+        className="diary-field resize-y leading-8"
       />
 
+      <label className="diary-form-label" htmlFor="entry-photos">함께 남길 사진 <span className="diary-muted font-normal">· 선택</span></label>
       <input
+        id="entry-photos"
+        aria-label="일기 사진 첨부"
         type="file"
         accept="image/*"
         multiple
         onChange={(e) => setPhotos(e.target.files)}
-        className="text-sm"
+        className="diary-field text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--diary-soft)] file:px-3 file:py-2 file:text-[var(--diary-text)]"
       />
 
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error && <p className="text-sm diary-accent">{error}</p>}
 
       <button
         type="submit"
         disabled={submitting}
-        className="rounded-lg bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white py-2.5 font-medium transition-colors"
+        className="diary-primary py-3"
       >
         {submitting ? '저장 중...' : '저장하기'}
       </button>
