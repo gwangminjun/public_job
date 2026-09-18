@@ -13,6 +13,8 @@
 # testing
 /coverage
 /.diary-check/
+/.study-check/
+/.lighthouse/
 
 # next.js
 /.next/

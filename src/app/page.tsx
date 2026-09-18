@@ -35,6 +35,20 @@ const PROJECTS = [
     status: 'live' as const,
   },
   {
+    title: '📖 시험 직전 복습',
+    description: '알고리즘·머신러닝 단권화 노트 · 핵심 개념과 비교표 · 헷갈리는 조건 정리 · 원문 참고',
+    tech: ['알고리즘', '머신러닝', '단권화'],
+    href: '/study/review',
+    status: 'live' as const,
+  },
+  {
+    title: '✍️ 백지 공부',
+    description: '주제별 질문으로 기억 꺼내기 · 답안 비교 · 다시 공부할 주제 표시 · 브라우저 자동 저장',
+    tech: ['능동 회상', '자가 점검', '학습 기록'],
+    href: '/study/recall',
+    status: 'live' as const,
+  },
+  {
     title: '🔐 정보보안기사 체크리스트',
     description: '정보보안기사 필기 시험 대비 D-DAY 학습 체크리스트 · 일자별 진행률 · 메모',
     tech: ['Next.js', 'TypeScript', 'Zustand'],
