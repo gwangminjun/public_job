@@ -35,6 +35,13 @@ const PROJECTS = [
     status: 'live' as const,
   },
   {
+    title: '🐾 말랑수비대',
+    description: '말랑한 동료들과 성을 지키는 디펜스 게임 · 동료 모집 · 진형 배치 · 자동 전투 · 분기 진화',
+    tech: ['Phaser', 'TypeScript', 'Vite'],
+    href: '/games/mallang-defense/index.html',
+    status: 'live' as const,
+  },
+  {
     title: '📖 시험 직전 복습',
     description: '알고리즘·머신러닝 단권화 노트 · 핵심 개념과 비교표 · 헷갈리는 조건 정리 · 원문 참고',
     tech: ['알고리즘', '머신러닝', '단권화'],
@@ -98,41 +105,46 @@ export default function HubPage() {
         <section>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Projects</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {PROJECTS.map((project) => (
-              <Link
-                key={project.href}
-                href={project.href}
-                className="group flex flex-col rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-200"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                    {project.title}
-                  </h3>
-                  {project.status === 'live' && (
-                    <span className="ml-2 shrink-0 inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 text-xs font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      Live
-                    </span>
-                  )}
-                </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 flex-1">
-                  {project.description}
-                </p>
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {project.tech.map((t) => (
-                    <span
-                      key={t}
-                      className="rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2.5 py-0.5 text-xs font-medium"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-                <span className="text-sm font-medium text-blue-600 dark:text-blue-400 group-hover:underline">
-                  바로가기 →
-                </span>
-              </Link>
-            ))}
+            {PROJECTS.map((project) => {
+              // Standalone HTML games need a full document navigation.
+              const ProjectLink = project.href.endsWith('.html') ? 'a' : Link;
+
+              return (
+                <ProjectLink
+                  key={project.href}
+                  href={project.href}
+                  className="group flex flex-col rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-200"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      {project.title}
+                    </h3>
+                    {project.status === 'live' && (
+                      <span className="ml-2 shrink-0 inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 text-xs font-medium">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        Live
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 flex-1">
+                    {project.description}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {project.tech.map((t) => (
+                      <span
+                        key={t}
+                        className="rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2.5 py-0.5 text-xs font-medium"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                  <span className="text-sm font-medium text-blue-600 dark:text-blue-400 group-hover:underline">
+                    바로가기 →
+                  </span>
+                </ProjectLink>
+              );
+            })}
 
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-6 text-center">
               <p className="text-sm text-gray-400 dark:text-gray-500 font-medium">Coming Soon...</p>

@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Imported game build assets include bundled third-party code.
+    "public/games/mallang-defense/assets/**",
   ]),
 ]);
 
