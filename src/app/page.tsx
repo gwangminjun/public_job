@@ -7,6 +7,13 @@ export const metadata: Metadata = {
 
 const PROJECTS = [
   {
+    title: '💼 개발자 포트폴리오',
+    description: 'Java/Spring 기반 공공 정보시스템 구축·운영 4년 · 데이터 연계 · GIS · 대표 사례와 경력',
+    tech: ['Java/Spring', 'GIS', 'Data Integration'],
+    href: '/portfolio',
+    status: 'live' as const,
+  },
+  {
     title: '공공기관 채용정보 포털',
     description: '공공데이터포털 API 기반 실시간 채용공고 검색 · 필터 · 북마크 · Slack 알림',
     tech: ['Next.js', 'TypeScript', 'Supabase', 'Tailwind CSS'],
