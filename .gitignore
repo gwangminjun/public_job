@@ -54,3 +54,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# private resume sources and graph outputs
+/docs/experience/
+/graphify-out/

@@ -7,9 +7,10 @@ type ProjectGanttProps = {
   until: string;
 };
 
-const KINDS = [
-  { key: 'build', label: '구축·고도화', bar: 'bg-blue-600' },
-  { key: 'operate', label: '운영·유지보수', bar: 'bg-teal-600' },
+const LANES = [
+  { key: 'gis', label: 'GIS·공간정보', bar: 'bg-blue-600' },
+  { key: 'data', label: '데이터 연계·업무 시스템', bar: 'bg-teal-600' },
+  { key: 'cctv', label: 'CCTV·영상관제', bar: 'bg-amber-600' },
 ] as const;
 
 const toMonth = (ym: string) => {
@@ -36,10 +37,10 @@ export function ProjectGantt({ spans, from, until }: ProjectGanttProps) {
       <figcaption className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3">
         <span className="text-lg font-black text-slate-950">프로젝트 수행 기간</span>
         <span className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-slate-600">
-          {KINDS.map((kind) => (
-            <span key={kind.key} className="inline-flex items-center gap-2">
-              <span aria-hidden="true" className={`h-2.5 w-5 rounded-sm ${kind.bar}`} />
-              {kind.label}
+          {LANES.map((lane) => (
+            <span key={lane.key} className="inline-flex items-center gap-2">
+              <span aria-hidden="true" className={`h-2.5 w-5 rounded-sm ${lane.bar}`} />
+              {lane.label}
             </span>
           ))}
           <span className="inline-flex items-center gap-2">
@@ -49,12 +50,13 @@ export function ProjectGantt({ spans, from, until }: ProjectGanttProps) {
         </span>
       </figcaption>
 
-      {KINDS.map((kind) => (
-        <div key={kind.key} className="mt-8">
-          <h3 className="text-sm font-black text-slate-700">{kind.label}</h3>
+      {LANES.map((lane) => (
+        <div key={lane.key} className="mt-8 border-t border-slate-100 pt-6 first-of-type:border-t-0">
+          <h3 className="text-sm font-black text-slate-700">{lane.label}</h3>
           <ol className="mt-3">
             {spans
-              .filter((span) => span.kind === kind.key)
+              .filter((span) => span.lane === lane.key)
+              .toSorted((a, b) => a.ranges[0].start.localeCompare(b.ranges[0].start))
               .map((span) => {
                 const periods = span.ranges
                   .map((r) => `${formatYm(r.start)}~${r.end ? formatYm(r.end) : '진행 중'}`)
@@ -84,7 +86,7 @@ export function ProjectGantt({ spans, from, until }: ProjectGanttProps) {
                         return (
                           <span
                             key={range.start}
-                            className={`absolute top-1/2 flex h-2.5 -translate-y-1/2 items-center justify-end rounded ${kind.bar}`}
+                            className={`absolute top-1/2 flex h-2.5 -translate-y-1/2 items-center justify-end rounded ${lane.bar}`}
                             style={{ left: pct(left), width: `calc(${pct(right)} - ${pct(left)})` }}
                           >
                             {range.end === null && (

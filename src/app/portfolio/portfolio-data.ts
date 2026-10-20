@@ -49,7 +49,7 @@ export type ArchiveGroup = {
 /** `YYYY-MM`; `end: null` means ongoing. */
 export type ProjectSpan = {
   label: string;
-  kind: 'build' | 'operate';
+  lane: 'gis' | 'data' | 'cctv';
   ranges: { start: string; end: string | null }[];
 };
 
@@ -355,32 +355,32 @@ export const otherProjects: string[] = [
 ];
 
 export const projectSpans: ProjectSpan[] = [
-  { label: '3D 웹 (GS 인증)', kind: 'build', ranges: [{ start: '2022-08', end: '2022-10' }] },
-  { label: '근무관리시스템', kind: 'build', ranges: [{ start: '2022-10', end: '2022-11' }] },
-  { label: 'Data Hub / API Manager', kind: 'build', ranges: [{ start: '2023-02', end: '2023-06' }] },
+  { label: '3D 웹 (GS 인증)', lane: 'gis', ranges: [{ start: '2022-08', end: '2022-10' }] },
+  { label: '근무관리시스템', lane: 'data', ranges: [{ start: '2022-10', end: '2022-11' }] },
+  { label: 'Data Hub / API Manager', lane: 'data', ranges: [{ start: '2023-02', end: '2023-06' }] },
   {
     label: '해남 스마트 군정',
-    kind: 'build',
+    lane: 'data',
     ranges: [
       { start: '2023-05', end: '2024-04' },
       { start: '2025-09', end: '2026-06' },
     ],
   },
-  { label: '영광 농촌개발 시설물', kind: 'build', ranges: [{ start: '2023-06', end: '2024-06' }] },
-  { label: '남원 통합플랫폼', kind: 'build', ranges: [{ start: '2024-04', end: '2026-06' }] },
-  { label: '영광 3차원 공간정보', kind: 'build', ranges: [{ start: '2025-03', end: null }] },
-  { label: '나주 RFID 연계', kind: 'build', ranges: [{ start: '2025-09', end: '2026-01' }] },
-  { label: '고흥 스마트군정', kind: 'build', ranges: [{ start: '2025-12', end: null }] },
-  { label: '고흥 빅데이터 포털', kind: 'build', ranges: [{ start: '2026-01', end: '2026-04' }] },
-  { label: '무안 Web-GIS', kind: 'build', ranges: [{ start: '2026-04', end: '2026-05' }] },
-  { label: 'GeoSync (영광 KRAS)', kind: 'build', ranges: [{ start: '2026-06', end: null }] },
-  { label: '해창만 구조안전진단', kind: 'build', ranges: [{ start: '2026-06', end: null }] },
-  { label: '전남 광역 CCTV (22개 시군)', kind: 'operate', ranges: [{ start: '2022-06', end: null }] },
-  { label: '정읍 통합플랫폼', kind: 'operate', ranges: [{ start: '2022-11', end: '2025-06' }] },
-  { label: '영암 통합플랫폼', kind: 'operate', ranges: [{ start: '2022-11', end: '2025-12' }] },
-  { label: '완도 공간정보', kind: 'operate', ranges: [{ start: '2023-01', end: '2025-07' }] },
-  { label: '목포 영상반출', kind: 'operate', ranges: [{ start: '2023-04', end: '2024-08' }] },
-  { label: '곡성 Web-GIS', kind: 'operate', ranges: [{ start: '2024-05', end: '2026-06' }] },
+  { label: '영광 농촌개발 시설물', lane: 'gis', ranges: [{ start: '2023-06', end: '2024-06' }] },
+  { label: '남원 통합플랫폼', lane: 'data', ranges: [{ start: '2024-04', end: '2026-06' }] },
+  { label: '영광 3차원 공간정보', lane: 'gis', ranges: [{ start: '2025-03', end: null }] },
+  { label: '나주 RFID 연계', lane: 'cctv', ranges: [{ start: '2025-09', end: '2026-01' }] },
+  { label: '고흥 스마트군정', lane: 'data', ranges: [{ start: '2025-12', end: null }] },
+  { label: '고흥 빅데이터 포털', lane: 'data', ranges: [{ start: '2026-01', end: '2026-04' }] },
+  { label: '무안 Web-GIS', lane: 'cctv', ranges: [{ start: '2026-04', end: '2026-05' }] },
+  { label: 'GeoSync (영광 KRAS)', lane: 'gis', ranges: [{ start: '2026-06', end: null }] },
+  { label: '해창만 구조안전진단', lane: 'gis', ranges: [{ start: '2026-06', end: null }] },
+  { label: '전남 광역 CCTV (22개 시군)', lane: 'cctv', ranges: [{ start: '2022-06', end: null }] },
+  { label: '정읍 통합플랫폼', lane: 'cctv', ranges: [{ start: '2022-11', end: '2025-06' }] },
+  { label: '영암 통합플랫폼', lane: 'cctv', ranges: [{ start: '2022-11', end: '2025-12' }] },
+  { label: '완도 공간정보', lane: 'gis', ranges: [{ start: '2023-01', end: '2025-07' }] },
+  { label: '목포 영상반출', lane: 'cctv', ranges: [{ start: '2023-04', end: '2024-08' }] },
+  { label: '곡성 Web-GIS', lane: 'cctv', ranges: [{ start: '2024-05', end: '2026-06' }] },
 ];
 
 export const careerTimeline: TimelineItem[] = [
