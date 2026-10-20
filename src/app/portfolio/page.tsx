@@ -1,14 +1,20 @@
 import type { Metadata } from 'next';
 import { CareerTimeline } from '@/components/portfolio/CareerTimeline';
 import { CaseStudy } from '@/components/portfolio/CaseStudy';
+import { Credentials } from '@/components/portfolio/Credentials';
 import { ExperienceSummary } from '@/components/portfolio/ExperienceSummary';
+import { PortfolioFooter } from '@/components/portfolio/PortfolioFooter';
 import { PortfolioHero } from '@/components/portfolio/PortfolioHero';
 import {
   careerTimeline,
   caseStudies,
+  credentialGroups,
+  education,
   highlights,
   links,
   profile,
+  sideProjects,
+  skillGroups,
   strengths,
 } from './portfolio-data';
 
@@ -58,14 +64,16 @@ export default function PortfolioPage() {
             <CareerTimeline items={careerTimeline} />
           </div>
         </section>
+
+        <Credentials
+          skillGroups={skillGroups}
+          education={education}
+          credentialGroups={credentialGroups}
+          sideProjects={sideProjects}
+        />
       </main>
 
-      <footer id="contact" className="scroll-mt-8 bg-slate-950 px-5 py-12 text-center text-slate-300">
-        <p className="text-sm">함께 일할 개발자를 찾고 계신다면 연락해주세요.</p>
-        <a className="mt-3 inline-block font-bold text-cyan-300 hover:text-cyan-200" href={`mailto:${links.email}`}>
-          {links.email}
-        </a>
-      </footer>
+      <PortfolioFooter email={links.email} github={links.github} blog={links.blog} />
     </div>
   );
 }
