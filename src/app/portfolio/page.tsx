@@ -5,13 +5,17 @@ import { Credentials } from '@/components/portfolio/Credentials';
 import { ExperienceSummary } from '@/components/portfolio/ExperienceSummary';
 import { PortfolioFooter } from '@/components/portfolio/PortfolioFooter';
 import { PortfolioHero } from '@/components/portfolio/PortfolioHero';
+import { ProjectArchive } from '@/components/portfolio/ProjectArchive';
 import {
+  activities,
+  archiveGroups,
   careerTimeline,
   caseStudies,
   credentialGroups,
   education,
   highlights,
   links,
+  otherProjects,
   profile,
   sideProjects,
   skillGroups,
@@ -52,6 +56,8 @@ export default function PortfolioPage() {
           </div>
         </section>
 
+        <ProjectArchive groups={archiveGroups} others={otherProjects} />
+
         <section id="career" aria-labelledby="career-heading" className="scroll-mt-8 py-20 lg:py-28">
           <div className="mx-auto max-w-6xl px-5 sm:px-8 lg:px-10">
             <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-700">Career</p>
@@ -70,6 +76,7 @@ export default function PortfolioPage() {
           education={education}
           credentialGroups={credentialGroups}
           sideProjects={sideProjects}
+          activities={activities}
         />
       </main>
 

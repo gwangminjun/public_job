@@ -11,6 +11,7 @@ type CredentialsProps = {
   education: EducationItem[];
   credentialGroups: CredentialGroup[];
   sideProjects: SideProject[];
+  activities: string[];
 };
 
 const focusRing =
@@ -23,6 +24,7 @@ export function Credentials({
   education,
   credentialGroups,
   sideProjects,
+  activities,
 }: CredentialsProps) {
   return (
     <>
@@ -123,6 +125,14 @@ export function Credentials({
                 </li>
               );
             })}
+          </ul>
+
+          <ul className="mt-8 list-disc space-y-2 pl-5 text-slate-700 marker:text-blue-400">
+            {activities.map((activity) => (
+              <li key={activity} className="break-words">
+                {activity}
+              </li>
+            ))}
           </ul>
 
           <Link

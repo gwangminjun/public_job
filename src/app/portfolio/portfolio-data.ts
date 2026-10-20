@@ -34,6 +34,18 @@ export type CaseStudyData = {
   result: string;
 };
 
+export type ArchiveProject = {
+  title: string;
+  period: string;
+  technologies: string[];
+  points: string[];
+};
+
+export type ArchiveGroup = {
+  label: string;
+  projects: ArchiveProject[];
+};
+
 export type TimelineItem = {
   year: string;
   title: string;
@@ -153,6 +165,188 @@ export const caseStudies: CaseStudyData[] = [
   },
 ];
 
+export const archiveGroups: ArchiveGroup[] = [
+  {
+    label: '구축·고도화',
+    projects: [
+      {
+        title: '고흥 해창만 갑문 통합 모니터링 · 구조안전진단 시스템',
+        period: '2026.06~진행 중',
+        technologies: ['Java', 'Spring', 'REST API', 'IoT 계측 센서', 'Cesium.js', 'QGIS'],
+        points: [
+          '수치지형도 등고선과 QGIS TIN 보간으로 해창만 3D Terrain을 만들고 전라남도 전체로 확대했습니다.',
+          '가상 센서와 더미 통계를 걷어내고 현장 센서 실측값과 임계값 기준 판정 로직으로 재설계했습니다.',
+          '상태평가·진동/경사·진단이력·예방정비 4개 모듈, 위험등급별 SOP 자동 배정, 기상청 초단기실황 API 연계를 구현했습니다.',
+        ],
+      },
+      {
+        title: '무안군 Web-GIS',
+        period: '2026.04~2026.05',
+        technologies: ['Web-GIS', 'VMS 연동', 'Excel'],
+        points: [
+          '장비관리, 접속·관제 이력 통계와 엑셀, 사용자·권한·역할 관리 기능을 개발했습니다.',
+          'VMS 연동으로 CCTV 접속 상태를 실시간 점검하고 속성 동기화와 미등록 CCTV 엑셀 일괄 처리를 구현했습니다.',
+        ],
+      },
+      {
+        title: '고흥군 빅데이터 포털',
+        period: '2026.01~2026.04',
+        technologies: ['Java', 'YouTube API', '스케줄러'],
+        points: [
+          '뉴스 기사 분석 모듈에서 Hadoop 구성을 제거하고 수집·분석·API 모듈을 하나로 통합했습니다.',
+          '대시보드·스케줄링·로그·API·DB 관리 화면과 수집 주기·키워드 설정, API 테스트 기능을 추가했습니다.',
+          '뉴스 채널·API 키 관리와 검색 로그·채널별 통계를 제공하는 YouTube API 관리 패널을 구현했습니다.',
+        ],
+      },
+      {
+        title: '고흥군 스마트군정시스템 — 공공데이터 수집·지오코딩',
+        period: '2025.12~진행 중',
+        technologies: ['Java', 'Spring Batch', '공공 Open API', 'VWorld Geocoding', 'PostgreSQL/PostGIS'],
+        points: [
+          '부서별 데이터 협의로 약 700쪽 분량의 자료에서 시각화 대상을 선별했습니다.',
+          '전기차 충전소·병원·약국·사회복지시설·전통시장·학교·유치원 정보를 공공 API로 자동 수집하는 배치를 구축했습니다.',
+          'API가 제공하는 좌표를 우선 사용해 위치 오차를 줄이고, 좌표가 없는 데이터만 VWorld 지오코딩으로 변환했습니다.',
+        ],
+      },
+      {
+        title: '나주 배터리 산업협회 RFID 연계',
+        period: '2025.09~2026.01',
+        technologies: ['RFID', 'CCTV', '3D 표출'],
+        points: [
+          'RFID 이벤트가 발생하면 3D 모델과 해당 CCTV를 표출하고, 기존 CCTV 순환 표출을 멈췄다 재개하도록 구현했습니다.',
+          '정전 후 RFID API 서버가 가동되지 않은 원인을 찾아 서비스를 정상화했습니다.',
+        ],
+      },
+      {
+        title: '영광군 3차원 공간정보시스템 구축·고도화',
+        period: '2025.03~진행 중',
+        technologies: ['Java', 'Spring', 'PostgreSQL/PostGIS', 'OpenLayers', 'GeoServer', 'Cesium.js'],
+        points: [
+          'Cesium.js 3D 지도 화면과 API 기반 데이터 수집·백엔드 통합 처리를 설계·개발했습니다.',
+          '토지·건축물 대장 조회, SHP/엑셀 업·다운로드, 히트맵·영역·버퍼 분석을 구현하고 통합형 공간정보시스템으로 전환했습니다.',
+          '외부 CDN 제거, WFS gzip, 캐시로 레이어 표출 속도를 개선하고 서버 간 시간 오차로 실패하던 SSO 인증을 조치했습니다.',
+        ],
+      },
+      {
+        title: '영광군 농촌개발 시설물 통합관리시스템',
+        period: '2023.06~2024.06',
+        technologies: ['Java', 'Spring', 'PostgreSQL', 'GeoServer', 'Cesium.js'],
+        points: [
+          'Cesium.js 3D 지도와 GeoServer 연동으로 시설물 위치·속성·상태 정보를 표출했습니다.',
+          '사용자·권한·시설물·정기점검·유지보수 관리와 거리·면적 측정, 주소검색 기능을 개발했습니다.',
+          '운영서버 설치와 실환경 테스트, 내부 점검 결과 패치를 수행했습니다.',
+        ],
+      },
+      {
+        title: '해남군 스마트 군정시스템 구축·고도화',
+        period: '2023.05~2024.04 · 고도화 2025.09~2026.06',
+        technologies: ['Java', 'Spring', 'PostgreSQL', 'OpenLayers', 'GeoServer', 'Apache POI', 'Chart.js'],
+        points: [
+          '부서마다 다른 데이터 양식을 공통 엑셀 서식으로 합의하고 DB 자동 적재 로직을 구현했습니다.',
+          '민원·전기차·SGIS 통계·뉴스를 데이터 허브로 연계하고 인구·민원·정책·재난 현황을 차트·지도 대시보드로 시각화했습니다.',
+          '고도화에서 세입/세출·교육·경제·보건/복지 등 분야별 지표와 데이터 일괄등록을 확대했습니다.',
+        ],
+      },
+      {
+        title: '데이터 허브 / API Manager',
+        period: '2023.02~2023.06 개발 · 이후 결함 수정',
+        technologies: ['Java', 'Spring Boot', 'Spring Batch', 'Quartz', 'PostgreSQL'],
+        points: [
+          '외부 API 등록·호출 테스트와 사용자별 API 키 발급·접근권한 관리를 구현했습니다.',
+          '계층형 API 관리 DB와 프로토콜·인증 방식별 핸들러로 기관별 이기종 API를 재사용 가능한 구조로 통합했습니다.',
+          'JSON/XML 파싱을 공통 구조로 통합하고, 대량 적재 오류를 분할 처리로 해결했으며 MySQL에서 PostgreSQL로 이관했습니다.',
+        ],
+      },
+      {
+        title: '전남도청 근무관리시스템',
+        period: '2022.10~2022.11 구축 · 이후 유지보수',
+        technologies: ['Java', 'Spring', 'Spring Security', 'MyBatis', 'PostgreSQL', 'Apache POI'],
+        points: [
+          'Spring Security 로그인과 당직·재난상황·근무·통계 등 10개 이상 업무 영역을 개발했습니다.',
+          'SQL 통계 리포트와 엑셀 업·다운로드, 오류 데이터를 바로 고칠 수 있는 오류 파일 처리를 구현했습니다.',
+          '서버 OS와 프로그램을 설치해 도청에 배포하고 유지보수를 담당했습니다.',
+        ],
+      },
+      {
+        title: '3D 웹 프로젝트 (GS 인증)',
+        period: '2022.08~2022.10',
+        technologies: ['Java', 'Spring', 'Three.js', 'PostgreSQL'],
+        points: [
+          'Three.js 기반 3D 뷰어, 모니터링 애니메이션, 카메라 위치 프리셋을 구현했습니다.',
+          '사용자·모델 관리 기능을 개발하고 보안 요건을 충족해 GS 인증 획득에 기여했습니다.',
+        ],
+      },
+    ],
+  },
+  {
+    label: '운영·유지보수',
+    projects: [
+      {
+        title: '전라남도 광역 CCTV 통합플랫폼 운영',
+        period: '2022.06~현재',
+        technologies: ['Java', 'Spring', 'PostgreSQL', 'Oracle', 'VMS', 'Tomcat'],
+        points: [
+          '22개 시군 CCTV·VMS·영상중계 시스템의 정기점검과 장애 대응을 VMS·망연계·방화벽 업체와 함께 수행했습니다.',
+          '전 지자체 gate 재설치와 VMS 교체 지자체의 동기화 설치, CCTV 좌표·구분코드 등록을 맡았습니다.',
+          '보안성 검토에 대응해 Tomcat 버전 노출 차단, 접속 IP·포트 제한, 서버별 보안 점검을 수행했습니다.',
+        ],
+      },
+      {
+        title: '완도군 공간정보시스템',
+        period: '2023.01~2025.07',
+        technologies: ['Java', 'GeoServer', 'SHP', '좌표계 변환'],
+        points: [
+          'SHP 등록 시 원본 좌표계를 선택해 EPSG:5186으로 변환 등록하도록 개선했습니다.',
+          'KRAS-KOREPS 변경 후 멈춘 개별공시지가 조회를 운영서버 디버깅으로 추적해 연결 설정 누락과 API 필드 변경을 수정했습니다.',
+        ],
+      },
+      {
+        title: '곡성군 Web-GIS · 영상중계 플랫폼',
+        period: '2024.05~2026.06',
+        technologies: ['Web-GIS', 'Java', 'PostgreSQL/PostGIS', 'VMS'],
+        points: [
+          'VMS·gate·Web-GIS·DB·바로e맵 현장 설치와 안정화 패치를 수행했습니다.',
+          '엑셀로 관리하던 CCTV 화각·구분 데이터를 GIS DB와 동기화하고 행안부 기준으로 구분코드를 재배치했습니다.',
+          'CCTV 동기화와 정사영상 표출 오류, 레이어 스타일 저장 오류를 해결했습니다.',
+        ],
+      },
+      {
+        title: '목포시 영상반출 시스템',
+        period: '2023.04~2024.08',
+        technologies: ['Linux', 'Vurix VMS API'],
+        points: [
+          'Vurix VMS API 버전 업데이트에 맞춰 영상반출 오류를 정상화했습니다.',
+          '관제센터 신규 서버로 영상반출 시스템을 설치·이전했습니다.',
+          '승인일시·재생횟수·첨부파일 수정과 정보공개청구 관리 기능을 추가했습니다.',
+        ],
+      },
+      {
+        title: '영암군 통합플랫폼',
+        period: '2022.11~2025.12',
+        technologies: ['VMS', 'CCTV 동기화'],
+        points: [
+          'CCTV 과거영상 저장 오류와 DMZ 서버 통신 오류 등 장애에 대응했습니다.',
+          'Vurix에서 다누시스로 VMS를 교체할 때 gate·브릿지를 설치하고 CCTV 목록을 재적재·동기화했습니다.',
+        ],
+      },
+      {
+        title: '정읍시 통합플랫폼 · 영상반출 시스템',
+        period: '2022.11~2025.06',
+        technologies: ['VMS', 'SQL'],
+        points: [
+          '대시보드 날씨·통계·로드뷰·이력조회 오류와 영상반출·장비 관리 기능을 수정했습니다.',
+          'TCOS 서비스 쿼리를 수정하고 VMS 계정 오류로 실패한 영상반출을 조치했습니다.',
+        ],
+      },
+    ],
+  },
+];
+
+export const otherProjects: string[] = [
+  '스마트도시협회 NDMS 테이블 생성·백업 (2022.06)',
+  '사천시 재난관리 시스템 SMS·방송장비 그룹 기능 추가 (2022.08)',
+];
+
 export const careerTimeline: TimelineItem[] = [
   {
     year: '2022',
@@ -189,7 +383,7 @@ export const careerTimeline: TimelineItem[] = [
 export const skillGroups: SkillGroup[] = [
   {
     label: 'Backend',
-    items: ['Java', 'Spring Boot', 'Spring Framework', 'Spring Batch', 'MyBatis'],
+    items: ['Java', 'Spring Boot', 'Spring Framework', 'Spring Batch', 'Spring Security', 'Quartz', 'MyBatis'],
   },
   {
     label: 'Data',
@@ -197,11 +391,15 @@ export const skillGroups: SkillGroup[] = [
   },
   {
     label: 'GIS',
-    items: ['OpenLayers', 'GeoServer', 'Cesium.js', 'QGIS', 'GeoTools'],
+    items: ['OpenLayers', 'GeoServer', 'Cesium.js', 'Three.js', 'QGIS', 'GeoTools', 'VWorld API'],
   },
   {
     label: 'Integration / Operations',
-    items: ['REST API', 'MQTT', 'VMS', 'Linux', 'Windows Server', 'Tomcat'],
+    items: ['REST API', 'MQTT', 'Linux', 'Windows Server', 'Tomcat'],
+  },
+  {
+    label: '영상관제',
+    items: ['Genetec', 'Milestone', '이노뎁', 'Vurix', '다누시스', 'CCTV 동기화·영상중계'],
   },
   {
     label: 'Web',
@@ -259,4 +457,18 @@ export const sideProjects: SideProject[] = [
     href: 'https://gwangminjun.github.io/goramin/',
     external: true,
   },
+  {
+    title: '『우아한 타입스크립트 with 리액트』 스터디',
+    summary: '2024.08~2025.01 · 타입 시스템, 제네릭, 유틸리티 타입을 실습했습니다.',
+    href: 'https://github.com/Gwangju-Web-Study/WoowahanTS_Study',
+    external: true,
+  },
+  {
+    title: '『모던 자바스크립트 Deep Dive』 스터디',
+    summary: '2024.02~2024.07 · 비동기, 클로저, 프로토타입 등 동작 원리를 학습했습니다.',
+    href: 'https://github.com/Gwangju-Web-Study/ModernJS_Deepdive',
+    external: true,
+  },
 ];
+
+export const activities: string[] = ['2022 AI 창업 경진대회 참가 (정보통신산업진흥원 주관, 2022.06)'];
