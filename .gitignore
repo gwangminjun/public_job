@@ -15,6 +15,7 @@
 /.diary-check/
 /.study-check/
 /.lighthouse/
+/.worktrees/
 
 # next.js
 /.next/
