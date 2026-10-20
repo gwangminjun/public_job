@@ -6,6 +6,7 @@ import { ExperienceSummary } from '@/components/portfolio/ExperienceSummary';
 import { PortfolioFooter } from '@/components/portfolio/PortfolioFooter';
 import { PortfolioHero } from '@/components/portfolio/PortfolioHero';
 import { ProjectArchive } from '@/components/portfolio/ProjectArchive';
+import { ProjectGantt } from '@/components/portfolio/ProjectGantt';
 import {
   activities,
   archiveGroups,
@@ -17,6 +18,7 @@ import {
   links,
   otherProjects,
   profile,
+  projectSpans,
   sideProjects,
   skillGroups,
   strengths,
@@ -67,6 +69,7 @@ export default function PortfolioPage() {
             <p className="mt-5 max-w-3xl leading-7 text-slate-600">
               개발 업무에서 출발해 데이터 연계, GIS, 현장 구축과 운영 안정화까지 역할을 확장했습니다.
             </p>
+            <ProjectGantt spans={projectSpans} from="2022-06" until="2026-10" />
             <CareerTimeline items={careerTimeline} />
           </div>
         </section>
