@@ -50,7 +50,7 @@ export function PortfolioFooter({ email, github, blog }: PortfolioFooterProps) {
           </li>
         </ul>
 
-        <p className="mt-16 border-t border-slate-800 pt-6 text-xs text-slate-500">© 양민준</p>
+        <p className="mt-16 border-t border-slate-800 pt-6 text-xs text-slate-400">© 양민준</p>
       </div>
     </footer>
   );
