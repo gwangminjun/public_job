@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { ShareButton } from '@/components/ui/ShareButton';
 import { QUESTIONS, START_QUESTION_ID, type QuestionId } from '@/lib/mbti';
 
 type Answer = { questionId: QuestionId; optionIndex: number };
@@ -37,10 +37,14 @@ export function MbtiQuiz() {
     <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
       <header className="border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-          <Link href="/" className={`inline-flex min-h-11 items-center gap-2 rounded-lg text-sm font-medium text-gray-600 hover:text-violet-600 dark:text-gray-300 dark:hover:text-violet-400 ${focusStyle}`}>
-            <span aria-hidden="true">←</span> 프로젝트 허브
-          </Link>
           <span className="text-sm font-semibold tracking-wide text-violet-600 dark:text-violet-400">MBTI PLAY</span>
+          <ShareButton
+            title="재미로 보는 MBTI"
+            text="질문을 클릭하며 나의 MBTI를 알아보세요!"
+            url="/mbti"
+            ariaLabel="MBTI 공유하기"
+            className={`min-h-11 ${focusStyle}`}
+          />
         </div>
       </header>
 
@@ -97,7 +101,6 @@ export function MbtiQuiz() {
             </div>
             <div className="flex items-center justify-between gap-3">
               <button type="button" onClick={() => setHistory(history.slice(0, -1))} className={secondaryStyle}>이전 질문</button>
-              <Link href="/" className={secondaryStyle}>프로젝트 허브</Link>
             </div>
           </section>
         ) : question && questionId ? (

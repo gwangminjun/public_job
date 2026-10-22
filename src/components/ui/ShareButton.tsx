@@ -7,19 +7,21 @@ interface ShareButtonProps {
   text: string;
   url: string;
   className?: string;
+  ariaLabel?: string;
 }
 
-export function ShareButton({ title, text, url, className = '' }: ShareButtonProps) {
+export function ShareButton({ title, text, url, className = '', ariaLabel = '공고 공유하기' }: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {
+    const shareUrl = new URL(url, window.location.origin).href;
     // Web Share API 지원 확인
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
         await navigator.share({
           title,
           text,
-          url,
+          url: shareUrl,
         });
       } catch (err) {
         // 사용자가 취소하거나 에러가 발생한 경우 무시
@@ -28,7 +30,7 @@ export function ShareButton({ title, text, url, className = '' }: ShareButtonPro
     } else {
       // 클립보드 복사 폴백
       try {
-        await navigator.clipboard.writeText(url);
+        await navigator.clipboard.writeText(shareUrl);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000); // 2초 후 초기화
       } catch (err) {
@@ -41,11 +43,13 @@ export function ShareButton({ title, text, url, className = '' }: ShareButtonPro
   return (
     <div className="relative inline-block">
       <button
+        type="button"
         onClick={handleShare}
         className={`flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 rounded-lg transition-colors font-medium text-sm ${className}`}
-        aria-label="공고 공유하기"
+        aria-label={ariaLabel}
       >
         <svg
+          aria-hidden="true"
           className="w-4 h-4"
           fill="none"
           stroke="currentColor"
@@ -63,7 +67,7 @@ export function ShareButton({ title, text, url, className = '' }: ShareButtonPro
 
       {/* 복사 완료 툴팁 */}
       {copied && (
-        <div className="absolute left-1/2 -translate-x-1/2 -top-10 bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-900 text-xs py-1 px-2 rounded shadow-lg whitespace-nowrap animate-fade-in-up">
+        <div role="status" className="absolute left-1/2 -translate-x-1/2 -top-10 bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-900 text-xs py-1 px-2 rounded shadow-lg whitespace-nowrap animate-fade-in-up">
           링크가 복사되었습니다!
           <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-800 dark:border-t-gray-200"></div>
         </div>
