@@ -3,7 +3,19 @@ import { MbtiQuiz } from '@/components/mbti/MbtiQuiz';
 
 export const metadata: Metadata = {
   title: '재미로 보는 MBTI',
-  description: '질문을 클릭하며 알아보는 흐름도 기반 MBTI 테스트',
+  description: '',
+  openGraph: {
+    title: '재미로 보는 MBTI',
+    description: '',
+    type: 'website',
+    images: [],
+  },
+  twitter: {
+    card: 'summary',
+    title: '재미로 보는 MBTI',
+    description: '',
+    images: [],
+  },
 };
 
 export default function MbtiPage() {

@@ -40,7 +40,7 @@ export function MbtiQuiz() {
           <span className="text-sm font-semibold tracking-wide text-violet-600 dark:text-violet-400">MBTI PLAY</span>
           <ShareButton
             title="재미로 보는 MBTI"
-            text="질문을 클릭하며 나의 MBTI를 알아보세요!"
+            text=""
             url="/mbti"
             ariaLabel="MBTI 공유하기"
             className={`min-h-11 ${focusStyle}`}
