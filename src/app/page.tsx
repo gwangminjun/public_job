@@ -76,6 +76,13 @@ const PROJECTS = [
     href: '/diary',
     status: 'live' as const,
   },
+  {
+    title: '🧠 재미로 보는 MBTI',
+    description: '질문을 클릭하며 알아보는 나의 MBTI · 흐름도 기반 재미용 테스트',
+    tech: ['Next.js', 'TypeScript', '성격 테스트'],
+    href: '/mbti',
+    status: 'live' as const,
+  },
 ];
 
 export default function HubPage() {
