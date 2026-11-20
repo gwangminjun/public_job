@@ -33,7 +33,7 @@ export function ProjectGantt({ spans, from, until }: ProjectGanttProps) {
   ).filter((year) => year * 12 >= start);
 
   return (
-    <figure className="mt-12 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
+    <figure className="mt-12 rounded-2xl border border-slate-200 bg-white p-5 sm:p-8">
       <figcaption className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3">
         <span className="text-lg font-black text-slate-950">프로젝트 수행 기간</span>
         <span className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-slate-600">

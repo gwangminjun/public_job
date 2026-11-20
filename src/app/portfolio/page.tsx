@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import { CareerTimeline } from '@/components/portfolio/CareerTimeline';
-import { CaseStudy } from '@/components/portfolio/CaseStudy';
+import { CaseStudyTabs } from '@/components/portfolio/CaseStudyTabs';
 import { Credentials } from '@/components/portfolio/Credentials';
 import { ExperienceSummary } from '@/components/portfolio/ExperienceSummary';
 import { PortfolioFooter } from '@/components/portfolio/PortfolioFooter';
 import { PortfolioHero } from '@/components/portfolio/PortfolioHero';
 import { ProjectArchive } from '@/components/portfolio/ProjectArchive';
 import { ProjectGantt } from '@/components/portfolio/ProjectGantt';
+import { SectionHeading } from '@/components/portfolio/SectionHeading';
 import {
   activities,
   archiveGroups,
@@ -32,43 +33,31 @@ export const metadata: Metadata = {
 
 export default function PortfolioPage() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      <PortfolioHero profile={profile} links={links} />
+    <div className="min-h-screen break-keep bg-white text-slate-900">
+      <PortfolioHero profile={profile} links={links} highlights={highlights} />
       <main>
-        <ExperienceSummary
-          highlights={highlights}
-          strengths={strengths}
-          employer={profile.employer}
-        />
+        <ExperienceSummary strengths={strengths} />
 
         <section id="projects" aria-labelledby="projects-heading" className="scroll-mt-8 bg-white py-20 lg:py-28">
           <div className="mx-auto max-w-6xl px-5 sm:px-8 lg:px-10">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-700">Selected work</p>
-            <h2 id="projects-heading" className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
-              문제 해결 과정을 보여주는 프로젝트
-            </h2>
-            <p className="mt-5 max-w-3xl leading-7 text-slate-600">
-              기술 목록보다 어떤 제약을 발견했고 왜 그 해결책을 선택했는지에 집중했습니다.
-            </p>
-            <div className="mt-12 space-y-8">
-              {caseStudies.map((study, index) => (
-                <CaseStudy key={study.slug} study={study} index={index} />
-              ))}
-            </div>
+            <SectionHeading
+              id="projects-heading"
+              title="Experience"
+              description="기술 목록보다 어떤 제약을 발견했고 왜 그 해결책을 선택했는지에 집중한 대표 프로젝트입니다."
+            />
+            <CaseStudyTabs studies={caseStudies} />
           </div>
         </section>
 
         <ProjectArchive groups={archiveGroups} others={otherProjects} />
 
-        <section id="career" aria-labelledby="career-heading" className="scroll-mt-8 py-20 lg:py-28">
+        <section id="career" aria-labelledby="career-heading" className="scroll-mt-8 bg-white py-20 lg:py-28">
           <div className="mx-auto max-w-6xl px-5 sm:px-8 lg:px-10">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-700">Career</p>
-            <h2 id="career-heading" className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
-              경력 타임라인
-            </h2>
-            <p className="mt-5 max-w-3xl leading-7 text-slate-600">
-              개발 업무에서 출발해 데이터 연계, GIS, 현장 구축과 운영 안정화까지 역할을 확장했습니다.
-            </p>
+            <SectionHeading
+              id="career-heading"
+              title="Career"
+              description="개발 업무에서 출발해 데이터 연계, GIS, 현장 구축과 운영 안정화까지 역할을 확장했습니다."
+            />
             <ProjectGantt spans={projectSpans} from="2022-06" until="2026-10" />
             <CareerTimeline items={careerTimeline} />
           </div>
